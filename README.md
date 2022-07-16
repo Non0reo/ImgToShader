@@ -9,7 +9,7 @@ I recently made this tool that allows you to change the background color, the lo
 ## How does it works? 📄
 
 Go on the [website](https://non0reo.github.io/ImgToShader/). You will see one big canvas, some options, the `Generate` button, and the generated code.<br>
-Change the color of the element, hide them, or even add your own background. When you are done click on the `Generate` button and download the resource pack underneath.<br>
+Change the color of the elements, hide them, or even add your own background. When you are done, click on the `Generate` button and download the resource pack underneath.<br>
 The script convert the color that you have chosen for the elements and transcribe them in core shader GLSL code (the language for shaders)
 
 ### Specifications:
@@ -17,6 +17,7 @@ The script convert the color that you have chosen for the elements and transcrib
 * The checkbox "Enable black screen compatibility" allows you to make your rendering compatible with the normal background in addition to the back background that you can toggle in the accessibility options.<br><b>   → Warning:</b> This option only break one known game element, the spyglass two black stripes. I may resolve this bug as soon as possible. Until then, if you find another element that this option breaks, you can also let me know by opening a [Ticket](https://github.com/Non0reo/ImgToShader/issues)
 
 ## Word From The Dev 👤
+
 
 This tool was originaly made after seeing that we used to be able to change the mojang logo. As a fairly "new" Minecraft player (and map maker), I was a little bit disappointed when I saw that this trick was no longer possible. I had the idea for this project after seeing what optifine was even though alllowing to change the logo (and the background color)
 
