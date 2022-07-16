@@ -60,7 +60,7 @@ function generateCode() {
         let color = hexToDecimal(backgroundColor);
         console.log(backgroundColor.replace("#", ""), color);
 
-        generated += "\n\t" + createIfStatement("(color.r == 0.93725" + ((accessibilityCompatibility) ? " || color.rgb == vec3(0.0)) " : "") + " && color.a > 0.7", "fragColor = vec4(" + color.r + ", " + color.g + ", " + color.b + ", 1.0);") + "\n";
+        generated += "\n\t" + createIfStatement(((accessibilityCompatibility) ? "(color.r == 0.93725 || color.rgb == vec3(0.0))" : "color.r == 0.93725") + " && color.a > 0.7", "fragColor = vec4(" + color.r + ", " + color.g + ", " + color.b + ", 1.0);") + "\n";
     }
 
     //Change Loading Bar Color
