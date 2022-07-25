@@ -26,7 +26,8 @@ function loadImage(event) {
             boundingBox: [[shaderView.width/2 - img.naturalWidth/2, shaderView.height/2 - img.naturalHeight/2],
                         [shaderView.width/2 + img.naturalWidth/2, shaderView.height/2 - img.naturalHeight/2],
                         [shaderView.width/2 + img.naturalWidth/2, shaderView.height/2 + img.naturalHeight/2],
-                        [shaderView.width/2 - img.naturalWidth/2, shaderView.height/2 + img.naturalHeight/2]]
+                        [shaderView.width/2 - img.naturalWidth/2, shaderView.height/2 + img.naturalHeight/2]],
+            imageName: event.srcElement.files[0].name
         });
     
         reloadImageList();
@@ -83,7 +84,8 @@ function AddImageToList(img) {
                 AreCoordsNormalized: dataStack[selectedIndex].AreCoordsNormalized,
                 IsSizeLinked: dataStack[selectedIndex].IsSizeLinked,
                 imageRatio: dataStack[selectedIndex].imageRatio,
-                boundingBox: dataStack[selectedIndex].boundingBox
+                boundingBox: dataStack[selectedIndex].boundingBox,
+                imageName: dataStack[selectedIndex].imageName
             };
             addEventListenerToList();
         }
@@ -110,7 +112,8 @@ function AddImageToList(img) {
                 AreCoordsNormalized: actualDivData.AreCoordsNormalized,
                 IsSizeLinked: actualDivData.IsSizeLinked,
                 imageRatio: actualDivData.imageRatio,
-                boundingBox: actualDivData.boundingBox
+                boundingBox: actualDivData.boundingBox,
+                imageName: actualDivData.imageName
             };
 
             const addedDiv = AddImageToList(newImg); //return a div and therefore, can be added in the list
@@ -131,7 +134,8 @@ function AddImageToList(img) {
                 AreCoordsNormalized: actualDivData.AreCoordsNormalized,
                 IsSizeLinked: actualDivData.IsSizeLinked,
                 imageRatio: actualDivData.imageRatio,
-                boundingBox: actualDivData.boundingBox
+                boundingBox: actualDivData.boundingBox,
+                imageName: actualDivData.imageName
             };
 
             addEventListenerToList();

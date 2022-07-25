@@ -6,7 +6,9 @@ const generatedBoxLogo = document.getElementById("generatedCodeLogo");
 const downloadPack = document.getElementById("downloadPack");
 const warningText = document.getElementById("warningText");
 let generated;
+let generatedFunction;
 let generatedLogo;
+let generatedLogoFunction;
 let finalCode;
 let finalCodeLogo;
 
@@ -19,7 +21,10 @@ const startText = [
     "#version 150\n",
     "in vec4 vertexColor;\n",
     "uniform vec4 ColorModulator;\n",
-    "out vec4 fragColor;",,
+    "out vec4 fragColor;"
+].join("\n");
+
+const middleText = [
     "void main() {",
     "\tvec4 color = vertexColor;",
     "\tif (color.a == 0.0) {",
@@ -37,7 +42,10 @@ const startTextLogo = [
     "uniform sampler2D Sampler0;\n",
     "uniform vec4 ColorModulator;\n",
     "in vec2 texCoord0;\n",
-    "out vec4 fragColor;\n",
+    "out vec4 fragColor;\n"
+].join("\n");
+
+const middleTextLogo = [
     "void main() {",
     "\tvec4 color = texture(Sampler0, texCoord0);",
     "\tif (color.a == 0.0) {",
@@ -55,7 +63,9 @@ const endText = [
 function generateCode() {
     //Reseet the generated code
     generated = "";
+    generatedFunction = "";
     generatedLogo = "";
+    generatedLogoFunction = "";
     generatedBox.innerHTML = "";
     generatedBoxLogo.innerHTML = "";
 
@@ -81,6 +91,15 @@ function generateCode() {
     warningText.style.display = "none";
     fileModified = false;
 
+    //= Added Functions =//
+
+    for (let i = 0; i < imageStack.length; i++) {
+        generatedFunction += createFunction(dataStack[i].imageName.replace(".png", ""), addedFunctions[i].code);
+    }
+
+
+    //= Void Main() =//    
+
     //Change Background Color
     if (backgroundColor != "#EF323D" || !drawBackground) {
         let colorInfos = hexToDecimal(backgroundColor);
@@ -88,7 +107,7 @@ function generateCode() {
         console.log(backgroundColor.replace("#", ""), colorInfos);
 
 
-        generated += "\n\t" + createIfStatement(((accessibilityCompatibility) ? "(color.r == 239.0 / 255.0 || color.rgb == vec3(0.0))" : "color.r == 239.0 / 255.0") + " && color.a > 0.7", "fragColor = vec4(" + colorInfos.color.r + ", " + colorInfos.color.g + ", " + colorInfos.color.b + ", " + (colorInfos.IsAlphaChanged ? colorInfos.color.a : "color.a") + ");") + "\n";
+        generated += "\n\t" + createIfStatement(((accessibilityCompatibility) ? "(color.r == 239.0 / 255.0 || color.rgb == vec3(0.0))" : "color.r == 239.0 / 255.0") + " && color.a > 0.7", "fragColor = vec4(" + colorInfos.color.r + ", " + colorInfos.color.g + ", " + colorInfos.color.b + ", " + (colorInfos.IsAlphaChanged ? ("color.a - " + (1.0 - colorInfos.color.a)) : "color.a") + ");") + "\n";
     }
 
     //Change Loading Bar Color
@@ -100,7 +119,7 @@ function generateCode() {
         }
         console.log(loadingBarColor.replace("#", ""), colorInfos);
 
-        generated += "\n\t" + createIfStatement("color.r == 1.0 && color.a > 0.7", "fragColor = vec4(" + colorInfos.color.r + ", " + colorInfos.color.g + ", " + colorInfos.color.b + ", " + (colorInfos.IsAlphaChanged ? colorInfos.color.a : "color.a") + ");") + "\n";
+        generated += "\n\t" + createIfStatement("color.r == 1.0 && color.a > 0.7", "fragColor = vec4(" + colorInfos.color.r + ", " + colorInfos.color.g + ", " + colorInfos.color.b + ", " + (colorInfos.IsAlphaChanged ? ("color.a - " + (1.0 - colorInfos.color.a)) : "color.a") + ");") + "\n";
     }
 
     //Change the logo Color
@@ -109,12 +128,12 @@ function generateCode() {
         if (!drawLogo) colorInfos = {color: {r: "0.0", g: "0.0", b: "0.0", a: "0.0"}, IsAlphaChanged: true};
         console.log(mojangLogoColor.replace("#", ""), colorInfos.color);
 
-        generatedLogo += "\n\t" + createIfStatement("texture(Sampler0, vec2(0.0, 0.25)).r == 1.0", "fragColor = vec4(" + colorInfos.color.r + ", " + colorInfos.color.g + ", " + colorInfos.color.b + ", " + (colorInfos.IsAlphaChanged ? colorInfos.color.a : "color.a") + ");") + "\n";
+        generatedLogo += "\n\t" + createIfStatement("texture(Sampler0, vec2(0.0, 0.25)).r == 1.0", "fragColor = vec4(" + colorInfos.color.r + ", " + colorInfos.color.g + ", " + colorInfos.color.b + ", " + (colorInfos.IsAlphaChanged ? ("color.a - " + (1.0 - colorInfos.color.a)) : "color.a") + ");") + "\n";
     }
 
 
     //Make the final composite to generate the code
-    finalCode =  [startText, generated, endText].join("\n");
+    finalCode =  [startText, generatedFunction, middleText, generated, endText].join("\n");
     const code = document.createElement("code");
     code.innerHTML = finalCode;
     code.style.whiteSpace = "pre-wrap";
@@ -123,7 +142,7 @@ function generateCode() {
     hljs.highlightElement(generatedBox);
 
     //Logo specific file
-    finalCodeLogo =  [startTextLogo, generatedLogo, endText].join("\n");
+    finalCodeLogo =  [startTextLogo, generatedLogoFunction, middleTextLogo, generatedLogo, endText].join("\n");
     const codeLogo = document.createElement("code");
     codeLogo.innerHTML = finalCodeLogo;
     codeLogo.style.whiteSpace = "pre-wrap";
@@ -141,6 +160,14 @@ function createIfStatement(condition, code, IsElseIf) {
             "\t\t" + code,
             "\t}"
         ].join("\n");
+}
+
+function createFunction(name, code) {
+    return [
+        "void " + name + "() {",
+        "\t" + code,
+        "}"
+    ].join("\n");
 }
 
 function hexToDecimal(variable, devideBy) {
