@@ -236,7 +236,8 @@ function drawAddedPictures() {
             let maxX = Math.max(...cornerPos.map(element => element[0]));
             let maxY = Math.max(...cornerPos.map(element => element[1]));
 
-            dataStack[i].boundingBox = [[minX, minY], [maxX, minY], [maxX, maxY], [minX, maxY]]; //Define the bounding box of the image
+            //dataStack[i].boundingBox = [[minX, minY], [maxX, minY], [maxX, maxY], [minX, maxY]]; //Define the bounding box lines of the image
+            dataStack[i].boundingBox = {minX: minX, minY: minY, maxX: maxX, maxY: maxY}; //Define the bounding box of the image
         }
     }
 

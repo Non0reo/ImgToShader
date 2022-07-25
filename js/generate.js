@@ -94,6 +94,16 @@ function generateCode() {
     //= Added Functions =//
 
     for (let i = 0; i < imageStack.length; i++) {
+
+        let condition;
+        if (dataStack[i].AreCoordsNormalized) {
+            condition = "gl_FragCoord.x >= " + dataStack[i].boundingBox.minX + " && gl_FragCoord.x <= " + dataStack[i].boundingBox.maxX + " && gl_FragCoord.y >= " + dataStack[i].boundingBox.minY + " && gl_FragCoord.y <= " + dataStack[i].boundingBox.maxY;
+        }
+        else {
+            condition = "gl_FragCoord.x >= " + dataStack[i].boundingBox.minX / size.width + " && gl_FragCoord.x <= " + dataStack[i].boundingBox.maxX / size.width + " && gl_FragCoord.y >= " + dataStack[i].boundingBox.minY / size.height + " && gl_FragCoord.y <= " + dataStack[i].boundingBox.maxY / size.height;
+        }
+        let insideBoundingBox = createIfStatement(condition, "fragColor = vec4(1.0, 0.0, 0.0, 1.0);", false);
+
         generatedFunction += "\n" + createFunction(dataStack[i].imageName.replace(/.png|.jpg|.jpeg|.webp"/, ""), "fragColor = vec4(1.0, 0.0, 0.0, 1.0);") + "\n";
     }
 
