@@ -94,7 +94,7 @@ function generateCode() {
     //= Added Functions =//
 
     for (let i = 0; i < imageStack.length; i++) {
-        generatedFunction += "\n" + createFunction(dataStack[i].imageName.replace(".png", ""), "fragColor = vec4(1.0, 0.0, 0.0, 1.0);") + "\n";
+        generatedFunction += "\n" + createFunction(dataStack[i].imageName.replace(/.png|.jpg|.jpeg|.webp"/, ""), "fragColor = vec4(1.0, 0.0, 0.0, 1.0);") + "\n";
     }
 
 
