@@ -1,0 +1,387 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300&display=swap');
+
+body {
+    background-color: #303442;
+    font-family: 'Poppins', sans-serif;
+    color: white;
+    position: relative;
+}
+
+.pickr {
+    vertical-align: middle;
+    margin-bottom: 7px;
+    margin-left: 5px;
+}
+
+canvas#shaderView {
+    border: 6px solid rgb(255, 255, 255);
+    border-radius: 8px;
+    background-color: #EF323D;
+    margin-bottom: -7px;
+}
+
+div#outsideCanvas {
+    background-image: url("../assets/default/blank.png");
+    background-size: 5% 5%;
+    background-position: top;
+    background-repeat: repeat;
+    padding: 0px;
+    margin: 7px;
+    border-radius: 10px;
+}
+
+.parameters {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-around;
+    align-items: center;
+    margin: 100px;
+}
+
+div.generatorView {
+    border: 2px solid rgb(255, 255, 255);
+    width: fit-content;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+div.optionBar {
+    display: flex;
+    flex-direction: row;
+    /* align-items: center; */
+    width: fit-content;
+    max-height: fit-content;
+}
+
+div.settings {
+    border: 2px solid rgb(255, 255, 255);
+    width: fit-content;
+    padding: 7px;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+}
+
+div.topBtnDiv {
+    height: 100%;
+    text-align: right;
+}
+
+div.topBtnDiv button#goToTopBtnSettings {
+    width: 50px;
+    height: 50px;
+    background-image: url("../assets/default/icon/expand_less.png");
+    background-size: 25px 25px;
+    background-position: center;
+    background-repeat: no-repeat;
+    position: absolute;
+        bottom: 10px;
+        right: 10px;
+    border-radius: 25%;
+    display: none;
+}
+
+div#imageListBox {
+    /* border: 2px solid rgb(255, 0, 255); */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    flex-wrap: wrap;
+    justify-content: left;
+    width: 400px;
+}
+
+div#imageListBox label#uploadImage {
+    font-family: 'Poppins', sans-serif;
+    font-size: small;
+    border: 1px solid rgb(98, 98, 98);
+    border-radius: 5px;
+    background-color: rgb(242, 235, 235);
+    color: #000000;
+    padding: 1px;
+    margin: 20px;
+    width: 75%;
+    height: fit-content;
+    text-align: center;
+    -webkit-user-select: none;  
+    -moz-user-select: none;    
+    -ms-user-select: none;      
+    user-select: none;
+}
+
+div.selected {
+    background-color: #454958;
+}
+
+div.addedImgBox span.moveButton {
+    display: flex;
+    flex-direction: column;
+    padding-left: 5px;
+}
+
+div.addedImgBox span.moveButton button {
+    background-color: rgb(255, 255, 255);
+    border: 1px solid rgb(98, 98, 98);
+    border-radius: 5px;
+    color: rgb(98, 98, 98);
+    padding: 20px 15px;
+    margin: 1px;
+    width: fit-content;
+    height: fit-content;
+    text-align: center;
+    background-size: 30px 30px;
+    background-position: center;
+    background-repeat: no-repeat;
+}
+
+div.addedImgBox span.moveButton button.upButton {
+    background-image: url("../assets/default/icon/expand_less.png");
+}
+
+div.addedImgBox span.moveButton button.downButton {
+    background-image: url("../assets/default/icon/expand_more.png");
+}
+
+div.addedImgBox img.addedImg{
+    align-items: center;
+    width: 75px;
+    height: 75px;
+    margin: 7px;
+    margin-left: 20px;
+    border: 2px solid rgb(255, 255, 255);
+    border-radius: 8px;
+    -webkit-user-select: none;  
+    -moz-user-select: none;    
+    -ms-user-select: none;      
+    user-select: none;
+}
+
+div.addedImgBox {
+    outline: 2px solid rgb(255, 255, 255);
+    width: fit-content;
+    padding: 7px;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    flex-wrap: wrap;
+    justify-content: center;
+    vertical-align: middle;
+}
+
+div.addedImgBox button.removeImg {
+    padding: 5px 6px;
+    width: 45px;
+    height: 45px;
+    margin-left: 30px;
+    margin-right: 10px;
+    border-radius: 7px;
+    vertical-align: sub;
+    text-align: center;
+    filter: grayscale(100%);
+    border: 2px solid #000000;
+    transition: 0.5s;
+    background-image: url("../assets/default/icon/delete.png");
+    background-size: 25px 25px;
+    background-position: center;
+    background-repeat: no-repeat;
+}
+
+div.addedImgBox button.removeImg:hover {
+    filter: grayscale(0%);
+    border: 2px solid #EF323D;
+    transition: 0.5s;
+}
+
+div.addedImgBox button.duplicateImg {
+    padding-top: 5px;
+    padding-left: 5.5px;
+    width: 45px;
+    height: 45px;
+    margin-left: 0;
+    margin-right: 15px;
+    border-radius: 7px;
+    vertical-align: sub;
+    text-align: center;
+    border: 2px solid #000000;
+    transition: 0.5s;
+    background-image: url("../assets/default/icon/control_point_duplicate.png");
+    background-size: 25px 25px;
+    background-position: center;
+    background-repeat: no-repeat;
+}
+
+div.addedImgBox button.duplicateImg:hover {
+    border: 2px solid #3b3b3b;
+    background-color: #c6c6c6;
+    transition: 0.5s;
+}
+
+
+
+div.addedImgBox button img {
+    width: 25px;
+    height: 25px;
+}
+
+div.addedImgBox input.IsVisible {
+    width: 20px;
+    height: 20px;
+}
+
+div.settingsImage {
+    border: 2px solid rgb(255, 255, 255);
+    width: fit-content;
+    height: fit-content;
+    padding: 7px;
+    display: flex;
+    flex-direction: column;
+    /* position: absolute;
+    right: 0; */
+}
+
+div.settingsImage label.label-resize {
+    cursor: ew-resize;
+}
+
+div.settingsImage input#normalizeCoords {
+    margin-bottom: 20px;
+}
+
+div.settingsImage input#linkSize {
+    margin-bottom: 20px;
+}
+
+div.settingsImage input.numberBar {
+    width: 50px;
+    margin-right: 10px;
+}
+
+div.settingsImage button#horizontalAlign {
+    background-image: url("../assets/default/icon/align_horizontal_center.png");
+}
+
+div.settingsImage button#verticalAlign {
+    background-image: url("../assets/default/icon/align_vertical_center.png");
+}
+
+div.settingsImage button#horizontalExpand {
+    background-image: url("../assets/default/icon/horizontal_distribute.png");
+}
+
+div.settingsImage button#verticalExpand {
+    background-image: url("../assets/default/icon/vertical_distribute.png");
+}
+
+div.settingsImage button#resetRotation {
+    background-image: url("../assets/default/icon/rotate.png");
+    background-position: center;
+}
+
+div.settingsImage button.actionBtn {
+    width: 25px;
+    height: 25px;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: 25px 25px;
+    border: solid transparent;
+    border-radius: 10%;
+    background-color: transparent;
+    margin-right: 10px;
+    transition: 0.5s;
+}
+
+div.settingsImage button.actionBtn:hover {
+    background-color: #c6c6c6;
+    transition: 0.5s;
+}
+
+div.settingsImage button.actionBtn:active {
+    background-color: #888888;
+    transition: 0.1s;
+}
+
+
+button#generateButton {
+    margin-bottom: 7px;
+    width: 50%;
+    font-family: 'Poppins', sans-serif;
+    color: black;
+}
+
+div#generated {
+    border: 2px solid rgb(14, 17, 56);
+    background-color: rgb(27, 32, 43);
+    width: fit-content;
+    margin: 10px;
+    display: flex;
+    flex-direction: column;
+}
+
+div#generated div#generatedCodeDiv {
+    font-size: 1em;
+    padding: 10px 30px 10px 20px; 
+    line-height: 20px;
+}
+
+button#downloadPack {
+    background-color: rgb(78, 192, 78);
+    border-radius: 10px;
+    border: none;
+    font-family: 'Poppins', sans-serif;
+    font-weight: bold;
+    color: white;
+    font-size: 1.0em;
+    padding: 7px 10px;
+    margin: 15px 20px;
+    margin-bottom: 5px;
+    transition: 0.5s;
+    animation: glint 1s infinite;
+    display: none;
+}
+
+button#downloadPack:hover {
+    background-color: rgb(96, 215, 96);
+    padding: 10px 15px;
+    transition: 0.5s;
+    animation: glint 1s infinite;
+    cursor: pointer;
+}
+
+@keyframes glint {
+    0% {
+        box-shadow: 0 0 0 0 rgba(255, 255, 255, 0.4);
+    }
+    100% {
+        box-shadow: 0 0 0 10px rgba(255, 255, 255, 0);
+    }
+}
+
+
+button#downloadPack img {
+    width: 25px;
+    height: 25px;
+    vertical-align: middle;
+}
+
+p#warningText {
+    font-size: 0.8em;
+    margin-left: 15px;
+    margin-top: 20px;
+    display: none;
+}
+
+code#generatedCode {
+    color: white;
+    font-size: 1em;
+    padding: 10px 30px 10px 20px; 
+    line-height: 20px;
+    /* white-space: pre; */
+}
+
+.preventSelection {
+    -webkit-user-select: none;  
+    -moz-user-select: none;    
+    -ms-user-select: none;      
+    user-select: none;
+}
