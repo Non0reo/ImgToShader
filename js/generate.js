@@ -11,52 +11,53 @@ let generatedLogo;
 let generatedLogoFunction;
 let finalCode;
 let finalCodeLogo;
+let functionList = [];
 
 //Variables for storing the core code
-const startText = [
-    "/*",
-    " Generated from https://non0reo.github.io/ImgToShader/",
-    "*/",
-    "",
-    "#version 150\n",
-    "in vec4 vertexColor;\n",
-    "uniform vec4 ColorModulator;\n",
-    "out vec4 fragColor;"
-].join("\n");
 
-const middleText = [
-    "void main() {",
-    "\tvec4 color = vertexColor;",
-    "\tif (color.a == 0.0) {",
-    "\t\tdiscard;",
-    "\t}\n",
-    "\tfragColor = color * ColorModulator;"
-].join("\n");
+const startText = `/*
+ Generated from https://non0reo.github.io/ImgToShader/
+*/
 
-const startTextLogo = [
-    "/*",
-    " Generated from https://non0reo.github.io/ImgToShader/",
-    "*/",
-    "",
-    "#version 150\n",
-    "uniform sampler2D Sampler0;\n",
-    "uniform vec4 ColorModulator;\n",
-    "in vec2 texCoord0;\n",
-    "out vec4 fragColor;\n"
-].join("\n");
+#version 150
 
-const middleTextLogo = [
-    "void main() {",
-    "\tvec4 color = texture(Sampler0, texCoord0);",
-    "\tif (color.a == 0.0) {",
-    "\t\tdiscard;",
-    "\t}\n",
-    "\tfragColor = color * ColorModulator;"
-].join("\n");
+in vec4 vertexColor;
 
-const endText = [
-    "}"
-].join("\n");
+uniform vec4 ColorModulator;
+uniform vec4 ScreenSize;
+
+out vec4 fragColor;`;
+
+const middleText = `void main() {
+    vec4 color = vertexColor;
+    if (color.a == 0.0) {
+        discard;
+        }
+
+    fragColor = color * ColorModulator;`;
+
+const startTextLogo = `/*
+Generated from https://non0reo.github.io/ImgToShader/
+*/
+
+#version 150
+
+uniform sampler2D Sampler0;
+uniform vec4 ColorModulator;
+
+in vec2 texCoord0;
+
+out vec4 fragColor;`;
+
+const middleTextLogo = `void main() {
+    vec4 color = texture(Sampler0, texCoord0);
+    if (color.a == 0.0) {
+        discard;
+    }
+    
+    fragColor = color * ColorModulator;`;
+
+const endText = `}`;
 
 
 
@@ -68,11 +69,12 @@ function generateCode() {
     generatedLogoFunction = "";
     generatedBox.innerHTML = "";
     generatedBoxLogo.innerHTML = "";
+    functionList = [];
 
     //Dislay doawnload button
     downloadPack.style.display = "unset";
 
-    //Get the data from the canvas
+    /* //Get the data from the canvas
     const tempDrawLogo = drawLogo;
     const tempDrawLoadingBar = drawLoadingBar;
     drawLogo = false;
@@ -85,39 +87,75 @@ function generateCode() {
     //Restore the data
     drawLogo = tempDrawLogo;
     drawLoadingBar = tempDrawLoadingBar;
+    draw(); */
+
+    //= Added Functions =//
+
+    //Get the data from the canvas
+    const tempDrawLogo = drawLogo;
+    const tempDrawLoadingBar = drawLoadingBar;
+    drawLogo = false;
+    drawLoadingBar = false;
     draw();
+
+    for (let i = imageStack.length - 1; i >= 0; i--) {
+
+        ctx.clearRect(0, 0, size.width, size.height);
+        drawAddedPictures(i);
+
+        //let data = shaderView.toDataURL("image/png");
+        let dataPixel = ctx.getImageData(dataStack[i].boundingBox.minX, dataStack[i].boundingBox.minY, dataStack[i].boundingBox.maxX, dataStack[i].boundingBox.maxY);
+        let colorList = "";
+
+        let worker = new Worker("/js/worker.js");
+        worker.postMessage([dataPixel, dataStack[i]]);
+        worker.onmessage = function(event) {
+            //colorList += event.data + ",";
+            console.log(event.data);
+        }
+
+        console.log(dataPixel.data, colorList, dataPixel.data.length);
+
+        //console.log(data, dataPixel);
+        //window.open(data, "_blank");
+        //download(data, "image.png");
+
+
+
+        let condition;
+        if (dataStack[i].AreCoordsNormalized) {
+            condition = "gl_FragCoord.x >= " + dataStack[i].boundingBox.minX + " * ScreenSize.x / " + size.width + " && gl_FragCoord.x <= " + dataStack[i].boundingBox.maxX + " * ScreenSize.x / " + size.width + " && gl_FragCoord.y >= " + dataStack[i].boundingBox.minY + " * ScreenSize.y / " + size.height + " && gl_FragCoord.y <= " + dataStack[i].boundingBox.maxY + " * ScreenSize.y / " + size.height;
+        }
+        else {
+            condition = "gl_FragCoord.x >= " + dataStack[i].boundingBox.minX + " && gl_FragCoord.x <= " + dataStack[i].boundingBox.maxX + " && gl_FragCoord.y >= " + dataStack[i].boundingBox.minY + " && gl_FragCoord.y <= " + dataStack[i].boundingBox.maxY;
+        }
+        let insideBoundingBox = createIfStatement(condition, "fragColor = vec4(1.0, 0.0, 0.0, color.a);", false);
+
+        let functionName = dataStack[i].imageName.replace(/.png|.jpg|.jpeg|.webp"/, "");
+        functionList.push(functionName);
+        generatedFunction += "\n" + createFunction(functionName, insideBoundingBox) + "\n";
+    }
+
+    //Restore the data
+    drawLogo = tempDrawLogo;
+    drawLoadingBar = tempDrawLoadingBar;
+    draw();
+
 
     //Reset the warning text
     warningText.style.display = "none";
     fileModified = false;
-
-    //= Added Functions =//
-
-    for (let i = 0; i < imageStack.length; i++) {
-
-        let condition;
-        if (dataStack[i].AreCoordsNormalized) {
-            condition = "gl_FragCoord.x >= " + dataStack[i].boundingBox.minX + " && gl_FragCoord.x <= " + dataStack[i].boundingBox.maxX + " && gl_FragCoord.y >= " + dataStack[i].boundingBox.minY + " && gl_FragCoord.y <= " + dataStack[i].boundingBox.maxY;
-        }
-        else {
-            condition = "gl_FragCoord.x >= " + dataStack[i].boundingBox.minX / size.width + " && gl_FragCoord.x <= " + dataStack[i].boundingBox.maxX / size.width + " && gl_FragCoord.y >= " + dataStack[i].boundingBox.minY / size.height + " && gl_FragCoord.y <= " + dataStack[i].boundingBox.maxY / size.height;
-        }
-        let insideBoundingBox = createIfStatement(condition, "fragColor = vec4(1.0, 0.0, 0.0, 1.0);", false);
-
-        generatedFunction += "\n" + createFunction(dataStack[i].imageName.replace(/.png|.jpg|.jpeg|.webp"/, ""), "fragColor = vec4(1.0, 0.0, 0.0, 1.0);") + "\n";
-    }
-
 
     //= Void Main() =//    
 
     //Change Background Color
     if (backgroundColor != "#EF323D" || !drawBackground) {
         let colorInfos = hexToDecimal(backgroundColor);
-        if (!drawBackground) colorInfos = {color: {r: "0.0", g: "0.0", b: "0.0", a: "0.0"}, IsAlphaChanged: true};
+        if (!drawBackground) colorInfos = {color: {r: "0.0", g: "0.0", b: "0.0", a: "0.0"}, IsAlphaChanged: false};
         console.log(backgroundColor.replace("#", ""), colorInfos);
 
-
-        generated += "\n\t" + createIfStatement(((accessibilityCompatibility) ? "(color.r == 239.0 / 255.0 || color.rgb == vec3(0.0))" : "color.r == 239.0 / 255.0") + " && color.a > 0.7", "fragColor = vec4(" + colorInfos.color.r + ", " + colorInfos.color.g + ", " + colorInfos.color.b + ", " + (colorInfos.IsAlphaChanged ? ("color.a - " + (1.0 - colorInfos.color.a)) : "color.a") + ");") + "\n";
+        let alpha = (drawBackground) ? (colorInfos.IsAlphaChanged ? ("color.a - " + ((1.0 - colorInfos.color.a))) : "color.a") : "0.0";
+        generated += "\n\t" + createIfStatement(((accessibilityCompatibility) ? "(color.r == 239.0 / 255.0 || color.rgb == vec3(0.0))" : "color.r == 239.0 / 255.0") + " && color.a > 0.7", "fragColor = vec4(" + colorInfos.color.r + ", " + colorInfos.color.g + ", " + colorInfos.color.b + ", " + alpha + ");") + "\n";
     }
 
     //Change Loading Bar Color
@@ -125,27 +163,38 @@ function generateCode() {
         let colorInfos = hexToDecimal(loadingBarColor);
         if (!drawLoadingBar) {
             if (drawBackground) colorInfos = hexToDecimal(backgroundColor);
-            else colorInfos = {color: {r: "0.0", g: "0.0", b: "0.0", a: "0.0"}, IsAlphaChanged: true};
+            else colorInfos = {color: {r: "0.0", g: "0.0", b: "0.0", a: "0.0"}, IsAlphaChanged: false};
         }
         console.log(loadingBarColor.replace("#", ""), colorInfos);
 
-        generated += "\n\t" + createIfStatement("color.r == 1.0 && color.a > 0.7", "fragColor = vec4(" + colorInfos.color.r + ", " + colorInfos.color.g + ", " + colorInfos.color.b + ", " + (colorInfos.IsAlphaChanged ? ("color.a - " + (1.0 - colorInfos.color.a)) : "color.a") + ");") + "\n";
+        //let alpha = (drawLoadingBar) ? (colorInfos.IsAlphaChanged ? ("color.a - " + ((1.0 - colorInfos.color.a))) : "color.a") : "0.0";
+        let alpha;
+        if (drawLoadingBar) {
+            if (colorInfos.IsAlphaChanged) alpha = "color.a - " + ((1.0 - colorInfos.color.a));
+            else alpha = "color.a";
+        } else {
+            if (drawBackground) alpha = "color.a";
+            else alpha = "0.0";
+        }
+
+        generated += "\n\t" + createIfStatement("color.r == 1.0 && color.a > 0.7", "fragColor = vec4(" + colorInfos.color.r + ", " + colorInfos.color.g + ", " + colorInfos.color.b + ", " + alpha + ");") + "\n";
     }
 
-    //Change the logo Color
+    //Change the Logo Color
     if (mojangLogoColor != "#ffffff" || !drawLogo) {
         let colorInfos = hexToDecimal(mojangLogoColor, 2);
-        if (!drawLogo) colorInfos = {color: {r: "0.0", g: "0.0", b: "0.0", a: "0.0"}, IsAlphaChanged: true};
+        if (!drawLogo) colorInfos = {color: {r: "0.0", g: "0.0", b: "0.0", a: "0.0"}, IsAlphaChanged: false};
         console.log(mojangLogoColor.replace("#", ""), colorInfos.color);
 
-        generatedLogo += "\n\t" + createIfStatement("texture(Sampler0, vec2(0.0, 0.25)).r == 1.0", "fragColor = vec4(" + colorInfos.color.r + ", " + colorInfos.color.g + ", " + colorInfos.color.b + ", " + (colorInfos.IsAlphaChanged ? ("color.a - " + (1.0 - colorInfos.color.a)) : "color.a") + ");") + "\n";
+        let alpha = (drawLogo) ? (colorInfos.IsAlphaChanged ? ("color.a - " + ((1.0 - colorInfos.color.a))) : "color.a") : "0.0";
+        generatedLogo += "\n\t" + createIfStatement("texture(Sampler0, vec2(0.0, 0.25)).r == 1.0", "fragColor = vec4(" + colorInfos.color.r + ", " + colorInfos.color.g + ", " + colorInfos.color.b + ", " + alpha + ");") + "\n";
     }
 
 
     //Make the final composite to generate the code
     finalCode =  [startText, generatedFunction, middleText, generated, endText].join("\n");
     const code = document.createElement("code");
-    code.innerHTML = finalCode;
+    code.innerHTML = escapeHtml(finalCode);
     code.style.whiteSpace = "pre-wrap";
     code.style.paddingLeft = "0px";
     generatedBox.appendChild(code);
@@ -154,7 +203,7 @@ function generateCode() {
     //Logo specific file
     finalCodeLogo =  [startTextLogo, generatedLogoFunction, middleTextLogo, generatedLogo, endText].join("\n");
     const codeLogo = document.createElement("code");
-    codeLogo.innerHTML = finalCodeLogo;
+    codeLogo.innerHTML = escapeHtml(finalCodeLogo);
     codeLogo.style.whiteSpace = "pre-wrap";
     codeLogo.style.paddingLeft = "0px";
     generatedBoxLogo.appendChild(codeLogo);
@@ -164,7 +213,8 @@ function generateCode() {
 }
 
 //Create if statement
-function createIfStatement(condition, code, IsElseIf) {
+function createIfStatement(condition, code, IsElseIf, IsOneLine) {
+    if (IsOneLine) return ((IsElseIf) ? "else " : "") + "if (" + condition + ") " + code;
         return [
             ((IsElseIf) ? "else " : "") + "if (" + condition + ") {",
             "\t\t" + code,
@@ -214,6 +264,18 @@ function hexToDecimal(variable, devideBy) {
     anchor.addEventListener('submit', handleForm);
     document.body.removeChild(anchor);
 }; */
+
+function escapeHtml(str){
+    return new Option(str).innerHTML;
+}
+
+
+function generateNumberFromSeed(seed) {
+    let cripto = new Crypto();
+    let number = cripto.md5(seed);
+    return parseInt(number.substring(0, 8), 16);
+}
+
 function download(data, filename, type) {
     var file = new Blob([data], {type: type});
     if (window.navigator.msSaveOrOpenBlob) // IE10+
@@ -234,24 +296,16 @@ function download(data, filename, type) {
 
 const DownlodPreparation = () => {
 
-    const packMcmeta = [
-        "{",
-        "\t\"pack\": {",
-        "\t\t\"pack_format\": 10,",
-        "\t\t\"description\": {",
-        "\t\t\t\"text\": \"Background loading screen\",",
-        "\t\t\t\"clickEvent\": {",
-        "\t\t\t\"action\": \"open_url\",",
-        "\t\t\t\"value\": \"https://non0reo.github.io/ImgToShader/\"",
-        "\t\t\t},",
-        "\t\t\t\"hoverEvent\": {",
-        "\t\t\t\"action\": \"show_text\",",
-        "\t\t\t\"value\": \"By Nonoreo\"",
-        "\t\t\t}",
-        "\t\t}",
-        "\t}",
-        "}"
-    ].join("\n");
+    const packMcmeta = `{
+                            "pack": {
+                                "pack_format": 10,
+                                "description": {
+                                    "text": "Background loading screen"
+                                }
+                            }
+                        }`;
+
+
 
     console.log(packMcmeta);
     zip = new JSZip();

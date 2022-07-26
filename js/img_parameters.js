@@ -117,6 +117,7 @@ elementRotationParam.addEventListener("input", function(){
 normalizeCoordsParam.addEventListener("input", function(){
     dataStack[selected].AreCoordsNormalized = normalizeCoordsParam.checked;
     draw();
+    displayWaningText();
 });
 
 linkSizeParam.addEventListener("input", function(){
@@ -128,6 +129,7 @@ linkSizeParam.addEventListener("input", function(){
         elementHeightParam.disabled = false;
     }
     draw();
+    displayWaningText();
 });
 
 document.addEventListener("mouseup", function(){
