@@ -104,7 +104,7 @@ function generateCode() {
         drawAddedPictures(i);
 
         //let data = shaderView.toDataURL("image/png");
-        let dataPixel = ctx.getImageData(dataStack[i].boundingBox.minX, dataStack[i].boundingBox.minY, dataStack[i].boundingBox.maxX, dataStack[i].boundingBox.maxY);
+        let dataPixel = ctx.getImageData(dataStack[i].boundingBox.minX, dataStack[i].boundingBox.minY, dataStack[i].boundingBox.maxX - dataStack[i].boundingBox.minX, dataStack[i].boundingBox.maxY - dataStack[i].boundingBox.minY);
         let colorList = "";
 
         let worker = new Worker("/js/worker.js");

@@ -1,4 +1,5 @@
-const DIVISION_HEIGHT = 4;
+const DIVISION_HEIGHT = 64;
+//Add color presision
 
 onmessage = function(e) {
     let colorData = e.data[0];
@@ -11,16 +12,46 @@ onmessage = function(e) {
     console.log(e, colorData, colorData.data.length)
 
     
-    for (let i = 0; i < DIVISION_HEIGHT; i += DIVISION_HEIGHT) {
-        let colorList = "";
-        for (let j = colorDataDivided * i; j < colorDataDivided * (i + 1); j += 4) { //Iterate through the pixels (rgba) throught a divided part of the image
+    for (let i = 0; i < DIVISION_HEIGHT; i += 1) {
+        let resultList = [];
+        let colorList = [];
 
-            if (j + 3 == 0) continue;
-            console.log(colorData.data[j] + " " + colorData.data[j + 1] + " " + colorData.data[j + 2] + " " + colorData.data[j + 3]);
-            colorList += createIfStatement( "test", `fragColor = vec4(${colorData.data[j]}, ${colorData.data[j + 1]}, ${colorData.data[j + 2]}, color.a);`, (j == 0) ? false : true, true) + "\n";   
+        console.log("------- NEW SECTION -------")
+        colorDefine: for (let j = colorDataDivided * i; j < colorDataDivided * (i + 1); j += 4) { //Iterate through the pixels (rgba) throught a divided part of the image
+
+            
+            console.log(j + ": " + colorData.data[j] + " " + colorData.data[j + 1] + " " + colorData.data[j + 2] + " " + colorData.data[j + 3], j / 4 % colorData.width, j / 4 % colorData.height);
+            if (colorData.data[j + 3] == 0) continue colorDefine;
+            //if (colorList[j - 4] == colorList)
+            let pixelPosition = {
+                fromX: (j / 4 % colorData.width) + imageData.boundingBox.minX,
+                fromY: (j / 4 % colorData.height) + imageData.boundingBox.minY,
+                toX: ((j + 4) / 4 % colorData.width) + imageData.boundingBox.minX,
+                toY: ((j + 4) / 4 % colorData.height) + imageData.boundingBox.minY
+            }
+
+            //If the last pixel is the same as the current pixel, remove the last pixel and add the current pixel with a bigger reach
+            if (colorList.length > 0) {
+                //const search = colorList.length - 1;
+                //console.log(j, colorData.data[j], colorList.length, search, (j / 4), - 1 -((j / 4) - colorList.length - (j / 4)), (j / 4)/* colorList[(j / 4) - 1][0] */ /* colorList[((j - 4) / 4) - 1] */)
+
+                if (colorData.data[j] == colorList[colorList.length - 1][0] && colorData.data[j + 1] == colorList[colorList.length - 1][1] && colorData.data[j + 2] == colorList[colorList.length - 1][2] && colorData.data[j + 3] == colorList[colorList.length - 1][3]) {
+                    
+                    //remove last elmement of the lists and add the new one with the pixel position 'from' keeped the same
+                    let removedElement = colorList.pop();
+                    resultList.pop();
+                    
+                    pixelPosition.fromX = removedElement[4].fromX;
+                    pixelPosition.fromY = removedElement[4].fromY;
+                }
+            }
+
+            colorList.push([colorData.data[j], colorData.data[j + 1], colorData.data[j + 2], colorData.data[j + 3], pixelPosition]);
+            resultList.push(createIfStatement( "test", `fragColor = vec4(${colorData.data[j]}, ${colorData.data[j + 1]}, ${colorData.data[j + 2]}, color.a);`, (j == (colorDataDivided * i) + 4) ? false : true, true) + "\n");
+            //console.log("added", colorList); 
         }
 
-        dividedColection.push(createIfStatement(`gl_FragCoord.y <= ${imageData.boundingBox.minY + chunkSizeHeight * i} && gl_FragCoord.y >= ${imageData.boundingBox.minY + chunkSizeHeight * (i + 1)}`, colorList, (i == 0) ? false : true, false));
+        dividedColection.push(createIfStatement(`gl_FragCoord.y <= ${imageData.boundingBox.minY + chunkSizeHeight * i} && gl_FragCoord.y >= ${imageData.boundingBox.minY + chunkSizeHeight * (i + 1)}`, resultList.join(""), (i == 0) ? false : true, false));
     }
 
 
