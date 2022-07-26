@@ -1,5 +1,5 @@
-const DIVISION_HEIGHT = 64;
-//Add color presision
+const DIVISION_HEIGHT = 4;
+//Add color presision (compresion)
 
 onmessage = function(e) {
     let colorData = e.data[0];
@@ -47,7 +47,7 @@ onmessage = function(e) {
             }
 
             colorList.push([colorData.data[j], colorData.data[j + 1], colorData.data[j + 2], colorData.data[j + 3], pixelPosition]);
-            resultList.push(createIfStatement( "test", `fragColor = vec4(${colorData.data[j]}, ${colorData.data[j + 1]}, ${colorData.data[j + 2]}, color.a);`, (j == (colorDataDivided * i) + 4) ? false : true, true) + "\n");
+            resultList.push(createIfStatement(`gl_FragCoord.y <= ${pixelPosition.fromX} && gl_FragCoord.y <= ${pixelPosition.fromY} && gl_FragCoord.y <= ${pixelPosition.toX} && gl_FragCoord.y <= ${pixelPosition.toY}`, `fragColor = vec4(${colorData.data[j]}, ${colorData.data[j + 1]}, ${colorData.data[j + 2]}, color.a);`, (j == (colorDataDivided * i) + 4) ? false : true, true) + "\n");
             //console.log("added", colorList); 
         }
 
@@ -73,7 +73,14 @@ function createIfStatement(condition, code, IsElseIf, IsOneLine) {
         ].join("\n");
 }
 
+function ColorsAreClose(ColorA, ColorB, threshold)
+{
 
+    /* let r = (int)a.R - z.R,
+        g = (int)a.G - z.G,
+        b = (int)a.B - z.B;
+    return (r*r + g*g + b*b) <= threshold*threshold; */
+}
 
 
 
