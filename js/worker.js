@@ -58,7 +58,7 @@ onmessage = function(e) {
             //console.log("added", colorList); 
         }
 
-        dividedColection.push(`${createIfStatement(`gl_FragCoord.y <= ${imageData.boundingBox.minY + chunkSizeHeight * i} && gl_FragCoord.y >= ${imageData.boundingBox.minY + chunkSizeHeight * (i + 1)}`, resultList.join(""), (i == 0) ? false : true, false)}`);
+        dividedColection.push(`${createIfStatement(`gl_FragCoord.y >= ${imageData.boundingBox.minY + chunkSizeHeight * i} && gl_FragCoord.y <= ${imageData.boundingBox.minY + chunkSizeHeight * (i + 1)}`, resultList.join(""), (i == 0) ? false : true, false)}`);
     }
 
 
