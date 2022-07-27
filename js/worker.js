@@ -1,5 +1,5 @@
 const DIVISION_HEIGHT = 16;
-const COLOR_PROXIMITY_THRESHOLD = 5;
+const COLOR_PROXIMITY_THRESHOLD = 15;
 //Add color presision (compresion)
 
 onmessage = function(e) {
@@ -10,12 +10,14 @@ onmessage = function(e) {
 
     const colorDataDivided = colorData.data.length / DIVISION_HEIGHT;
     let dividedColection = [];
+    let resultList = [];
+    let colorList = [];
     console.log(e, colorData, colorData.data.length)
 
     
     for (let i = 0; i < DIVISION_HEIGHT; i += 1) {
-        let resultList = [];
-        let colorList = [];
+        resultList = [];
+        colorList = [];
 
         console.log("------- NEW SECTION -------")
         colorDefine: for (let j = colorDataDivided * i; j < colorDataDivided * (i + 1); j += 4) { //Iterate through the pixels (rgba) throught a divided part of the image
@@ -52,30 +54,28 @@ onmessage = function(e) {
             }
 
             colorList.push([colorData.data[j], colorData.data[j + 1], colorData.data[j + 2], colorData.data[j + 3], pixelPosition]);
-            resultList.push(createIfStatement(`gl_FragCoord.y <= ${pixelPosition.fromX} && gl_FragCoord.y <= ${pixelPosition.fromY} && gl_FragCoord.y <= ${pixelPosition.toX} && gl_FragCoord.y <= ${pixelPosition.toY}`, `fragColor = vec4(${colorData.data[j]}, ${colorData.data[j + 1]}, ${colorData.data[j + 2]}, color.a);`, (resultList.length > 0) ? true : false, true) + "\n");
+            resultList.push(`${createIfStatement(`gl_FragCoord.x >= ${pixelPosition.fromX} && gl_FragCoord.y >= ${pixelPosition.fromY} && gl_FragCoord.x <= ${pixelPosition.toX} && gl_FragCoord.y <= ${pixelPosition.toY}`, `fragColor = vec4(${colorData.data[j]}, ${colorData.data[j + 1]}, ${colorData.data[j + 2]}, color.a);`, (resultList.length > 0) ? true : false, true)}\n`);
             //console.log("added", colorList); 
         }
 
-        dividedColection.push(createIfStatement(`gl_FragCoord.y <= ${imageData.boundingBox.minY + chunkSizeHeight * i} && gl_FragCoord.y >= ${imageData.boundingBox.minY + chunkSizeHeight * (i + 1)}`, resultList.join(""), (i == 0) ? false : true, false));
+        dividedColection.push(`${createIfStatement(`gl_FragCoord.y <= ${imageData.boundingBox.minY + chunkSizeHeight * i} && gl_FragCoord.y >= ${imageData.boundingBox.minY + chunkSizeHeight * (i + 1)}`, resultList.join(""), (i == 0) ? false : true, false)}`);
     }
 
 
     console.log(dividedColection);
-    /* this.postMessage({
-        result: result,
-        colorList: colorList
-    }); */
+    this.postMessage({
+        result: dividedColection,
+        //colorList: colorList
+    });
 }
 
 
 //Create if statement
 function createIfStatement(condition, code, IsElseIf, IsOneLine) {
-    if (IsOneLine) return ((IsElseIf) ? "else " : "") + "if (" + condition + ") " + code;
-        return [
-            ((IsElseIf) ? "else " : "") + "if (" + condition + ") {",
-            "\t\t" + code,
-            "\t}"
-        ].join("\n");
+    if (IsOneLine) return `${(IsElseIf) ? "\t\t\telse " : ""}if (${condition}) ${code}`;
+        return `${(IsElseIf) ? "\t\telse " : ""}if (${condition}) {
+                \t${code}
+                }`;
 }
 
 function colorProximity(ColorA, ColorB, threshold)

@@ -51,9 +51,7 @@ out vec4 fragColor;`;
 
 const middleTextLogo = `void main() {
     vec4 color = texture(Sampler0, texCoord0);
-    if (color.a == 0.0) {
-        discard;
-    }
+    if (color.a == 0.0) discard;
     
     fragColor = color * ColorModulator;`;
 
@@ -61,7 +59,7 @@ const endText = `}`;
 
 
 
-function generateCode() {
+async function generateCode() {
     //Reseet the generated code
     generated = "";
     generatedFunction = "";
@@ -98,118 +96,99 @@ function generateCode() {
     drawLoadingBar = false;
     draw();
 
-    for (let i = imageStack.length - 1; i >= 0; i--) {
+    //Wait for all data in the function to be loaded
+    //let promise = new Promise(resolve => setTimeout(() => resolve("done!"), 1000)/* ImagesData() */);
+    await ImagesData(function() {
+        console.log("All data loaded");
 
-        ctx.clearRect(0, 0, size.width, size.height);
-        drawAddedPictures(i);
+        //Restore the data
+        drawLogo = tempDrawLogo;
+        drawLoadingBar = tempDrawLoadingBar;
+        draw();
 
-        //let data = shaderView.toDataURL("image/png");
-        let dataPixel = ctx.getImageData(dataStack[i].boundingBox.minX, dataStack[i].boundingBox.minY, dataStack[i].boundingBox.maxX - dataStack[i].boundingBox.minX, dataStack[i].boundingBox.maxY - dataStack[i].boundingBox.minY);
-        let colorList = "";
 
-        let worker = new Worker("/js/worker.js");
-        worker.postMessage([dataPixel, dataStack[i]]);
-        worker.onmessage = function(event) {
-            //colorList += event.data + ",";
-            console.log(event.data);
+        //Reset the warning text
+        warningText.style.display = "none";
+        fileModified = false;
+
+        //= Void Main() =//    
+
+        //Change Background Color
+        if (backgroundColor != "#EF323D" || !drawBackground) {
+            let colorInfos = hexToDecimal(backgroundColor);
+            if (!drawBackground) colorInfos = {color: {r: "0.0", g: "0.0", b: "0.0", a: "0.0"}, IsAlphaChanged: false};
+            console.log(backgroundColor.replace("#", ""), colorInfos);
+
+            let alpha = (drawBackground) ? (colorInfos.IsAlphaChanged ? ("color.a - " + ((1.0 - colorInfos.color.a))) : "color.a") : "0.0";
+            generated += "\n\t" + createIfStatement(((accessibilityCompatibility) ? "(color.r == 239.0 / 255.0 || color.rgb == vec3(0.0))" : "color.r == 239.0 / 255.0") + " && color.a > 0.7", "fragColor = vec4(" + colorInfos.color.r + ", " + colorInfos.color.g + ", " + colorInfos.color.b + ", " + alpha + ");") + "\n";
         }
 
-        console.log(dataPixel.data, colorList, dataPixel.data.length);
+        //Change Loading Bar Color
+        if (loadingBarColor != "#ffffff" || !drawLoadingBar) {
+            let colorInfos = hexToDecimal(loadingBarColor);
+            if (!drawLoadingBar) {
+                if (drawBackground) colorInfos = hexToDecimal(backgroundColor);
+                else colorInfos = {color: {r: "0.0", g: "0.0", b: "0.0", a: "0.0"}, IsAlphaChanged: false};
+            }
+            console.log(loadingBarColor.replace("#", ""), colorInfos);
 
-        //console.log(data, dataPixel);
-        //window.open(data, "_blank");
-        //download(data, "image.png");
+            //let alpha = (drawLoadingBar) ? (colorInfos.IsAlphaChanged ? ("color.a - " + ((1.0 - colorInfos.color.a))) : "color.a") : "0.0";
+            let alpha;
+            if (drawLoadingBar) {
+                if (colorInfos.IsAlphaChanged) alpha = "color.a - " + ((1.0 - colorInfos.color.a));
+                else alpha = "color.a";
+            } else {
+                if (drawBackground) alpha = "color.a";
+                else alpha = "0.0";
+            }
+
+            generated += "\n\t" + createIfStatement("color.r == 1.0 && color.a > 0.7", "fragColor = vec4(" + colorInfos.color.r + ", " + colorInfos.color.g + ", " + colorInfos.color.b + ", " + alpha + ");") + "\n";
+        }
+
+        //Change the Logo Color
+        if (mojangLogoColor != "#ffffff" || !drawLogo) {
+            let colorInfos = hexToDecimal(mojangLogoColor, 2);
+            if (!drawLogo) colorInfos = {color: {r: "0.0", g: "0.0", b: "0.0", a: "0.0"}, IsAlphaChanged: false};
+            console.log(mojangLogoColor.replace("#", ""), colorInfos.color);
+
+            let alpha = (drawLogo) ? (colorInfos.IsAlphaChanged ? ("color.a - " + ((1.0 - colorInfos.color.a))) : "color.a") : "0.0";
+            generatedLogo += "\n\t" + createIfStatement("texture(Sampler0, vec2(0.0, 0.25)).r == 1.0", "fragColor = vec4(" + colorInfos.color.r + ", " + colorInfos.color.g + ", " + colorInfos.color.b + ", " + alpha + ");") + "\n";
+        }
 
 
-
-        let condition;
-        if (dataStack[i].AreCoordsNormalized) {
-            condition = "gl_FragCoord.x >= " + dataStack[i].boundingBox.minX + " * ScreenSize.x / " + size.width + " && gl_FragCoord.x <= " + dataStack[i].boundingBox.maxX + " * ScreenSize.x / " + size.width + " && gl_FragCoord.y >= " + dataStack[i].boundingBox.minY + " * ScreenSize.y / " + size.height + " && gl_FragCoord.y <= " + dataStack[i].boundingBox.maxY + " * ScreenSize.y / " + size.height;
+        //Make the final composite to generate the code
+        finalCode =  [startText, generatedFunction, middleText, generated, endText].join("\n");
+        if (finalCode.length < 1000000) { //Display rerul only if the string is less than 1000000 characters
+            const code = document.createElement("code");
+            code.innerHTML = escapeHtml(finalCode);
+            code.style.whiteSpace = "pre-wrap";
+            code.style.paddingLeft = "0px";
+            generatedBox.appendChild(code);
+            hljs.highlightElement(generatedBox);
         }
         else {
-            condition = "gl_FragCoord.x >= " + dataStack[i].boundingBox.minX + " && gl_FragCoord.x <= " + dataStack[i].boundingBox.maxX + " && gl_FragCoord.y >= " + dataStack[i].boundingBox.minY + " && gl_FragCoord.y <= " + dataStack[i].boundingBox.maxY;
-        }
-        let insideBoundingBox = createIfStatement(condition, "fragColor = vec4(1.0, 0.0, 0.0, color.a);", false);
-
-        let functionName = dataStack[i].imageName.replace(/.png|.jpg|.jpeg|.webp"/, "");
-        functionList.push(functionName);
-        generatedFunction += "\n" + createFunction(functionName, insideBoundingBox) + "\n";
-    }
-
-    //Restore the data
-    drawLogo = tempDrawLogo;
-    drawLoadingBar = tempDrawLoadingBar;
-    draw();
-
-
-    //Reset the warning text
-    warningText.style.display = "none";
-    fileModified = false;
-
-    //= Void Main() =//    
-
-    //Change Background Color
-    if (backgroundColor != "#EF323D" || !drawBackground) {
-        let colorInfos = hexToDecimal(backgroundColor);
-        if (!drawBackground) colorInfos = {color: {r: "0.0", g: "0.0", b: "0.0", a: "0.0"}, IsAlphaChanged: false};
-        console.log(backgroundColor.replace("#", ""), colorInfos);
-
-        let alpha = (drawBackground) ? (colorInfos.IsAlphaChanged ? ("color.a - " + ((1.0 - colorInfos.color.a))) : "color.a") : "0.0";
-        generated += "\n\t" + createIfStatement(((accessibilityCompatibility) ? "(color.r == 239.0 / 255.0 || color.rgb == vec3(0.0))" : "color.r == 239.0 / 255.0") + " && color.a > 0.7", "fragColor = vec4(" + colorInfos.color.r + ", " + colorInfos.color.g + ", " + colorInfos.color.b + ", " + alpha + ");") + "\n";
-    }
-
-    //Change Loading Bar Color
-    if (loadingBarColor != "#ffffff" || !drawLoadingBar) {
-        let colorInfos = hexToDecimal(loadingBarColor);
-        if (!drawLoadingBar) {
-            if (drawBackground) colorInfos = hexToDecimal(backgroundColor);
-            else colorInfos = {color: {r: "0.0", g: "0.0", b: "0.0", a: "0.0"}, IsAlphaChanged: false};
-        }
-        console.log(loadingBarColor.replace("#", ""), colorInfos);
-
-        //let alpha = (drawLoadingBar) ? (colorInfos.IsAlphaChanged ? ("color.a - " + ((1.0 - colorInfos.color.a))) : "color.a") : "0.0";
-        let alpha;
-        if (drawLoadingBar) {
-            if (colorInfos.IsAlphaChanged) alpha = "color.a - " + ((1.0 - colorInfos.color.a));
-            else alpha = "color.a";
-        } else {
-            if (drawBackground) alpha = "color.a";
-            else alpha = "0.0";
+            const code = document.createElement("code");
+            code.innerHTML = escapeHtml("The code that you've generated is too long to display. Please download it.");
+            code.style.whiteSpace = "pre-wrap";
+            code.style.paddingLeft = "0px";
+            generatedBox.appendChild(code);
+            hljs.highlightElement(generatedBox);
         }
 
-        generated += "\n\t" + createIfStatement("color.r == 1.0 && color.a > 0.7", "fragColor = vec4(" + colorInfos.color.r + ", " + colorInfos.color.g + ", " + colorInfos.color.b + ", " + alpha + ");") + "\n";
-    }
+        //Logo specific file
+        finalCodeLogo =  [startTextLogo, generatedLogoFunction, middleTextLogo, generatedLogo, endText].join("\n");
+        const codeLogo = document.createElement("code");
+        codeLogo.innerHTML = escapeHtml(finalCodeLogo);
+        codeLogo.style.whiteSpace = "pre-wrap";
+        codeLogo.style.paddingLeft = "0px";
+        generatedBoxLogo.appendChild(codeLogo);
+        hljs.highlightElement(generatedBoxLogo);
+    });
+    //await promise;
+    //promise.then(function() {
 
-    //Change the Logo Color
-    if (mojangLogoColor != "#ffffff" || !drawLogo) {
-        let colorInfos = hexToDecimal(mojangLogoColor, 2);
-        if (!drawLogo) colorInfos = {color: {r: "0.0", g: "0.0", b: "0.0", a: "0.0"}, IsAlphaChanged: false};
-        console.log(mojangLogoColor.replace("#", ""), colorInfos.color);
-
-        let alpha = (drawLogo) ? (colorInfos.IsAlphaChanged ? ("color.a - " + ((1.0 - colorInfos.color.a))) : "color.a") : "0.0";
-        generatedLogo += "\n\t" + createIfStatement("texture(Sampler0, vec2(0.0, 0.25)).r == 1.0", "fragColor = vec4(" + colorInfos.color.r + ", " + colorInfos.color.g + ", " + colorInfos.color.b + ", " + alpha + ");") + "\n";
-    }
-
-
-    //Make the final composite to generate the code
-    finalCode =  [startText, generatedFunction, middleText, generated, endText].join("\n");
-    const code = document.createElement("code");
-    code.innerHTML = escapeHtml(finalCode);
-    code.style.whiteSpace = "pre-wrap";
-    code.style.paddingLeft = "0px";
-    generatedBox.appendChild(code);
-    hljs.highlightElement(generatedBox);
-
-    //Logo specific file
-    finalCodeLogo =  [startTextLogo, generatedLogoFunction, middleTextLogo, generatedLogo, endText].join("\n");
-    const codeLogo = document.createElement("code");
-    codeLogo.innerHTML = escapeHtml(finalCodeLogo);
-    codeLogo.style.whiteSpace = "pre-wrap";
-    codeLogo.style.paddingLeft = "0px";
-    generatedBoxLogo.appendChild(codeLogo);
-    hljs.highlightElement(generatedBoxLogo);
-
-    //DownlodPreparation("download_page.html", finalCode, finalCodeLogo);
+        //DownlodPreparation("download_page.html", finalCode, finalCodeLogo);
+    //});
 }
 
 //Create if statement
@@ -296,14 +275,13 @@ function download(data, filename, type) {
 
 const DownlodPreparation = () => {
 
-    const packMcmeta = `{
-                            "pack": {
-                                "pack_format": 10,
-                                "description": {
-                                    "text": "Background loading screen"
-                                }
-                            }
-                        }`;
+    const packMcmeta = 
+`{
+    "pack": {
+        "pack_format": 10,
+        "description": "Background loading screen"
+    }
+}`;
 
 
 
@@ -359,4 +337,55 @@ const DownlodPreparation = () => {
     //window.stop();
     //window.location.href = `${url}?` + param.toString();
      */
+}
+
+async function ImagesData(_callback) {
+    for (let i = imageStack.length - 1; i >= 0; i--) {
+
+        ctx.clearRect(0, 0, size.width, size.height);
+        drawAddedPictures(i);
+
+        //let data = shaderView.toDataURL("image/png");
+        let dataPixel = ctx.getImageData(dataStack[i].boundingBox.minX, dataStack[i].boundingBox.minY, dataStack[i].boundingBox.maxX - dataStack[i].boundingBox.minX, dataStack[i].boundingBox.maxY - dataStack[i].boundingBox.minY);
+        let resultList = [];
+
+
+        /* console.log(dataPixel.data, colorList, dataPixel.data.length);
+
+        //console.log(data, dataPixel);
+        //window.open(data, "_blank");
+        //download(data, "image.png"); */
+
+
+
+        let worker = new Worker("/js/worker.js");
+        worker.postMessage([dataPixel, dataStack[i]]);
+
+        worker.onmessage = await async function(event) {
+            //colorList += event.data + ",";
+            console.log(event.data);
+            resultList = await event.data.result;
+
+            let condition;
+            if (dataStack[i].AreCoordsNormalized) {
+                condition = "gl_FragCoord.x >= " + dataStack[i].boundingBox.minX + " * ScreenSize.x / " + size.width + " && gl_FragCoord.x <= " + dataStack[i].boundingBox.maxX + " * ScreenSize.x / " + size.width + " && gl_FragCoord.y >= " + dataStack[i].boundingBox.minY + " * ScreenSize.y / " + size.height + " && gl_FragCoord.y <= " + dataStack[i].boundingBox.maxY + " * ScreenSize.y / " + size.height;
+            }
+            else {
+                condition = "gl_FragCoord.x >= " + dataStack[i].boundingBox.minX + " && gl_FragCoord.x <= " + dataStack[i].boundingBox.maxX + " && gl_FragCoord.y >= " + dataStack[i].boundingBox.minY + " && gl_FragCoord.y <= " + dataStack[i].boundingBox.maxY;
+            }
+
+            console.log(resultList.join("\n"))
+            let insideBoundingBox = createIfStatement(condition, resultList.join("\n"), false);
+
+            let functionName = dataStack[i].imageName.replace(/.png|.jpg|.jpeg|.webp"/, "");
+            functionList.push(functionName);
+            generatedFunction += "\n" + createFunction(functionName, insideBoundingBox) + "\n";
+
+            console.log("The result list is: ", resultList.join("\n"));
+
+            _callback();
+        }
+
+
+    }
 }
