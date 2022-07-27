@@ -1,4 +1,5 @@
-const DIVISION_HEIGHT = 4;
+const DIVISION_HEIGHT = 16;
+const COLOR_PROXIMITY_THRESHOLD = 5;
 //Add color presision (compresion)
 
 onmessage = function(e) {
@@ -35,7 +36,11 @@ onmessage = function(e) {
                 //const search = colorList.length - 1;
                 //console.log(j, colorData.data[j], colorList.length, search, (j / 4), - 1 -((j / 4) - colorList.length - (j / 4)), (j / 4)/* colorList[(j / 4) - 1][0] */ /* colorList[((j - 4) / 4) - 1] */)
 
-                if (colorData.data[j] == colorList[colorList.length - 1][0] && colorData.data[j + 1] == colorList[colorList.length - 1][1] && colorData.data[j + 2] == colorList[colorList.length - 1][2] && colorData.data[j + 3] == colorList[colorList.length - 1][3]) {
+                if (/* colorData.data[j] == colorList[colorList.length - 1][0] &&
+                    colorData.data[j + 1] == colorList[colorList.length - 1][1] &&
+                    colorData.data[j + 2] == colorList[colorList.length - 1][2] &&
+                    colorData.data[j + 3] == colorList[colorList.length - 1][3] */
+                    colorProximity([colorData.data[j], colorData.data[j + 1], colorData.data[j + 2]], [colorList[colorList.length - 1][0], colorList[colorList.length - 1][1], colorList[colorList.length - 1][2]], COLOR_PROXIMITY_THRESHOLD)) {
                     
                     //remove last elmement of the lists and add the new one with the pixel position 'from' keeped the same
                     let removedElement = colorList.pop();
@@ -47,7 +52,7 @@ onmessage = function(e) {
             }
 
             colorList.push([colorData.data[j], colorData.data[j + 1], colorData.data[j + 2], colorData.data[j + 3], pixelPosition]);
-            resultList.push(createIfStatement(`gl_FragCoord.y <= ${pixelPosition.fromX} && gl_FragCoord.y <= ${pixelPosition.fromY} && gl_FragCoord.y <= ${pixelPosition.toX} && gl_FragCoord.y <= ${pixelPosition.toY}`, `fragColor = vec4(${colorData.data[j]}, ${colorData.data[j + 1]}, ${colorData.data[j + 2]}, color.a);`, (j == (colorDataDivided * i) + 4) ? false : true, true) + "\n");
+            resultList.push(createIfStatement(`gl_FragCoord.y <= ${pixelPosition.fromX} && gl_FragCoord.y <= ${pixelPosition.fromY} && gl_FragCoord.y <= ${pixelPosition.toX} && gl_FragCoord.y <= ${pixelPosition.toY}`, `fragColor = vec4(${colorData.data[j]}, ${colorData.data[j + 1]}, ${colorData.data[j + 2]}, color.a);`, (resultList.length > 0) ? true : false, true) + "\n");
             //console.log("added", colorList); 
         }
 
@@ -73,13 +78,12 @@ function createIfStatement(condition, code, IsElseIf, IsOneLine) {
         ].join("\n");
 }
 
-function ColorsAreClose(ColorA, ColorB, threshold)
+function colorProximity(ColorA, ColorB, threshold)
 {
-
-    /* let r = (int)a.R - z.R,
-        g = (int)a.G - z.G,
-        b = (int)a.B - z.B;
-    return (r*r + g*g + b*b) <= threshold*threshold; */
+    let r = ColorA[0] - ColorB[0],
+        g = ColorA[1] - ColorB[1],
+        b = ColorA[2] - ColorB[2];
+    return (r*r + g*g + b*b) <= threshold*threshold;
 }
 
 
