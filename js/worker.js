@@ -1,5 +1,7 @@
 const DIVISION_HEIGHT = 16;
 const COLOR_PROXIMITY_THRESHOLD = 15;
+
+//const generatedCode = document.getElementById("generatedCode");
 //Add color presision (compresion)
 
 onmessage = function(e) {
@@ -22,8 +24,14 @@ onmessage = function(e) {
         console.log("------- NEW SECTION -------")
         colorDefine: for (let j = colorDataDivided * i; j < colorDataDivided * (i + 1); j += 4) { //Iterate through the pixels (rgba) throught a divided part of the image
 
+            let actualColor = {
+                r: colorData.data[j],
+                g: colorData.data[j + 1],
+                b: colorData.data[j + 2],
+                a: colorData.data[j + 3]
+            }
             
-            console.log(j + ": " + colorData.data[j] + " " + colorData.data[j + 1] + " " + colorData.data[j + 2] + " " + colorData.data[j + 3], j / 4 % colorData.width, j / 4 % colorData.height);
+            console.log(j + ": " + actualColor.r + " " + actualColor.g + " " + actualColor.b + " " + actualColor.a, j / 4 % colorData.width, j / 4 % colorData.height);
             if (colorData.data[j + 3] == 0) continue colorDefine;
             //if (colorList[j - 4] == colorList)
             let pixelPosition = {
@@ -42,7 +50,7 @@ onmessage = function(e) {
                     colorData.data[j + 1] == colorList[colorList.length - 1][1] &&
                     colorData.data[j + 2] == colorList[colorList.length - 1][2] &&
                     colorData.data[j + 3] == colorList[colorList.length - 1][3] */
-                    colorProximity([colorData.data[j], colorData.data[j + 1], colorData.data[j + 2]], [colorList[colorList.length - 1][0], colorList[colorList.length - 1][1], colorList[colorList.length - 1][2]], COLOR_PROXIMITY_THRESHOLD)) {
+                    colorProximity(actualColor, [[colorList[colorList.length - 1][0], colorList[colorList.length - 1][1], colorList[colorList.length - 1][2]]], COLOR_PROXIMITY_THRESHOLD)) {
                     
                     //remove last elmement of the lists and add the new one with the pixel position 'from' keeped the same
                     let removedElement = colorList.pop();
@@ -53,8 +61,15 @@ onmessage = function(e) {
                 }
             }
 
-            colorList.push([colorData.data[j], colorData.data[j + 1], colorData.data[j + 2], colorData.data[j + 3], pixelPosition]);
-            resultList.push(`${createIfStatement(`gl_FragCoord.x >= ${pixelPosition.fromX} && gl_FragCoord.y >= ${pixelPosition.fromY} && gl_FragCoord.x <= ${pixelPosition.toX} && gl_FragCoord.y <= ${pixelPosition.toY}`, `fragColor = vec4(${colorData.data[j]}, ${colorData.data[j + 1]}, ${colorData.data[j + 2]}, color.a);`, (resultList.length > 0) ? true : false, true)}\n`);
+            //Making the nombers Floats
+            if (actualColor.r === 0 || actualColor.r === 1) parseFloat(actualColor.r += ".0");
+            if (actualColor.g === 0 || actualColor.g === 1) parseFloat(actualColor.g += ".0");
+            if (actualColor.b === 0 || actualColor.b === 1) parseFloat(actualColor.b += ".0");
+            if (actualColor.a === 0 || actualColor.a === 1) parseFloat(actualColor.a += ".0");
+            
+            colorList.push([actualColor.r, actualColor.g, actualColor.b, actualColor.a, pixelPosition]);
+            //resultList.push(`${createIfStatement(`gl_FragCoord.x >= ${pixelPosition.fromX} && gl_FragCoord.y >= ${pixelPosition.fromY} && gl_FragCoord.x <= ${pixelPosition.toX} && gl_FragCoord.y <= ${pixelPosition.toY}`, `fragColor = vec4(${actualColor.r / 255}, ${actualColor.g / 255}, ${actualColor.b / 255}, color.a);`, (resultList.length > 0) ? true : false, true)}\n`);
+            resultList.push(`${createIfStatement(`gl_FragCoord.x == ${pixelPosition.toX} && gl_FragCoord.y == ${pixelPosition.toY}`, `fragColor = vec4(${actualColor.r} / 255, ${actualColor.g} / 255, ${actualColor.b} / 255, color.a);`, (resultList.length > 0) ? true : false, true)}\n`);
             //console.log("added", colorList); 
         }
 
@@ -73,16 +88,16 @@ onmessage = function(e) {
 //Create if statement
 function createIfStatement(condition, code, IsElseIf, IsOneLine) {
     if (IsOneLine) return `${(IsElseIf) ? "\t\t\telse " : ""}if (${condition}) ${code}`;
-        return `${(IsElseIf) ? "\t\telse " : ""}if (${condition}) {
-                \t${code}
-                }`;
+        return `\t${(IsElseIf) ? "\telse " : ""}if (${condition}) {
+\t\t\t${code}
+\t\t}`;
 }
 
 function colorProximity(ColorA, ColorB, threshold)
 {
-    let r = ColorA[0] - ColorB[0],
-        g = ColorA[1] - ColorB[1],
-        b = ColorA[2] - ColorB[2];
+    let r = ColorA.r - ColorB[0],
+        g = ColorA.g - ColorB[1],
+        b = ColorA.b - ColorB[2];
     return (r*r + g*g + b*b) <= threshold*threshold;
 }
 

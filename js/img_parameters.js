@@ -52,7 +52,7 @@ function assignObjectToList(objectIndex) {
         elementWidthParam.disabled = false;
         if (dataStack[selected].linkSize) {
             elementHeightParam.disabled = true;
-            dataStack[selected].height = dataStack[selected].width / dataStack[selected].imageRatio;
+            dataStack[selected].height = Math.floor(dataStack[selected].width / dataStack[selected].imageRatio);
         } else {
             elementHeightParam.disabled = false;
         }
@@ -96,7 +96,7 @@ elementPosYParam.addEventListener("input", function(){
 elementWidthParam.addEventListener("input", function(){
     if (elementWidthParam.value == "") elementWidthParam.value = 0;
     dataStack[selected].width = parseInt(elementWidthParam.value);
-    if (dataStack[selected].linkSize) dataStack[selected].height = dataStack[selected].width / dataStack[selected].imageRatio;
+    if (dataStack[selected].linkSize) dataStack[selected].height = Math.floor(dataStack[selected].width / dataStack[selected].imageRatio);
     draw();
 });
 
@@ -124,7 +124,7 @@ linkSizeParam.addEventListener("input", function(){
     dataStack[selected].linkSize = linkSizeParam.checked;
     if (dataStack[selected].linkSize) {
         elementHeightParam.disabled = true;
-        dataStack[selected].height = dataStack[selected].width / dataStack[selected].imageRatio;
+        dataStack[selected].height = Math.floor(dataStack[selected].width / dataStack[selected].imageRatio);
     } else {
         elementHeightParam.disabled = false;
     }
@@ -191,7 +191,7 @@ let sliderMove = {
         const dx = e.x - m_pos.x;
         m_pos.x = e.x;
         dataStack[selected].width += dx;
-        if (dataStack[selected].linkSize) dataStack[selected].height = dataStack[selected].width / dataStack[selected].imageRatio;
+        if (dataStack[selected].linkSize) dataStack[selected].height = Math.floor(dataStack[selected].width / dataStack[selected].imageRatio);
         draw();
     },
     height: function(e){

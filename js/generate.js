@@ -113,7 +113,7 @@ async function generateCode() {
 //Create if statement
 function createIfStatement(condition, code, IsElseIf, IsOneLine) {
     if (IsOneLine) return `${(IsElseIf) ? "\t\t\telse " : ""}if (${condition}) ${code}`;
-        return `    ${(IsElseIf) ? "\t\telse " : ""}if (${condition}) {
+    return `${(IsElseIf) ? "\t\telse " : "    "}if (${condition}) {
         ${code}
     }`;
 }
@@ -128,8 +128,8 @@ function createIfStatement(condition, code, IsElseIf, IsOneLine) {
 } */
 function createFunction(name, parameters, code) {
     return `void ${name}(${parameters}) {
-            \t${code}
-            }`;
+${code}
+}`;
 }
 
 function hexToDecimal(variable, devideBy) {
@@ -241,7 +241,7 @@ const DownlodPreparation = () => {
         let core = shaders.folder("core");
         core.file("position_color.fsh", finalCode);
         core.file("position_tex.fsh", finalCodeLogo);
-        core.fle("position_color.json", jsonColor);
+        core.file("position_color.json", jsonColor);
         zip.generateAsync({type:"blob"})
         .then(function(content) {
             download(content, "ChangedBackground.zip", "application/zip");
@@ -327,7 +327,7 @@ async function ImagesData() {
 
             let functionName = dataStack[i].imageName.replace(/.png|.jpg|.jpeg|.webp"/, "");
             functionList.push(functionName);
-            generatedFunction += "\n" + createFunction(functionName, "uniform vec2 ScreenSize", insideBoundingBox) + "\n";
+            generatedFunction += `\n${createFunction(functionName, "vec4 color, in vec2 ScreenSize", insideBoundingBox)}\n`;
 
             console.log("The result list is: ", resultList.join("\n"));
 
@@ -392,7 +392,7 @@ function DataCompletlyLoaded(tempDrawLogo, tempDrawLoadingBar) {
         console.log(mojangLogoColor.replace("#", ""), colorInfos.color);
 
         let alpha = (drawLogo) ? (colorInfos.IsAlphaChanged ? ("color.a - " + ((1.0 - colorInfos.color.a))) : "color.a") : "0.0";
-        generatedLogo += `\n${createIfStatement("texture(Sampler0, vec2(0.0, 0.25)).r == 1.0", "fragColor = vec4(" + colorInfos.color.r + ", " + colorInfos.color.g + ", " + colorInfos.color.b + ", " + alpha + ");")}\n`;
+        generatedLogo += `\n${createIfStatement("texture(Sampler0, vec2(0.0, 0.25)) == vec4(1.0)", "fragColor = vec4(" + colorInfos.color.r + ", " + colorInfos.color.g + ", " + colorInfos.color.b + ", " + alpha + ");")}\n`;
     }
 
 
