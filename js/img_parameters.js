@@ -52,7 +52,7 @@ function assignObjectToList(objectIndex) {
         elementWidthParam.disabled = false;
         if (dataStack[selected].linkSize) {
             elementHeightParam.disabled = true;
-            dataStack[selected].height = dataStack[selected].width / dataStack[selected].imageRatio;
+            dataStack[selected].height = Math.floor(dataStack[selected].width / dataStack[selected].imageRatio);
         } else {
             elementHeightParam.disabled = false;
         }
@@ -96,7 +96,7 @@ elementPosYParam.addEventListener("input", function(){
 elementWidthParam.addEventListener("input", function(){
     if (elementWidthParam.value == "") elementWidthParam.value = 0;
     dataStack[selected].width = parseInt(elementWidthParam.value);
-    if (dataStack[selected].linkSize) dataStack[selected].height = dataStack[selected].width / dataStack[selected].imageRatio;
+    if (dataStack[selected].linkSize) dataStack[selected].height = Math.floor(dataStack[selected].width / dataStack[selected].imageRatio);
     draw();
 });
 
@@ -117,17 +117,19 @@ elementRotationParam.addEventListener("input", function(){
 normalizeCoordsParam.addEventListener("input", function(){
     dataStack[selected].AreCoordsNormalized = normalizeCoordsParam.checked;
     draw();
+    displayWaningText();
 });
 
 linkSizeParam.addEventListener("input", function(){
     dataStack[selected].linkSize = linkSizeParam.checked;
     if (dataStack[selected].linkSize) {
         elementHeightParam.disabled = true;
-        dataStack[selected].height = dataStack[selected].width / dataStack[selected].imageRatio;
+        dataStack[selected].height = Math.floor(dataStack[selected].width / dataStack[selected].imageRatio);
     } else {
         elementHeightParam.disabled = false;
     }
     draw();
+    displayWaningText();
 });
 
 document.addEventListener("mouseup", function(){
@@ -189,13 +191,15 @@ let sliderMove = {
         const dx = e.x - m_pos.x;
         m_pos.x = e.x;
         dataStack[selected].width += dx;
-        if (dataStack[selected].linkSize) dataStack[selected].height = dataStack[selected].width / dataStack[selected].imageRatio;
+        if (dataStack[selected].width < 0) dataStack[selected].width = 0;
+        if (dataStack[selected].linkSize) dataStack[selected].height = Math.floor(dataStack[selected].width / dataStack[selected].imageRatio);
         draw();
     },
     height: function(e){
         const dx = e.x - m_pos.x;
         m_pos.x = e.x;
         dataStack[selected].height += dx;
+        if (dataStack[selected].height < 0) dataStack[selected].height = 0;
         draw();
     },
     rotation: function(e){
@@ -226,13 +230,13 @@ let userTextBoxInteraction = {
 let actionBtn = {
     alignHorizontal: function(){
         if (selected != undefined) {
-            dataStack[selected].x = shaderView.width / 2;
+            dataStack[selected].x = Math.floor(shaderView.width / 2);
             draw();
         }
     },
     alignVertical: function(){
         if (selected != undefined) {
-            dataStack[selected].y = shaderView.height / 2;
+            dataStack[selected].y = Math.floor(shaderView.height / 2);
             draw();
         }
     },

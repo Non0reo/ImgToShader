@@ -33,7 +33,7 @@
             <div class="parameter">
                 <label for="backColor">Background color</label>
                 <input class="color-picker" type="color" id="backgroundColor" value="#EF323D">
-                <label for="blackScreen">Enable black screen compatibility</label>
+                <label for="blackScreen">Enable monochrome screen compatibility</label>
                 <input type="checkbox" id="accessibilityCompatibility" name="blackScreen" value="blackScreen" checked="false">
             </div>
             <div class="parameter">
@@ -67,7 +67,7 @@
         </div>
 
         <div id="imageListBox">
-            <input type="file" accept="image/*" id="BtnUploadImage" hidden onchange="loadImage(event)"/>
+            <input type="file" accept=".png, .jpg, .jpeg, .webp" id="BtnUploadImage" hidden oninput="loadImage(event) " onclick="this.value=null;"/>
             <label for="BtnUploadImage" id="uploadImage">Upload Image</label>
             <div id="imageList">
                 <!-- <div class="addedImgBox">
@@ -96,9 +96,9 @@
             </div>
             <div class="parameter">
                 <label class="label-resize" id="elementWidthSlider" for="elem_width">Width</label>
-                <input class="numberBar" type="number" id="elementWidth" value="">
+                <input class="numberBar" type="number" id="elementWidth" min="0" value="">
                 <label class="label-resize" id="elementHeightSlider" for="elem_height">Height</label>
-                <input class="numberBar" type="number" id="elementHeight" value="">
+                <input class="numberBar" type="number" id="elementHeight" min="0" value="">
                 <button class="actionBtn" id="horizontalExpand" onclick="actionBtn.expandHorizontal()"></button><button class="actionBtn" id="verticalExpand" onclick="actionBtn.expandVertical()"></button>
             </div>
             <div class="parameter">

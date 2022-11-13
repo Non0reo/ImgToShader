@@ -4,35 +4,41 @@ let imageStack = []; //Actual Image
 let dataStack = []; //Image informations on the canvas
 
 function loadImage(event) {
-    let img = new Image();
-    img.src = URL.createObjectURL(event.srcElement.files[0]);
-    const addedDiv = AddImageToList(img);
-    
-    img.onload = function(){
-        dataStack.forEach(element => {
-            element.IsSelected = false;
-        });
-        imageStack.unshift(addedDiv);
-        dataStack.unshift({
-            IsSelected: true,
-            x: shaderView.width/2,
-            y: shaderView.height/2,
-            width: img.naturalWidth/2,
-            height: img.naturalHeight/2,
-            rotation: 0,
-            AreCoordsNormalized: true,
-            IsSizeLinked: false,
-            imageRatio: img.naturalWidth/img.naturalHeight,
-            boundingBox: [[shaderView.width/2 - img.naturalWidth/2, shaderView.height/2 - img.naturalHeight/2],
-                        [shaderView.width/2 + img.naturalWidth/2, shaderView.height/2 - img.naturalHeight/2],
-                        [shaderView.width/2 + img.naturalWidth/2, shaderView.height/2 + img.naturalHeight/2],
-                        [shaderView.width/2 - img.naturalWidth/2, shaderView.height/2 + img.naturalHeight/2]]
-        });
-    
-        reloadImageList();
-        addEventListenerToList();
-        //assignObjectToList(imageStack.length - 1);
+    try {
+        console.log(event);
+        let img = new Image();
+        img.src = URL.createObjectURL(event.srcElement.files[0]);
+        const addedDiv = AddImageToList(img);
+        
+        img.onload = function(){
+            dataStack.forEach(element => {
+                element.IsSelected = false;
+            });
+            imageStack.unshift(addedDiv);
+            dataStack.unshift({
+                IsSelected: true,
+                x: Math.floor(shaderView.width/2),
+                y: Math.floor(shaderView.height/2),
+                width: img.naturalWidth/2,
+                height: img.naturalHeight/2,
+                rotation: 0,
+                AreCoordsNormalized: true,
+                IsSizeLinked: false,
+                imageRatio: img.naturalWidth/img.naturalHeight,
+                boundingBox: [[shaderView.width/2 - img.naturalWidth/2, shaderView.height/2 - img.naturalHeight/2],
+                            [shaderView.width/2 + img.naturalWidth/2, shaderView.height/2 - img.naturalHeight/2],
+                            [shaderView.width/2 + img.naturalWidth/2, shaderView.height/2 + img.naturalHeight/2],
+                            [shaderView.width/2 - img.naturalWidth/2, shaderView.height/2 + img.naturalHeight/2]],
+                imageName: event.srcElement.files[0].name
+            });
+        
+            reloadImageList();
+            addEventListenerToList();
+            //assignObjectToList(imageStack.length - 1);
+        }
 
+    } catch (error) {
+        console.log("Error: " + error);
     }
 }
 
@@ -83,7 +89,8 @@ function AddImageToList(img) {
                 AreCoordsNormalized: dataStack[selectedIndex].AreCoordsNormalized,
                 IsSizeLinked: dataStack[selectedIndex].IsSizeLinked,
                 imageRatio: dataStack[selectedIndex].imageRatio,
-                boundingBox: dataStack[selectedIndex].boundingBox
+                boundingBox: dataStack[selectedIndex].boundingBox,
+                imageName: dataStack[selectedIndex].imageName
             };
             addEventListenerToList();
         }
@@ -110,7 +117,8 @@ function AddImageToList(img) {
                 AreCoordsNormalized: actualDivData.AreCoordsNormalized,
                 IsSizeLinked: actualDivData.IsSizeLinked,
                 imageRatio: actualDivData.imageRatio,
-                boundingBox: actualDivData.boundingBox
+                boundingBox: actualDivData.boundingBox,
+                imageName: actualDivData.imageName
             };
 
             const addedDiv = AddImageToList(newImg); //return a div and therefore, can be added in the list
@@ -131,7 +139,8 @@ function AddImageToList(img) {
                 AreCoordsNormalized: actualDivData.AreCoordsNormalized,
                 IsSizeLinked: actualDivData.IsSizeLinked,
                 imageRatio: actualDivData.imageRatio,
-                boundingBox: actualDivData.boundingBox
+                boundingBox: actualDivData.boundingBox,
+                imageName: actualDivData.imageName
             };
 
             addEventListenerToList();
@@ -193,10 +202,12 @@ function reloadImageList() {
     displayWaningText();
 }
 
-function drawAddedPictures() {
+function drawAddedPictures(drawSpecificImage) {
     ctx.globalCompositeOperation = "destination-over";
 
-    for (let i = 0; i < imageStack.length; i++) {
+    for (let index = 0; index < ((drawSpecificImage === undefined) ? imageStack.length : 1); index++) {
+        let i = (drawSpecificImage === undefined) ? index : drawSpecificImage; //use index number unless if drawSpecificImage exists
+
         if (imageStack[i].children[1].className == "addedImg") {
             if (!imageStack[i].children[2].checked) continue; //If the checkbox ins't checked, don't draw the img
 
@@ -232,29 +243,31 @@ function drawAddedPictures() {
             let maxX = Math.max(...cornerPos.map(element => element[0]));
             let maxY = Math.max(...cornerPos.map(element => element[1]));
 
-            dataStack[i].boundingBox = [[minX, minY], [maxX, minY], [maxX, maxY], [minX, maxY]]; //Define the bounding box of the image
+            //dataStack[i].boundingBox = [[minX, minY], [maxX, minY], [maxX, maxY], [minX, maxY]]; //Define the bounding box lines of the image
+            dataStack[i].boundingBox = {minX: minX > 0 ? minX : 0,
+                                        minY: minY > 0 ? minY : 0,
+                                        maxX: maxX < size.width ? maxX : size.width,
+                                        maxY: maxY < size.height ? maxY : size.height}; //Define the bounding box of the image
         }
     }
 
-    //Boundign box debug
-    /* for (let i = 0; i < imageStack.length; i++) {
-        for (let j = 0; j < 4; j++) {
-
-            if (j < 3) {
-                ctx.fillStroke = "blue";
-                ctx.beginPath();
-                ctx.moveTo(dataStack[i].boundingBox[j][0], dataStack[i].boundingBox[j][1]);
-                ctx.lineTo(dataStack[i].boundingBox[j + 1][0], dataStack[i].boundingBox[j + 1][1]);
-                ctx.stroke();
-            }
-            else {
-                ctx.fillStroke = "blue";
-                ctx.beginPath();
-                ctx.moveTo(dataStack[i].boundingBox[j][0], dataStack[i].boundingBox[j][1]);
-                ctx.lineTo(dataStack[i].boundingBox[0][0], dataStack[i].boundingBox[0][1]);
-                ctx.stroke();
-            }
-        }
+    /* //Boundign box debug
+    for (let i = 0; i < imageStack.length; i++) {
+        
+        ctx.lineWidth = 20;
+        ctx.beginPath();
+        ctx.moveTo(dataStack[i].boundingBox.minX, dataStack[i].boundingBox.minY);
+        ctx.lineTo(dataStack[i].boundingBox.maxX, dataStack[i].boundingBox.minY);
+        ctx.stroke();
+        ctx.moveTo(dataStack[i].boundingBox.maxX, dataStack[i].boundingBox.minY);
+        ctx.lineTo(dataStack[i].boundingBox.maxX, dataStack[i].boundingBox.maxY);
+        ctx.stroke();
+        ctx.moveTo(dataStack[i].boundingBox.maxX, dataStack[i].boundingBox.maxY);
+        ctx.lineTo(dataStack[i].boundingBox.minX, dataStack[i].boundingBox.maxY);
+        ctx.stroke();
+        ctx.moveTo(dataStack[i].boundingBox.minX, dataStack[i].boundingBox.maxY);
+        ctx.lineTo(dataStack[i].boundingBox.minX, dataStack[i].boundingBox.minY);
+        ctx.stroke();
     } */
 
     ctx.globalCompositeOperation = "source-over";
