@@ -1,5 +1,5 @@
 const DIVISION_HEIGHT = 16;
-const COLOR_PROXIMITY_THRESHOLD = 15;
+const COLOR_PROXIMITY_THRESHOLD =  80;
 
 //const generatedCode = document.getElementById("generatedCode");
 //Add color presision (compresion)
@@ -31,14 +31,18 @@ onmessage = function(e) {
                 a: colorData.data[j + 3]
             }
             
-            console.log(j + ": " + actualColor.r + " " + actualColor.g + " " + actualColor.b + " " + actualColor.a, j / 4 % colorData.width, j / 4 % colorData.height);
+            console.log(j + ": " + actualColor.r + " " + actualColor.g + " " + actualColor.b + " " + actualColor.a);
+            //console.log(j, j / 4 % colorData.width + imageData.boundingBox.minX, j / 4 % colorData.height + imageData.boundingBox.minY, (j + 4) / 4 % colorData.width  + imageData.boundingBox.minX, (j + 4) / 4 % colorData.height + imageData.boundingBox.minY)
             if (colorData.data[j + 3] == 0) continue colorDefine;
             //if (colorList[j - 4] == colorList)
             let pixelPosition = {
                 fromX: (j / 4 % colorData.width) + imageData.boundingBox.minX,
+                //fromX: (j / 4) + 
                 fromY: (j / 4 % colorData.height) + imageData.boundingBox.minY,
-                toX: ((j + 4) / 4 % colorData.width) + imageData.boundingBox.minX,
-                toY: ((j + 4) / 4 % colorData.height) + imageData.boundingBox.minY
+                toX: (j / 4 % colorData.width) + imageData.boundingBox.minX + 1,
+                toY: (j / 4 % colorData.height) + imageData.boundingBox.minY + 1
+                //toX: ((j + 4) / 4 % colorData.width) + imageData.boundingBox.minX,
+                //toY: ((j + 4) / 4 % colorData.height) + imageData.boundingBox.minY
             }
 
             //If the last pixel is the same as the current pixel, remove the last pixel and add the current pixel with a bigger reach
@@ -46,11 +50,14 @@ onmessage = function(e) {
                 //const search = colorList.length - 1;
                 //console.log(j, colorData.data[j], colorList.length, search, (j / 4), - 1 -((j / 4) - colorList.length - (j / 4)), (j / 4)/* colorList[(j / 4) - 1][0] */ /* colorList[((j - 4) / 4) - 1] */)
 
-                if (/* colorData.data[j] == colorList[colorList.length - 1][0] &&
+                /* colorData.data[j] == colorList[colorList.length - 1][0] &&
                     colorData.data[j + 1] == colorList[colorList.length - 1][1] &&
                     colorData.data[j + 2] == colorList[colorList.length - 1][2] &&
                     colorData.data[j + 3] == colorList[colorList.length - 1][3] */
-                    colorProximity(actualColor, [[colorList[colorList.length - 1][0], colorList[colorList.length - 1][1], colorList[colorList.length - 1][2]]], COLOR_PROXIMITY_THRESHOLD)) {
+                if (colorProximity(actualColor, [[colorList[colorList.length - 1][0], 
+                                                colorList[colorList.length - 1][1],
+                                                colorList[colorList.length - 1][2]]],
+                                    COLOR_PROXIMITY_THRESHOLD)) {
                     
                     //remove last elmement of the lists and add the new one with the pixel position 'from' keeped the same
                     let removedElement = colorList.pop();
@@ -61,18 +68,20 @@ onmessage = function(e) {
                 }
             }
 
+            console.log(actualColor);
             //Making the nombers Floats
-            if (actualColor.r === 0 || actualColor.r === 1) parseFloat(actualColor.r += ".0");
-            if (actualColor.g === 0 || actualColor.g === 1) parseFloat(actualColor.g += ".0");
-            if (actualColor.b === 0 || actualColor.b === 1) parseFloat(actualColor.b += ".0");
-            if (actualColor.a === 0 || actualColor.a === 1) parseFloat(actualColor.a += ".0");
+            if (actualColor.r === 0 || actualColor.r === 1) parseFloat(actualColor.r += ".");
+            if (actualColor.g === 0 || actualColor.g === 1) parseFloat(actualColor.g += ".");
+            if (actualColor.b === 0 || actualColor.b === 1) parseFloat(actualColor.b += ".");
+            if (actualColor.a === 0 || actualColor.a === 1) parseFloat(actualColor.a += ".");
             
             colorList.push([actualColor.r, actualColor.g, actualColor.b, actualColor.a, pixelPosition]);
-            //resultList.push(`${createIfStatement(`gl_FragCoord.x >= ${pixelPosition.fromX} && gl_FragCoord.y >= ${pixelPosition.fromY} && gl_FragCoord.x <= ${pixelPosition.toX} && gl_FragCoord.y <= ${pixelPosition.toY}`, `fragColor = vec4(${actualColor.r / 255}, ${actualColor.g / 255}, ${actualColor.b / 255}, color.a);`, (resultList.length > 0) ? true : false, true)}\n`);
-            resultList.push(`${createIfStatement(`gl_FragCoord.x == ${pixelPosition.toX} && gl_FragCoord.y == ${pixelPosition.toY}`, `fragColor = vec4(${actualColor.r} / 255, ${actualColor.g} / 255, ${actualColor.b} / 255, color.a);`, (resultList.length > 0) ? true : false, true)}\n`);
+            resultList.push(`${createIfStatement(`gl_FragCoord.x >= ${pixelPosition.fromX} && gl_FragCoord.y >= ${pixelPosition.fromY} && gl_FragCoord.x <= ${pixelPosition.toX} && gl_FragCoord.y <= ${pixelPosition.toY}`, `fragColor = vec4(${actualColor.r / 255}, ${actualColor.g / 255}, ${actualColor.b / 255}, color.a);`, (resultList.length > 0) ? true : false, true)}\n`);
+            //resultList.push(`${createIfStatement(`gl_FragCoord.x == ${pixelPosition.toX} && gl_FragCoord.y == ${pixelPosition.toY}`, `fragColor = vec4(${actualColor.r} / 255, ${actualColor.g} / 255, ${actualColor.b} / 255, color.a);`, (resultList.length > 0) ? true : false, true)}\n`);
             //console.log("added", colorList); 
         }
 
+        ///TODO: done
         dividedColection.push(`${createIfStatement(`gl_FragCoord.y >= ${imageData.boundingBox.minY + chunkSizeHeight * i} && gl_FragCoord.y <= ${imageData.boundingBox.minY + chunkSizeHeight * (i + 1)}`, resultList.join(""), (i == 0) ? false : true, false)}`);
     }
 
@@ -82,6 +91,8 @@ onmessage = function(e) {
         result: dividedColection,
         //colorList: colorList
     });
+
+    console.log(colorData.data.length, colorData.data.length / DIVISION_HEIGHT);
 }
 
 

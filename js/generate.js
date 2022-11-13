@@ -142,7 +142,7 @@ function hexToDecimal(variable, devideBy) {
             a: (hexColor.length == 8) ? (parseInt(hexColor.substring(6, 8), 16) / 255 / division).toString() : "1"
     };
 
-    //Making the nombers Floats
+    //Making the numbers Floats
     if (color.r == 0 || color.r == 1) color.r += ".0";
     if (color.g == 0 || color.g == 1) color.g += ".0";
     if (color.b == 0 || color.b == 1) color.b += ".0";
@@ -360,7 +360,7 @@ function DataCompletlyLoaded(tempDrawLogo, tempDrawLoadingBar) {
         console.log(backgroundColor.replace("#", ""), colorInfos);
 
         let alpha = (drawBackground) ? (colorInfos.IsAlphaChanged ? ("color.a - " + ((1.0 - colorInfos.color.a))) : "color.a") : "0.0";
-        generated += `\n${createIfStatement(((accessibilityCompatibility) ? "(color.r == 239.0 / 255.0 || color.rgb == vec3(0.0))" : "color.r == 239.0 / 255.0") + " && color.a > 0.7", "fragColor = vec4(" + colorInfos.color.r + ", " + colorInfos.color.g + ", " + colorInfos.color.b + ", " + alpha + ");")}\n`;
+        generated += `\n${createIfStatement(((accessibilityCompatibility) ? "(color.r == 239.0 / 255.0 || color.rgb == vec3(0.0))" : "color.r == 239.0 / 255.0"), "fragColor = vec4(" + colorInfos.color.r + ", " + colorInfos.color.g + ", " + colorInfos.color.b + ", " + alpha + ");")}\n`;
     }
 
     //Change Loading Bar Color
@@ -382,7 +382,7 @@ function DataCompletlyLoaded(tempDrawLogo, tempDrawLoadingBar) {
             else alpha = "0.0";
         }
 
-        generated += `\n${createIfStatement("color.r == 1.0 && color.a > 0.7", "fragColor = vec4(" + colorInfos.color.r + ", " + colorInfos.color.g + ", " + colorInfos.color.b + ", " + alpha + ");")}\n`;
+        generated += `\n${createIfStatement("color.r == 1.0 && color.a != 128.0 / 255.0", "fragColor = vec4(" + colorInfos.color.r + ", " + colorInfos.color.g + ", " + colorInfos.color.b + ", " + alpha + ");")}\n`;
     }
 
     //Change the Logo Color

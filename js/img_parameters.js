@@ -191,6 +191,7 @@ let sliderMove = {
         const dx = e.x - m_pos.x;
         m_pos.x = e.x;
         dataStack[selected].width += dx;
+        if (dataStack[selected].width < 0) dataStack[selected].width = 0;
         if (dataStack[selected].linkSize) dataStack[selected].height = Math.floor(dataStack[selected].width / dataStack[selected].imageRatio);
         draw();
     },
@@ -198,6 +199,7 @@ let sliderMove = {
         const dx = e.x - m_pos.x;
         m_pos.x = e.x;
         dataStack[selected].height += dx;
+        if (dataStack[selected].height < 0) dataStack[selected].height = 0;
         draw();
     },
     rotation: function(e){
@@ -228,13 +230,13 @@ let userTextBoxInteraction = {
 let actionBtn = {
     alignHorizontal: function(){
         if (selected != undefined) {
-            dataStack[selected].x = shaderView.width / 2;
+            dataStack[selected].x = Math.floor(shaderView.width / 2);
             draw();
         }
     },
     alignVertical: function(){
         if (selected != undefined) {
-            dataStack[selected].y = shaderView.height / 2;
+            dataStack[selected].y = Math.floor(shaderView.height / 2);
             draw();
         }
     },

@@ -5,7 +5,7 @@ let dataStack = []; //Image informations on the canvas
 
 function loadImage(event) {
     try {
-
+        console.log(event);
         let img = new Image();
         img.src = URL.createObjectURL(event.srcElement.files[0]);
         const addedDiv = AddImageToList(img);
@@ -17,8 +17,8 @@ function loadImage(event) {
             imageStack.unshift(addedDiv);
             dataStack.unshift({
                 IsSelected: true,
-                x: shaderView.width/2,
-                y: shaderView.height/2,
+                x: Math.floor(shaderView.width/2),
+                y: Math.floor(shaderView.height/2),
                 width: img.naturalWidth/2,
                 height: img.naturalHeight/2,
                 rotation: 0,
