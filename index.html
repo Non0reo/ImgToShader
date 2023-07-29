@@ -71,8 +71,10 @@
         </div>
 
         <div id="imageListBox">
-            <input type="file" accept=".png, .jpg, .jpeg, .webp" id="BtnUploadImage" hidden oninput="loadImage(event) " onclick="this.value=null;"/>
-            <label for="BtnUploadImage" id="uploadImage">Upload Image</label>
+            <input disabled ="file" accept=".png, .jpg, .jpeg, .webp" id="BtnUploadLogo" hidden oninput="loadLogo(event)" onclick="this.value=null;"/>
+            <label class="imgUpload" for="BtnUploadLogo" id="uploadLogo">Upload Logo</label>
+            <input disabled type="file" accept=".png, .jpg, .jpeg, .webp" id="BtnUploadImage" hidden oninput="loadImage(event)" onclick="this.value=null;"/>
+            <label class="imgUpload" for="BtnUploadImage" id="uploadImage">Upload Background Image</label>
             <div id="imageList">
                 <!-- <div class="addedImgBox">
                     <span class="moveButton">

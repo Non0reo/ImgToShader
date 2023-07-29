@@ -107,9 +107,10 @@ div#imageListBox {
     flex-wrap: wrap;
     justify-content: left;
     width: 400px;
+    padding: 20px 0 0 0;
 }
 
-div#imageListBox label#uploadImage {
+div#imageListBox label.imgUpload {
     font-family: 'Poppins', sans-serif;
     font-size: small;
     border: 1px solid rgb(98, 98, 98);
@@ -117,7 +118,7 @@ div#imageListBox label#uploadImage {
     background-color: rgb(242, 235, 235);
     color: #000000;
     padding: 1px;
-    margin: 20px;
+    margin: 0 0 15px 0;
     width: 75%;
     height: fit-content;
     text-align: center;
@@ -125,6 +126,8 @@ div#imageListBox label#uploadImage {
     -moz-user-select: none;    
     -ms-user-select: none;      
     user-select: none;
+
+    cursor: not-allowed;
 }
 
 div.selected {
