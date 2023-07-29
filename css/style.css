@@ -63,6 +63,23 @@ div.settings {
     position: relative;
 }
 
+.versionBtn {
+    margin: 15px 5px;
+    color: #fbc709;
+    background-color: #ffffff;
+    font-size: 16px;
+    border: 0px solid #2d63c8;
+    border-radius: 30px;
+    padding: 10px 20px;
+    cursor: pointer
+}
+
+.selected {
+    animation: glint 1s infinite;
+    color: #ffffff;
+    background-color: #fbc709;
+}
+
 div.topBtnDiv {
     height: 100%;
     text-align: right;

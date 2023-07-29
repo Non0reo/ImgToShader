@@ -1,5 +1,8 @@
+let SHADER_VERSION = 1;
 const BORDER_SIZE = 10;
 const shaderView = document.getElementById("shaderView");
+const version1Param = document.getElementById("shaderVersion1");
+const version2Param = document.getElementById("shaderVersion2");
 const widthParam = document.getElementById("shaderWidth");
 const heightParam = document.getElementById("shaderHeight");
 //const backgroundColorParam = document.getElementById("backgroundColor");
@@ -133,6 +136,25 @@ document.addEventListener("mouseup", function(){
     document.removeEventListener("mousemove", resizeX, false);
     document.removeEventListener("mousemove", resizeY, false);
 }, false);
+
+
+//PARAMETERS
+
+function changeVersion(version) {
+    SHADER_VERSION = version;
+    switch (version) {
+        case 0:
+            version1Param.className = "versionBtn selected";
+            version2Param.className = "versionBtn";
+            break;
+        case 1:
+            version2Param.className = "versionBtn selected";
+            version1Param.className = "versionBtn";
+            break;
+        default:
+            break;
+    }
+}
 
 widthParam.addEventListener("input", function(){
     size.width = parseInt(widthParam.value);

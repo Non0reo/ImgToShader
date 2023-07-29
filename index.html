@@ -22,6 +22,10 @@
     </div>
     <div class="optionBar preventSelection">
         <div class="settings">
+            <div class="parameter" style="display: flex; align-self: center;">
+                <button id="shaderVersion1" class="versionBtn" onclick="changeVersion(0)">1.17 - 1.19.4</button>
+                <button id="shaderVersion2" class="versionBtn selected" onclick="changeVersion(1)">+1.20</button>
+            </div>
             <div class="parameter">
                 <label for="width">Width</label>
                 <input type="number" id="shaderWidth" value="">
@@ -120,6 +124,8 @@
             <pre><code class="glsl" id="generatedCode"></code></pre>
             
             <pre><code class="glsl" id="generatedCodeLogo"></code></pre>
+
+            <pre><code class="glsl" id="generatedCodeBar"></code></pre>
         </div>
     </div>
     <script src="js/img_parameters.js"></script>
