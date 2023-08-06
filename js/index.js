@@ -175,6 +175,7 @@ backgroundColorParam.on('change', (color, source, instance) => {
     backgroundColor = color.toHEXA().toString();
     if (drawBackground) shaderView.style.backgroundColor = color.toHEXA().toString();
     backgroundColorParam.setHSVA(color.h, color.s, color.v, color.a);
+    draw();
 })
 
 //Compatibility for the black background loading screen
@@ -233,6 +234,7 @@ let mojangLogo = new Image();
 let loadingBar = new Image();
 let testImg = new Image();
 mojangLogo.src = "./assets/img/mojangstudios.png";
+//mojangLogo.src = "./assets/img/mojangstudios_inverted.png";
 loadingBar.src = "./assets/img/loading_bar.png";
 testImg.src = "./assets/default/Banner.png";
 
@@ -243,17 +245,35 @@ let loadingBarSize = {width: logoSizeParam.value, height: logoSizeParam.value / 
 //draw an image onto the canvas
 mojangLogo.onload = function(){
     let logoPosition = {x: (size.width / 2 - logoSize.width / 2), y: (size.height / 2 - logoSize.height / 2)};
-
-    ctx.fillStyle = mojangLogoColor;
+    
+    // ctx.globalCompositeOperation = "destination-out";
+    // ctx.fillStyle = backgroundColor;
+    // ctx.fillRect(logoPosition.x, logoPosition.y, logoSize.width, logoSize.height);
+    
+    ctx.globalCompositeOperation = "source-over";
+    ctx.fillStyle = backgroundColor;
     ctx.fillRect(logoPosition.x, logoPosition.y, logoSize.width, logoSize.height);
 
-    // set composite mode
+    ctx.globalCompositeOperation = "lighten";
+    ctx.fillStyle = mojangLogoColor;
+    ctx.fillRect(logoPosition.x, logoPosition.y, logoSize.width, logoSize.height);
+    ctx.globalCompositeOperation = "source-over";
+
     ctx.globalCompositeOperation = "destination-in";
-    
+
+    // set composite mode
+
     // draw image
     ctx.drawImage(mojangLogo, logoPosition.x, logoPosition.y, logoSize.width, logoSize.height);
 
     ctx.globalCompositeOperation = "source-over";
+
+
+
+
+    //ctx.globalCompositeOperation = "source-over";
+
+    
 
 
     //let diference = {width: (shaderView.width - size.width) / 2, height: (shaderView.height - size.height) / 2};
@@ -297,6 +317,7 @@ loadingBar.onload = function(){
 
 //Draw all element on the canvas
 function draw() {
+    //ctx.globalCompositeOperation = "lighten";
     ctx.clearRect(0, 0, size.width, size.height);
 
     if (drawLogo) mojangLogo.onload(); //draw the logo
