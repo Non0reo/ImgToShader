@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/slider.css">
     <link rel="stylesheet" href="js/lib/highlight/styles/custom.min.css">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@48,400,0,0"/>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@simonwep/pickr/dist/themes/nano.min.css"/>
@@ -10,6 +11,10 @@
     <script src="js/lib/highlight/highlight.min.js"></script>
     <script src="js/lib/highlight/languages/glsl.min.js"></script> 
     <script src="js/lib/jszip.min.js"></script>  
+    <script src="js/lib/PnnQuant/pnnquant.js"></script>
+    <script src="js/lib/PnnQuant/pnnLABquant.js"></script>
+    <script src="js/lib/PnnQuant/blueNoise.js"></script>
+    <script src="js/lib/PnnQuant/gilbertCurve.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.0/FileSaver.min.js"></script>
     <title>ImgToShader</title>
 </head>
@@ -55,8 +60,8 @@
             <div class="parameter">
                 <label for="drawLogo">Draw Logo</label>
                 <input type="checkbox" id="drawLogo" name="drawLogo" value="drawLogo" checked="true">
-                <label for="logoColor">Logo Size (visual)</label>
-                <input type="range" id="logoSize" value="480" min="1" max="1000">
+                <label for="logoSize">Logo Size (visual)</label>
+                <input type="range" id="logoSize" class="slider" value="480" min="1" max="1000">
                 <label for="autoSize">Auto</label>
                 <input type="checkbox" id="autoSize" name="autoSize" value="autoSize">
             </div>
@@ -71,9 +76,9 @@
         </div>
 
         <div id="imageListBox">
-            <input disabled ="file" accept=".png, .jpg, .jpeg, .webp" id="BtnUploadLogo" hidden oninput="loadLogo(event)" onclick="this.value=null;"/>
+            <input type="file" accept=".png, .jpg, .jpeg, .webp" id="BtnUploadLogo" hidden oninput="loadLogo(event)" onclick="this.value=null;"/>
             <label class="imgUpload" for="BtnUploadLogo" id="uploadLogo">Upload Logo</label>
-            <input disabled type="file" accept=".png, .jpg, .jpeg, .webp" id="BtnUploadImage" hidden oninput="loadImage(event)" onclick="this.value=null;"/>
+            <input type="file" accept=".png, .jpg, .jpeg, .webp" id="BtnUploadImage" hidden oninput="loadImage(event)" onclick="this.value=null;"/>
             <label class="imgUpload" for="BtnUploadImage" id="uploadImage">Upload Background Image</label>
             <div id="imageList">
                 <!-- <div class="addedImgBox">
@@ -88,33 +93,49 @@
             </div>
         </div>
 
-        <div class="settingsImage">
-            <div class="parameter">
-                <label class="label-resize" id="elementPosXSlider" for="elem_posX">Pos X</label>
-                <input class="numberBar" type="number" id="elementPosX" value="">
-                <label class="label-resize" id="elementPosYSlider" for="elem_posY">Pos Y</label>
-                <input class="numberBar" type="number" id="elementPosY" value="">
-                <button class="actionBtn" id="horizontalAlign" onclick="actionBtn.alignHorizontal()"></button><button class="actionBtn" id="verticalAlign" onclick="actionBtn.alignVertical()"></button>
+        <div id="settingRender">
+            <div class="settingsImage">
+                <h3 style="margin: 5px;">Render Properties</h3>
+                <div class="parameter">
+                    <label for="paletteQuality">Color Palette Size</label>
+                    <input type="range" id="paletteQuality" class="slider" value="30" min="1" max="256">
+                    <label for="paletteQuality" id="paletteQualityValue" class="code">30</label>
+                </div>
+                <div class="parameter">
+                    <label>Use Dithering</label>
+                    <input type="checkbox" id="useDithering" checked="true">
+                </div>
             </div>
-            <div class="parameter">
-                <label for="elem_normalizeCoords">Normalize position in the final background</label>
-                <input type="checkbox" id="normalizeCoords" name="elem_normalizeCoords" value="elem_normalizeCoords" checked="true">
-            </div>
-            <div class="parameter">
-                <label class="label-resize" id="elementWidthSlider" for="elem_width">Width</label>
-                <input class="numberBar" type="number" id="elementWidth" min="0" value="">
-                <label class="label-resize" id="elementHeightSlider" for="elem_height">Height</label>
-                <input class="numberBar" type="number" id="elementHeight" min="0" value="">
-                <button class="actionBtn" id="horizontalExpand" onclick="actionBtn.expandHorizontal()"></button><button class="actionBtn" id="verticalExpand" onclick="actionBtn.expandVertical()"></button>
-            </div>
-            <div class="parameter">
-                <label for="elem_linkSize">Link Size</label>
-                <input type="checkbox" id="linkSize" name="elem_linkSize" value="elem_linkSize" checked="true">
-            </div>
-            <div class="parameter">
-                <label class="label-resize" id="elementRotationSlider" for="elem_rotation">Rotation</label>
-                <input class="numberBar" type="number" id="elementRotation" min="-360" max="360" value="" placeholder="">
-                <button class="actionBtn" id="resetRotation" onclick="actionBtn.resetRotate()"></button>
+
+            <div class="settingsImage">
+                <h3 style="margin: 5px;">Image Properties</h3>
+                <div class="parameter">
+                    <label class="label-resize" id="elementPosXSlider" for="elem_posX">Pos X</label>
+                    <input class="numberBar" type="number" id="elementPosX" value="">
+                    <label class="label-resize" id="elementPosYSlider" for="elem_posY">Pos Y</label>
+                    <input class="numberBar" type="number" id="elementPosY" value="">
+                    <button class="actionBtn" id="horizontalAlign" onclick="actionBtn.alignHorizontal()"></button><button class="actionBtn" id="verticalAlign" onclick="actionBtn.alignVertical()"></button>
+                </div>
+                <div class="parameter">
+                    <label for="elem_normalizeCoords">Normalize position in the final background</label>
+                    <input type="checkbox" id="normalizeCoords" name="elem_normalizeCoords" value="elem_normalizeCoords" checked="true">
+                </div>
+                <div class="parameter">
+                    <label class="label-resize" id="elementWidthSlider" for="elem_width">Width</label>
+                    <input class="numberBar" type="number" id="elementWidth" min="0" value="">
+                    <label class="label-resize" id="elementHeightSlider" for="elem_height">Height</label>
+                    <input class="numberBar" type="number" id="elementHeight" min="0" value="">
+                    <button class="actionBtn" id="horizontalExpand" onclick="actionBtn.expandHorizontal()"></button><button class="actionBtn" id="verticalExpand" onclick="actionBtn.expandVertical()"></button>
+                </div>
+                <div class="parameter">
+                    <label for="elem_linkSize">Link Size</label>
+                    <input type="checkbox" id="linkSize" name="elem_linkSize" value="elem_linkSize" checked="true">
+                </div>
+                <div class="parameter">
+                    <label class="label-resize" id="elementRotationSlider" for="elem_rotation">Rotation</label>
+                    <input class="numberBar" type="number" id="elementRotation" min="-360" max="360" value="" placeholder="">
+                    <button class="actionBtn" id="resetRotation" onclick="actionBtn.resetRotate()"></button>
+                </div>
             </div>
         </div>
     </div>
@@ -131,8 +152,11 @@
         </div>
     </div>
     <script src="js/img_parameters.js"></script>
+    <script src="js/render_parameters.js"></script>
     <script src="js/new_image.js"></script>
     <script src="js/index.js"></script>
     <script src="js/generate.js"></script>
+    <script src="js/lib/color-palette-extraction.js"></script>
+    <script src="js/algorithms/color_palette.js"></script>
 </body>
 </html>

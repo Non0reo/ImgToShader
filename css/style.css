@@ -13,6 +13,10 @@ body {
     margin-left: 5px;
 }
 
+.code {
+    font-family: "Lucida Console"
+}
+
 canvas#shaderView {
     border: 6px solid rgb(255, 255, 255);
     border-radius: 8px;
@@ -247,6 +251,17 @@ div.addedImgBox button img {
 div.addedImgBox input.IsVisible {
     width: 20px;
     height: 20px;
+}
+
+div#settingRender {
+    /* border: 5px solid #3b3b3b; */
+    width: fit-content;
+    height: fit-content;
+    padding: 10px;
+    display: flex;
+    flex-direction: column;
+    /* position: absolute;
+    right: 0; */
 }
 
 div.settingsImage {

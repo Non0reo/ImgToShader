@@ -6,6 +6,7 @@ const generatedBoxLogo = document.getElementById("generatedCodeLogo");
 const generatedBoxBar = document.getElementById("generatedCodeBar");
 const downloadPack = document.getElementById("downloadPack");
 const warningText = document.getElementById("warningText");
+const useDithering = document.getElementById("useDithering");
 let generated, generatedLogo, generatedBar;
 let generatedFunction, generatedLogoFunction, generatedBarFunction;
 let finalCode, finalCodeLogo, finalCodeBar;
@@ -101,7 +102,57 @@ async function generateCode() {
         DataCompletlyLoaded(tempDrawLogo, tempDrawLoadingBar);
         return;
     } else {
-        await ImagesData();
+
+        /* ctx.clearRect(0, 0, size.width, size.height);
+        drawAddedPictures();
+        let canvaPixels = ctx.getImageData(0, 0, shaderView.width, shaderView.height);
+        const rgbArray = buildRgb(canvaPixels.data);
+        const quantColors = quantization(rgbArray, 4 - paletteQuality.value);
+        
+        console.log(quantColors);
+        return quantColors; */
+
+        ctx.clearRect(0, 0, size.width, size.height);
+        drawAddedPictures();
+        const canvaPixels = ctx.getImageData(0, 0, shaderView.width, shaderView.height);
+        const canvaPixels32 = new Uint32Array(canvaPixels.data.buffer);
+
+        var opts = {
+            colors: paletteQuality.value,             /*  desired palette size  */
+            dithering: useDithering.checked,         /*  whether to use dithering or not  */
+            pixels: canvaPixels32,         /*  source pixels in RGBA 32 bits  */
+            width: shaderView.width, 
+            height: shaderView.height
+        };
+        
+        let bestQuality = false;
+        var quant = bestQuality ? new PnnLABQuant(opts) : new PnnQuant(opts);
+
+        /*  reduce image  */
+        var img8 = quant.quantizeImage();      /*  Uint32Array  */
+        var pal8 = quant.getPalette();         /*  RGBA 32 bits of ArrayBuffer  */
+        var indexedPixels = quant.getIndexedPixels();     /*  colors > 256 ? Uint16Array : Uint8Array  */
+
+        let colorPalette = new Uint8ClampedArray(pal8);
+        let finalImage = new Uint8ClampedArray(img8.buffer);
+
+        //console.warn(pal8);
+
+        console.info(finalImage, colorPalette);
+
+        const imageData = new ImageData(finalImage, shaderView.width, shaderView.height);
+        ctx.putImageData(imageData, 0, 0);
+        
+        /* const img = new Image();
+        img.src = shaderView.toDataURL(); */
+
+
+        //const palette = getRenderPalette();
+        //const modifiedImage = mostSimilarColor(canvaPixels, palette);
+
+        //ctx.clearRect(0, 0, size.width, size.height);
+        //ctx.drawImage(img8, 0, 0, shaderView.width, shaderView.height);
+        //await ImagesData();
     }
     //await promise;
     //promise.then(function() {
