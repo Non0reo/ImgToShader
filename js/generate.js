@@ -7,6 +7,7 @@ const generatedBoxBar = document.getElementById("generatedCodeBar");
 const downloadPack = document.getElementById("downloadPack");
 const warningText = document.getElementById("warningText");
 const useDithering = document.getElementById("useDithering");
+const betterQuality = document.getElementById("betterQuality");
 let generated, generatedLogo, generatedBar;
 let generatedFunction, generatedLogoFunction, generatedBarFunction;
 let finalCode, finalCodeLogo, finalCodeBar;
@@ -103,15 +104,6 @@ async function generateCode() {
         return;
     } else {
 
-        /* ctx.clearRect(0, 0, size.width, size.height);
-        drawAddedPictures();
-        let canvaPixels = ctx.getImageData(0, 0, shaderView.width, shaderView.height);
-        const rgbArray = buildRgb(canvaPixels.data);
-        const quantColors = quantization(rgbArray, 4 - paletteQuality.value);
-        
-        console.log(quantColors);
-        return quantColors; */
-
         ctx.clearRect(0, 0, size.width, size.height);
         drawAddedPictures();
         const canvaPixels = ctx.getImageData(0, 0, shaderView.width, shaderView.height);
@@ -125,7 +117,7 @@ async function generateCode() {
             height: shaderView.height
         };
         
-        let bestQuality = false;
+        let bestQuality = betterQuality.checked;
         var quant = bestQuality ? new PnnLABQuant(opts) : new PnnQuant(opts);
 
         /*  reduce image  */
@@ -136,29 +128,12 @@ async function generateCode() {
         let colorPalette = new Uint8ClampedArray(pal8);
         let finalImage = new Uint8ClampedArray(img8.buffer);
 
-        //console.warn(pal8);
-
-        console.info(finalImage, colorPalette);
+        console.info(finalImage, colorPalette, indexedPixels);
 
         const imageData = new ImageData(finalImage, shaderView.width, shaderView.height);
         ctx.putImageData(imageData, 0, 0);
         
-        /* const img = new Image();
-        img.src = shaderView.toDataURL(); */
-
-
-        //const palette = getRenderPalette();
-        //const modifiedImage = mostSimilarColor(canvaPixels, palette);
-
-        //ctx.clearRect(0, 0, size.width, size.height);
-        //ctx.drawImage(img8, 0, 0, shaderView.width, shaderView.height);
-        //await ImagesData();
     }
-    //await promise;
-    //promise.then(function() {
-
-        //DownlodPreparation("download_page.html", finalCode, finalCodeLogo);
-    //});
 }
 
 //Create if statement

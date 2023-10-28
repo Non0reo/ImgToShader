@@ -131,7 +131,7 @@ div#imageListBox label.imgUpload {
     -ms-user-select: none;      
     user-select: none;
 
-    cursor: not-allowed;
+    /* cursor: not-allowed; */
 }
 
 div.selected {
@@ -255,6 +255,7 @@ div.addedImgBox input.IsVisible {
 
 div#settingRender {
     /* border: 5px solid #3b3b3b; */
+    /* width: fit-content; */
     width: fit-content;
     height: fit-content;
     padding: 10px;
@@ -334,6 +335,17 @@ div.settingsImage button.actionBtn:hover {
 div.settingsImage button.actionBtn:active {
     background-color: #888888;
     transition: 0.1s;
+}
+
+div.settingsImage button.numberBtn {
+    font-size: small;
+    outline: 1px solid white;
+    margin: 0 5px;
+    padding: 0 5px;
+    color: white;
+    border-radius: 50px;
+    width: 20px;
+    height: 20px;
 }
 
 
@@ -419,4 +431,19 @@ code#generatedCode {
     -moz-user-select: none;    
     -ms-user-select: none;      
     user-select: none;
+}
+
+
+.infoText {
+    font-size: 0.6em;
+    margin: 0px;
+    /* width: 50%; */
+    width: 500px;
+}
+
+.paramFamily {
+    background-color: #394059;
+    margin: 5px 0;
+    padding: 3px 6px;
+    border-radius: 5px;
 }

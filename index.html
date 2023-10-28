@@ -97,13 +97,35 @@
             <div class="settingsImage">
                 <h3 style="margin: 5px;">Render Properties</h3>
                 <div class="parameter">
-                    <label for="paletteQuality">Color Palette Size</label>
-                    <input type="range" id="paletteQuality" class="slider" value="30" min="1" max="256">
-                    <label for="paletteQuality" id="paletteQualityValue" class="code">30</label>
+                    <div class="paramFamily">
+                        <label for="paletteQuality">Color Palette Size</label>
+                        <input type="range" id="paletteQuality" class="slider" value="30" min="1" max="256">
+                        <button class="actionBtn numberBtn" onclick="paletteQualityButton(-1)">-</button>
+                        <label for="paletteQuality" id="paletteQualityValue" class="code">30</label>
+                        <button class="actionBtn numberBtn" onclick="paletteQualityButton(1)">+</button>
+                        <p class="infoText">► The number of colors present in the final render. Too many colors may make the shader too heavy and thus, prevent the shader to load</p>
+                    </div>
                 </div>
                 <div class="parameter">
                     <label>Use Dithering</label>
                     <input type="checkbox" id="useDithering" checked="true">
+                </div>
+                <div class="parameter">
+                    <div class="paramFamily">
+                        <label>Better Quality</label>
+                        <input type="checkbox" id="betterQuality" checked="true">
+                        <p class="infoText">► Makes the image closer from the original, may introduce more dither</p>
+                    </div>
+                </div>
+                <div class="parameter">
+                    <div class="paramFamily">
+                        <label for="renderResolution">Render Resolution</label>
+                        <input type="range" id="renderResolution" class="slider" value="25" min="1" max="100">
+                        <button class="actionBtn numberBtn" onclick="renderResButton(-1)">-</button>
+                        <label for="renderResolution" id="renderResolutionValue" class="code">25</label>
+                        <button class="actionBtn numberBtn" onclick="renderResButton(1)">+</button>
+                        <p class="infoText">► Resolution percentage from the actual canvas. The less the value is, the more the shader will display a pixalated image. Big values may cause to not load the shader at all</p>
+                    </div>
                 </div>
             </div>
 

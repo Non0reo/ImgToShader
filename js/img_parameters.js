@@ -88,7 +88,6 @@ elementPosXParam.addEventListener("input", function(){
 
 elementPosYParam.addEventListener("input", function(){
     if (elementPosYParam.value == "") elementPosYParam.value = 0;
-    console.log(elementPosYParam.value);
     dataStack[selected].y = parseInt(elementPosYParam.value);
     draw();
 });
