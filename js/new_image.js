@@ -1,5 +1,6 @@
 const imageList = document.getElementById("imageList");
 const goToTopBtnSettings = document.getElementById("goToTopBtnSettings");
+const settings = document.getElementsByClassName("settings");
 let imageStack = []; //Actual Image
 let dataStack = []; //Image informations on the canvas
 
@@ -190,8 +191,14 @@ function reloadImageList() {
         if (i == imageStack.length - 1) imageList.children[i].children[0].children[1].style.backgroundColor = "darkgray";
     }
 
-    if (imageStack.length >= 6) goToTopBtnSettings.style.display = "unset";
-    else goToTopBtnSettings.style.display = "none";
+    if (imageStack.length >= 6) {
+        goToTopBtnSettings.style.display = "unset";
+        settings[0].style.height = "unset";
+    }
+    else {
+        goToTopBtnSettings.style.display = "none";
+        settings[0].style.height = "fit-content";
+    }
 
     if (imageStack.length <= 0) {
         assignObjectToList("empty");

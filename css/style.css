@@ -61,6 +61,7 @@ div.optionBar {
 div.settings {
     border: 2px solid rgb(255, 255, 255);
     width: fit-content;
+    height: fit-content;
     padding: 7px;
     display: flex;
     flex-direction: column;
@@ -435,14 +436,15 @@ code#generatedCode {
 
 
 .infoText {
-    font-size: 0.6em;
+    font-size: 0.8em;
     margin: 0px;
     /* width: 50%; */
     width: 500px;
+    color: #ffffff65;
 }
 
 .paramFamily {
-    background-color: #394059;
+    background-color: #39405980;
     margin: 5px 0;
     padding: 3px 6px;
     border-radius: 5px;

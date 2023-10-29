@@ -98,31 +98,57 @@
                 <h3 style="margin: 5px;">Render Properties</h3>
                 <div class="parameter">
                     <div class="paramFamily">
-                        <label for="paletteQuality">Color Palette Size</label>
-                        <input type="range" id="paletteQuality" class="slider" value="30" min="1" max="256">
-                        <button class="actionBtn numberBtn" onclick="paletteQualityButton(-1)">-</button>
-                        <label for="paletteQuality" id="paletteQualityValue" class="code">30</label>
-                        <button class="actionBtn numberBtn" onclick="paletteQualityButton(1)">+</button>
-                        <p class="infoText">► The number of colors present in the final render. Too many colors may make the shader too heavy and thus, prevent the shader to load</p>
+                        <input type="radio" id="quantAlgoButton" name="algo" value="quant" onclick="displayMethod('quant')" checked>
+                        <label for="quantAlgoButton">Quaternization Compression</label><br>
+                        <input type="radio" id="bitsAlgoButton" name="algo" value="bits" onclick="displayMethod('bits')">
+                        <label for="bitsAlgoButton">Color per pixels Compression</label><br>
+                        <p class="infoText">• Quaternization Compression (recommended) will seach for the best color palette among the image average colors.<br>• Color per pixel Compression will search for each pixel the closest color using aproximated RGB values</p>
                     </div>
                 </div>
-                <div class="parameter">
-                    <label>Use Dithering</label>
-                    <input type="checkbox" id="useDithering" checked="true">
-                </div>
-                <div class="parameter">
+                <div id="quant">
                     <div class="paramFamily">
-                        <label>Better Quality</label>
-                        <input type="checkbox" id="betterQuality" checked="true">
-                        <p class="infoText">► Makes the image closer from the original, may introduce more dither. Process time might also be longer when you click on Generate</p>
+                        <div class="parameter">
+                            <div class="paramFamily">
+                                <label for="paletteQuality">Color Palette Size</label>
+                                <input type="range" id="paletteQuality" class="slider" value="15" min="1" max="256">
+                                <button class="actionBtn numberBtn" onclick="paletteQualityButton(-1)">-</button>
+                                <label for="paletteQuality" id="paletteQualityValue" class="code">15</label>
+                                <button class="actionBtn numberBtn" onclick="paletteQualityButton(1)">+</button>
+                                <p class="infoText">► The number of colors present in the final render. Too many colors may make the shader too heavy and thus, prevent the shader to load</p>
+                            </div>
+                        </div>
+                        <div class="parameter">
+                            <label>Use Dithering</label>
+                            <input type="checkbox" id="useDithering" checked="true">
+                        </div>
+                        <div class="parameter">
+                            <div class="paramFamily">
+                                <label>Better Quality</label>
+                                <input type="checkbox" id="betterQuality" checked="true">
+                                <p class="infoText">► Makes the image closer from the original, may introduce more dither. Process time might also be longer when you click on Generate</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div id="bits">
+                    <div class="parameter">
+                        <div class="paramFamily">
+                            <label for="channelQuantity">Color Available Per Channel</label>
+                            <input type="range" id="channelQuantity" class="slider" value="4" min="1" max="20">
+                            <button class="actionBtn numberBtn" onclick="channelQuantityButton(-1)">-</button>
+                            <label for="channelQuantity" id="channelQuantityValue" class="code">4</label>
+                            <button class="actionBtn numberBtn" onclick="channelQuantityButton(1)">+</button>
+                            <p class="infoText">► Defines the amount of available values in each channel</p>
+                            <p class="infoText" id="colorCount">☞ There are 64 possible colors</p>
+                        </div>
                     </div>
                 </div>
                 <div class="parameter">
                     <div class="paramFamily">
                         <label for="renderResolution">Render Resolution</label>
-                        <input type="range" id="renderResolution" class="slider" value="25" min="1" max="100">
+                        <input type="range" id="renderResolution" class="slider" value="50" min="1" max="100">
                         <button class="actionBtn numberBtn" onclick="renderResButton(-1)">-</button>
-                        <label for="renderResolution" id="renderResolutionValue" class="code">25</label>
+                        <label for="renderResolution" id="renderResolutionValue" class="code">50</label>
                         <button class="actionBtn numberBtn" onclick="renderResButton(1)">+</button>
                         <p class="infoText">► Resolution percentage from the actual canvas. The less the value is, the more the shader will display a pixalated image. Big values may cause to not load the shader at all</p>
                     </div>
@@ -179,6 +205,5 @@
     <script src="js/index.js"></script>
     <script src="js/generate.js"></script>
     <script src="js/lib/color-palette-extraction.js"></script>
-    <script src="js/algorithms/color_palette.js"></script>
 </body>
 </html>

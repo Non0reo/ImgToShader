@@ -8,6 +8,7 @@ const downloadPack = document.getElementById("downloadPack");
 const warningText = document.getElementById("warningText");
 const useDithering = document.getElementById("useDithering");
 const betterQuality = document.getElementById("betterQuality");
+
 let generated, generatedLogo, generatedBar;
 let generatedFunction, generatedLogoFunction, generatedBarFunction;
 let finalCode, finalCodeLogo, finalCodeBar;
@@ -102,116 +103,95 @@ async function generateCode() {
     if (imageStack.length == 0) { //Don't bother to make code if there is no image
         DataCompletlyLoaded(tempDrawLogo, tempDrawLoadingBar);
         return;
-    } else {
+    } 
 
-        //at the end, scale canvas image by scale factor, use getImageData form 0,0 to size * scaleFactor
+    //Render only the images
+    ctx.clearRect(0, 0, shaderView.width, shaderView.height);
+    drawAddedPictures();
+    const scaleFactor = renderResolution.value / 100;
+    const inv_scaleFactor = 1 / scaleFactor;
 
-        ctx.clearRect(0, 0, shaderView.width, shaderView.height);
-        console.log(ctx);
-        const scaleFactor = renderResolution.value / 100;
-        console.log(renderResolution.value, scaleFactor)
-        const inv_scaleFactor = 1 / scaleFactor;
-        
-        drawAddedPictures();
-        
+    const canvasPixels = ctx.getImageData(0, 0, shaderView.width, shaderView.height);
+    const canvasPixels32 = new Uint32Array(canvasPixels.data.buffer);
 
-        ///---------------------------------------------
-        const canvaPixels = ctx.getImageData(0, 0, shaderView.width, shaderView.height);
-        const canvaPixels32 = new Uint32Array(canvaPixels.data.buffer);
-
-        var opts = {
-            colors: paletteQuality.value,             /*  desired palette size  */
-            dithering: useDithering.checked,         /*  whether to use dithering or not  */
-            pixels: canvaPixels32,         /*  source pixels in RGBA 32 bits  */
-            width: shaderView.width, 
-            height: shaderView.height
-        };
-        
-        let bestQuality = betterQuality.checked;
-        var quant = bestQuality ? new PnnLABQuant(opts) : new PnnQuant(opts);
-
-        /*  reduce image  */
-        var img8 = quant.quantizeImage();      /*  Uint32Array  */
-        var pal8 = quant.getPalette();         /*  RGBA 32 bits of ArrayBuffer  */
-        var indexedPixels = quant.getIndexedPixels();     /*  colors > 256 ? Uint16Array : Uint8Array  */
-
-        let colorPalette = new Uint8ClampedArray(pal8);
-        let finalImage = new Uint8ClampedArray(img8.buffer);
-
-        console.info(finalImage, colorPalette, indexedPixels);
-
-        console.log(finalImage, shaderView.width * 4 * shaderView.height);
-        const imageData = new ImageData(finalImage, shaderView.width, shaderView.height);
-        //ctx.scale(inv_scaleFactor, inv_scaleFactor)
-        ctx.clearRect(0, 0, size.width, size.height);
-        ctx.putImageData(imageData, 0, 0);
-        //---------------------------------------------
-
-        //ctx.scale(scaleFactor, scaleFactor);
-        //drawAddedPictures();
-
-        
-
-        const image = new Image();
-        const smallImage = new Image();
-        image.src = shaderView.toDataURL();
-
-        let lowRes_image;
-        let highRes_image;
-        highRes_image = ctx.getImageData(0, 0, shaderView.width, shaderView.height);
-
-        //ctx.clearRect(0, 0, shaderView.width, shaderView.height);
-
-        /* ctx.scale(scaleFactor, scaleFactor);
-        ctx.drawImage(image, 0, 0, shaderView.width, shaderView.height); */
-
-        //ctx.scale(scaleFactor, scaleFactor);
-
-        image.onload = function() {
-            ctx.clearRect(0, 0, shaderView.width, shaderView.height);
-            ctx.scale(scaleFactor, scaleFactor);
-            ctx.drawImage(image, 0, 0, shaderView.width / inv_scaleFactor, shaderView.height / inv_scaleFactor);
-            lowRes_image = ctx.getImageData(0, 0, shaderView.width / inv_scaleFactor, shaderView.height / inv_scaleFactor);
-            smallImage.src = shaderView.toDataURL();
-            console.log(highRes_image)
-            console.log(lowRes_image)
-
+    console.log(compressionMode)
+    switch (compressionMode) {
+        case "quant":
+            //Image Quaternization Method
+            var opts = {
+                colors: paletteQuality.value,             /*  desired palette size  */
+                dithering: useDithering.checked,         /*  whether to use dithering or not  */
+                pixels: canvasPixels32,         /*  source pixels in RGBA 32 bits  */
+                width: shaderView.width, 
+                height: shaderView.height
+            };
             
-        
-            //ctx.clearRect(0, 0, shaderView.width, shaderView.height);
-            //ctx.putImageData(lowRes_image, 0, 0);
-            //ctx.drawImage(smallImage, 0, 0, shaderView.width * inv_scaleFactor, shaderView.height * inv_scaleFactor);
-            
-        };
+            let bestQuality = betterQuality.checked;
+            var quant = bestQuality ? new PnnLABQuant(opts) : new PnnQuant(opts);
 
-        smallImage.onload = function() {
-            ctx.scale(inv_scaleFactor, inv_scaleFactor)
-            ctx.clearRect(0, 0, shaderView.width, shaderView.height);
-            ctx.drawImage(smallImage, 0, 0, shaderView.width * inv_scaleFactor**2, shaderView.height * inv_scaleFactor**2);
-        }
+            /*  reduce image  */
+            var img8 = quant.quantizeImage();      /*  Uint32Array  */
+            var pal8 = quant.getPalette();         /*  RGBA 32 bits of ArrayBuffer  */
+            var indexedPixels = quant.getIndexedPixels();     /*  colors > 256 ? Uint16Array : Uint8Array  */
 
+            let colorPalette = new Uint8ClampedArray(pal8);
+            let finalImage = new Uint8ClampedArray(img8.buffer);
 
-        // ctx.scale(inv_scaleFactor, inv_scaleFactor)
-        
-        // ctx.clearRect(0, 0, shaderView.width, shaderView.height);
-        // //ctx.putImageData(lowRes_image, 0, 0);
-        // ctx.drawImage(smallImage, 0, 0, shaderView.width * scaleFactor, shaderView.height * scaleFactor);
+            console.info(finalImage, colorPalette, indexedPixels);
 
-        
-        /* const image = new Image();
-        image.src = shaderView.toDataURL();
-        image.onload = function() {
-            ctx.drawImage(image, 0, 0, inv_scaleFactor * shaderView.width, inv_scaleFactor * shaderView.height);
-        }; */
+            console.log(finalImage, shaderView.width * 4 * shaderView.height);
+            const imageData = new ImageData(finalImage, shaderView.width, shaderView.height);
+            ctx.clearRect(0, 0, size.width, size.height);
+            ctx.putImageData(imageData, 0, 0);
 
-        // const image = new Image()
-        // const imageData = new ImageData(finalImage, 100 / renderResolution.value * shaderView.width, 100 / renderResolution.value * shaderView.height);
-        // image.data = imageData;
-        // console.log(image);
-        // ctx.scale(100 / renderResolution.value, 100 / renderResolution.value)
-        // ctx.drawImage(imageData, 0, 0, shaderView.width, shaderView.height);
-        
+            break;
+
+        case "bits":
+            //Image Bit Reduction Method
+            let finalCanvas = [];
+            for (let i = 0; i < canvasPixels.data.length; i += 4) {
+                finalCanvas.push(
+                    Math.round(canvasPixels.data[i] / 255 * (channelQuantity.value - 1)) * (255 / (channelQuantity.value - 1)),
+                    Math.round(canvasPixels.data[i + 1] / 255 * (channelQuantity.value - 1)) * (255 / (channelQuantity.value - 1)),
+                    Math.round(canvasPixels.data[i + 2] / 255 * (channelQuantity.value - 1)) * (255 / (channelQuantity.value - 1)),
+                    255
+                );
+            }
+            const finalCanvaData = new Uint8ClampedArray(finalCanvas);
+            const finalImageData = new ImageData(finalCanvaData, shaderView.width, shaderView.height);
+            ctx.clearRect(0, 0, size.width, size.height);
+            console.log(finalCanvas, canvasPixels);
+            ctx.putImageData(finalImageData, 0, 0);
+            break;
     }
+    
+    //Downscale the image
+    const image = new Image();
+    const smallImage = new Image();
+    image.src = shaderView.toDataURL();
+
+    let lowRes_image;
+    let highRes_image;
+    highRes_image = ctx.getImageData(0, 0, shaderView.width, shaderView.height);
+
+
+    image.onload = function() {
+        ctx.clearRect(0, 0, shaderView.width, shaderView.height);
+        ctx.scale(scaleFactor, scaleFactor);
+        ctx.drawImage(image, 0, 0, shaderView.width / inv_scaleFactor, shaderView.height / inv_scaleFactor);
+        lowRes_image = ctx.getImageData(0, 0, shaderView.width / inv_scaleFactor, shaderView.height / inv_scaleFactor);
+        smallImage.src = shaderView.toDataURL();
+        console.log(highRes_image);
+        console.log(lowRes_image);            
+    };
+
+    smallImage.onload = function() {
+        ctx.scale(inv_scaleFactor, inv_scaleFactor);
+        ctx.clearRect(0, 0, shaderView.width, shaderView.height);
+        ctx.drawImage(smallImage, 0, 0, shaderView.width * inv_scaleFactor**2, shaderView.height * inv_scaleFactor**2);
+    }
+    
+    
 }
 
 //Create if statement
