@@ -22,6 +22,7 @@ canvas#shaderView {
     border-radius: 8px;
     background-color: #EF323D;
     margin-bottom: -7px;
+    resize: both;
 }
 
 div#outsideCanvas {

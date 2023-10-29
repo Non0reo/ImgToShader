@@ -61,14 +61,17 @@
                 <div class="parameter">
                     <label for="drawLogo">Draw Logo</label>
                     <input type="checkbox" id="drawLogo" name="drawLogo" value="drawLogo" checked="true">
-                    <label for="logoSize">Logo Size (visual)</label>
-                    <input type="range" id="logoSize" class="slider" value="480" min="1" max="1000">
-                    <label for="autoSize">Auto</label>
-                    <input type="checkbox" id="autoSize" name="autoSize" value="autoSize">
                 </div>
                 <div class="parameter">
                     <label for="drawLoadingBar">Draw Loading Bar</label>
                     <input type="checkbox" id="drawLoadingBar" name="drawLoadingBar" value="drawLoadingBar" checked="true">
+                </div>
+                <br>
+                <div class="parameter">
+                    <label for="logoSize">Logo Size (visual)</label>
+                    <input type="range" id="logoSize" class="slider" value="480" min="1" max="1000">
+                    <label for="autoSize">Auto</label>
+                    <input type="checkbox" id="autoSize" name="autoSize" value="autoSize">
                 </div>
     
                 <div class="topBtnDiv">
@@ -202,7 +205,8 @@
             </div>
         </div>
     </div>
-    <div class="sidebar">
+    <div id="sidebar">
+        <button id="sidebarBtn" onclick="toggleSidebar()"><!-- <img src="https://api.iconify.design/ci:hamburger-md.svg" width="32" height="32"> --></button>
         <div id="topDiv">
             <h1 class="rainbow">ImgToShader</h1>
         </div>
@@ -221,6 +225,7 @@
         </div>
     </div>
     <script src="js/img_parameters.js"></script>
+    <script src="js/layout.js"></script>
     <script src="js/render_parameters.js"></script>
     <script src="js/new_image.js"></script>
     <script src="js/index.js"></script>

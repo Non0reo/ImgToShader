@@ -6,7 +6,6 @@ let dataStack = []; //Image informations on the canvas
 
 function loadImage(event) {
     try {
-        console.log(event);
         let img = new Image();
         img.src = URL.createObjectURL(event.srcElement.files[0]);
         const addedDiv = AddImageToList(img);

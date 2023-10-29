@@ -3,23 +3,70 @@ svg {
 }
 
 /* The sidebar menu */
-.sidebar {
+
+#sidebar {
     /* height: 100%; */ /* Full-height: remove this if you want "auto" height */
     width: fit-content; /* Set the width of the sidebar */
     position: fixed; /* Fixed Sidebar (stay in place on scroll) */
     z-index: 1; /* Stay on top */
     bottom: 0; /* Stay at the top */
-    right: 0;
+    right: -320px;
     background-color: #222530; /* Black */
     overflow-x: hidden; /* Disable horizontal scroll */
     padding-top: 20px;
     display: flex;
     flex-direction: column;
     border-radius: 20px 0 0 20px;
+    transition: all 0.8s ease-in-out;
+}
+
+
+#sidebar.active {
+    /* height: 100%; */ /* Full-height: remove this if you want "auto" height */
+    width: fit-content; /* Set the width of the sidebar */
+    position: fixed; /* Fixed Sidebar (stay in place on scroll) */
+    z-index: 1; /* Stay on top */
+    bottom: 0; /* Stay at the top */
+    right: 0;
+}
+
+#sidebar.active #sidebarBtn {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    width: 40px;
+    height: 40px;
+    color: #fff;
+    background-color: #303442;
+    border: none;
+    border-radius: 20px;
+    background-image: url("https://api.iconify.design/ci:hamburger-md.svg?color=%23ffffff");
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: 25px 25px;
+    transition: all 0.8s ease-in-out;
+}
+
+#sidebar #sidebarBtn {
+    position: absolute;
+    top: 45%;
+    bottom: 50%;
+    left: 10px;
+    width: 40px;
+    height: 40px;
+    color: #fff;
+    background-color: #303442;
+    border: none;
+    border-radius: 20px;
+    background-image: url("https://api.iconify.design/ion:chevron-back-outline.svg?color=%23ffffff");
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: 25px 25px;
+    transition: all 0.8s ease-in-out;
 }
   
 /* The navigation menu links */
-.sidebar div#actions a {
+#sidebar div#actions a {
     padding: 0px 16px;
     text-decoration: none;
     font-size: 1em;
@@ -29,7 +76,7 @@ svg {
 }
   
 /* When you mouse over the navigation links, change their color */
-.sidebar div#actions a:hover {
+#sidebar div#actions a:hover {
     color: #f1f1f1;
 }
 

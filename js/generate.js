@@ -254,8 +254,21 @@ async function generateCode() {
 
 
         ctx.scale(inv_scaleFactor, inv_scaleFactor);
-        ctx.clearRect(0, 0, shaderView.width, shaderView.height);
+        /* ctx.clearRect(0, 0, shaderView.width, shaderView.height);
+
+        drawLogo = drawLogoParam.checked
+        drawLoadingBar = drawLoadingBarParam.checked
+        if (drawLogo) mojangLogo.onload(); //draw the logo
+        if (drawLoadingBar) loadingBar.onload(); //draw the loading bar
+
+        //Draw only on top of transparent pixels
+        ctx.globalCompositeOperation = "destination-over";
         ctx.drawImage(smallImage, 0, 0, shaderView.width * inv_scaleFactor**2, shaderView.height * inv_scaleFactor**2);
+        ctx.globalCompositeOperation = "source-over"; */
+
+        console.log(image.width, image.height, image)
+        console.log(smallImage.width, smallImage.height, smallImage)
+
     }
     
     

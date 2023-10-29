@@ -82,28 +82,6 @@ const logoColorParam = Pickr.create(logoColorOptions);
 const loadingBarColorParam = Pickr.create(logoColorOptions);
 
 
-function resizeX(e){
-    const dx = e.x - m_pos.x;
-    m_pos.x = e.x;
-    size.width = (parseInt(getComputedStyle(shaderView, '').width) + dx);
-    shaderView.width = size.width;
-    widthParam.value = size.width;
-    if (autoSize) SetSizeElement();
-    //addedSize.width += dx;
-    draw();
-}
-
-function resizeY(e){
-    const dy = e.y - m_pos.y;
-    m_pos.y = e.y;
-    size.height = (parseInt(getComputedStyle(shaderView, '').height) + dy);
-    shaderView.height = size.height;
-    heightParam.value = size.height;
-    if (autoSize) SetSizeElement();
-    //addedSize.height += dy;
-    draw();
-}
-
 // document.addEventListener("keydown", function (f) {
 //     shaderView.addEventListener("mousedown", function(e){
 //         if (f.key == "Control") {
@@ -119,7 +97,41 @@ function resizeY(e){
 //     }, false);
 // });
 
+
 //Canvas resize
+document.addEventListener("mousedown", function (e) {
+    if (e.target === shaderView) {
+        const startX = e.pageX - shaderView.offsetLeft;
+        const startY = e.pageY - shaderView.offsetTop;
+        const startWidth = shaderView.width;
+        const startHeight = shaderView.height;
+        redrawProcess()
+
+        document.addEventListener("mousemove", resizeCanvas, false);
+        document.addEventListener("mouseup", stopResize, false);
+
+        function resizeCanvas(e) {
+            widthParam.value = shaderView.width = size.width = startWidth + e.pageX - shaderView.offsetLeft - startX;
+            heightParam.value = shaderView.height = size.height = startHeight + e.pageY - shaderView.offsetTop - startY;
+            redrawProcess();
+        }
+
+        function stopResize() {
+            document.removeEventListener("mousemove", resizeCanvas, false);
+            document.removeEventListener("mouseup", stopResize, false);
+            redrawProcess();
+        }
+
+        redrawProcess();
+    }
+}, false);
+
+function redrawProcess() {
+    if (autoSize) SetSizeElement();
+    draw();
+    ctx.imageSmoothingEnabled = false;
+}
+
 /* shaderView.addEventListener("mousedown", function(e){
     if (e.offsetX > BORDER_SIZE) {
         m_pos.x = e.x;
@@ -129,14 +141,34 @@ function resizeY(e){
         m_pos.y = e.y;
         document.addEventListener("mousemove", resizeY, false);
     }
-}, false); */
+}, false);
 
 document.addEventListener("mouseup", function(){
+    shaderView.width = size.width = supposedSize.width;
+    shaderView.height = size.height = supposedSize.height;
     //document.removeEventListener("keydown");
     document.removeEventListener("mousemove", resizeX, false);
     document.removeEventListener("mousemove", resizeY, false);
 }, false);
 
+function resizeX(e){
+    console.log(e)
+    const dx = e.x - m_pos.x;
+    m_pos.x = e.x;
+    supposedSize.width = widthParam.value = (parseInt(getComputedStyle(shaderView, '').width) + dx);
+    if (autoSize) SetSizeElement();
+    //addedSize.width += dx;
+    draw();
+}
+
+function resizeY(e){
+    const dy = e.y - m_pos.y;
+    m_pos.y = e.y;
+    supposedSize.height = heightParam.value = (parseInt(getComputedStyle(shaderView, '').height) + dy);
+    if (autoSize) SetSizeElement();
+    //addedSize.height += dy;
+    draw();
+} */
 
 //PARAMETERS
 
@@ -160,14 +192,13 @@ widthParam.addEventListener("input", function(){
     size.width = parseInt(widthParam.value);
     shaderView.width = size.width;
     widthParam.value = size.width;
-    if (autoSize) SetSizeElement();
-    draw();
+    redrawProcess();
 });
 heightParam.addEventListener("input", function(){
     size.height = parseInt(heightParam.value);
     shaderView.height = size.height;
     heightParam.value = size.height;
-    draw();
+    redrawProcess();
 });
 
 //Background Color
