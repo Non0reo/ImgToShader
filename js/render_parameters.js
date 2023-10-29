@@ -15,6 +15,6 @@ function paletteQualityButton(value) {
     paletteQualityValue.textContent = paletteQuality.value = parseInt(paletteQuality.value) + value;
 }
 
-function renderRedButton(value) {
+function renderResButton(value) {
     renderResolutionValue.textContent = renderResolution.value = parseInt(renderResolution.value) + value;
 }

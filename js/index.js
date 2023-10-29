@@ -229,7 +229,8 @@ drawLoadingBarParam.addEventListener("input", function(){
 });
 
 
-const ctx = shaderView.getContext("2d");
+let ctx = shaderView.getContext("2d", { willReadFrequently: true });
+ctx.imageSmoothingEnabled = false;
 let mojangLogo = new Image();
 let loadingBar = new Image();
 let testImg = new Image();

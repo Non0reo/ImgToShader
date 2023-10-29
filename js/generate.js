@@ -104,8 +104,18 @@ async function generateCode() {
         return;
     } else {
 
-        ctx.clearRect(0, 0, size.width, size.height);
+        //at the end, scale canvas image by scale factor, use getImageData form 0,0 to size * scaleFactor
+
+        ctx.clearRect(0, 0, shaderView.width, shaderView.height);
+        console.log(ctx);
+        const scaleFactor = renderResolution.value / 100;
+        console.log(renderResolution.value, scaleFactor)
+        const inv_scaleFactor = 1 / scaleFactor;
+        
         drawAddedPictures();
+        
+
+        ///---------------------------------------------
         const canvaPixels = ctx.getImageData(0, 0, shaderView.width, shaderView.height);
         const canvaPixels32 = new Uint32Array(canvaPixels.data.buffer);
 
@@ -130,8 +140,76 @@ async function generateCode() {
 
         console.info(finalImage, colorPalette, indexedPixels);
 
+        console.log(finalImage, shaderView.width * 4 * shaderView.height);
         const imageData = new ImageData(finalImage, shaderView.width, shaderView.height);
+        //ctx.scale(inv_scaleFactor, inv_scaleFactor)
+        ctx.clearRect(0, 0, size.width, size.height);
         ctx.putImageData(imageData, 0, 0);
+        //---------------------------------------------
+
+        //ctx.scale(scaleFactor, scaleFactor);
+        //drawAddedPictures();
+
+        
+
+        const image = new Image();
+        const smallImage = new Image();
+        image.src = shaderView.toDataURL();
+
+        let lowRes_image;
+        let highRes_image;
+        highRes_image = ctx.getImageData(0, 0, shaderView.width, shaderView.height);
+
+        //ctx.clearRect(0, 0, shaderView.width, shaderView.height);
+
+        /* ctx.scale(scaleFactor, scaleFactor);
+        ctx.drawImage(image, 0, 0, shaderView.width, shaderView.height); */
+
+        //ctx.scale(scaleFactor, scaleFactor);
+
+        image.onload = function() {
+            ctx.clearRect(0, 0, shaderView.width, shaderView.height);
+            ctx.scale(scaleFactor, scaleFactor);
+            ctx.drawImage(image, 0, 0, shaderView.width / inv_scaleFactor, shaderView.height / inv_scaleFactor);
+            lowRes_image = ctx.getImageData(0, 0, shaderView.width / inv_scaleFactor, shaderView.height / inv_scaleFactor);
+            smallImage.src = shaderView.toDataURL();
+            console.log(highRes_image)
+            console.log(lowRes_image)
+
+            
+        
+            //ctx.clearRect(0, 0, shaderView.width, shaderView.height);
+            //ctx.putImageData(lowRes_image, 0, 0);
+            //ctx.drawImage(smallImage, 0, 0, shaderView.width * inv_scaleFactor, shaderView.height * inv_scaleFactor);
+            
+        };
+
+        smallImage.onload = function() {
+            ctx.scale(inv_scaleFactor, inv_scaleFactor)
+            ctx.clearRect(0, 0, shaderView.width, shaderView.height);
+            ctx.drawImage(smallImage, 0, 0, shaderView.width * inv_scaleFactor**2, shaderView.height * inv_scaleFactor**2);
+        }
+
+
+        // ctx.scale(inv_scaleFactor, inv_scaleFactor)
+        
+        // ctx.clearRect(0, 0, shaderView.width, shaderView.height);
+        // //ctx.putImageData(lowRes_image, 0, 0);
+        // ctx.drawImage(smallImage, 0, 0, shaderView.width * scaleFactor, shaderView.height * scaleFactor);
+
+        
+        /* const image = new Image();
+        image.src = shaderView.toDataURL();
+        image.onload = function() {
+            ctx.drawImage(image, 0, 0, inv_scaleFactor * shaderView.width, inv_scaleFactor * shaderView.height);
+        }; */
+
+        // const image = new Image()
+        // const imageData = new ImageData(finalImage, 100 / renderResolution.value * shaderView.width, 100 / renderResolution.value * shaderView.height);
+        // image.data = imageData;
+        // console.log(image);
+        // ctx.scale(100 / renderResolution.value, 100 / renderResolution.value)
+        // ctx.drawImage(imageData, 0, 0, shaderView.width, shaderView.height);
         
     }
 }
