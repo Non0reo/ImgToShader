@@ -120,7 +120,7 @@ function resizeY(e){
 // });
 
 //Canvas resize
-shaderView.addEventListener("mousedown", function(e){
+/* shaderView.addEventListener("mousedown", function(e){
     if (e.offsetX > BORDER_SIZE) {
         m_pos.x = e.x;
         document.addEventListener("mousemove", resizeX, false);
@@ -129,7 +129,7 @@ shaderView.addEventListener("mousedown", function(e){
         m_pos.y = e.y;
         document.addEventListener("mousemove", resizeY, false);
     }
-}, false);
+}, false); */
 
 document.addEventListener("mouseup", function(){
     //document.removeEventListener("keydown");

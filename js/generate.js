@@ -113,6 +113,8 @@ async function generateCode() {
 
     const canvasPixels = ctx.getImageData(0, 0, shaderView.width, shaderView.height);
     const canvasPixels32 = new Uint32Array(canvasPixels.data.buffer);
+    let palette = [];
+    let indexedColors = [];
 
     console.log(compressionMode)
     switch (compressionMode) {
@@ -137,6 +139,8 @@ async function generateCode() {
             let colorPalette = new Uint8ClampedArray(pal8);
             let finalImage = new Uint8ClampedArray(img8.buffer);
 
+            palette = Uint8ClampedArrayToColorArray(colorPalette);
+            indexedColors = indexedPixels;
             console.info(finalImage, colorPalette, indexedPixels);
 
             console.log(finalImage, shaderView.width * 4 * shaderView.height);
@@ -149,14 +153,44 @@ async function generateCode() {
         case "bits":
             //Image Bit Reduction Method
             let finalCanvas = [];
+            let colors = [];
             for (let i = 0; i < canvasPixels.data.length; i += 4) {
                 finalCanvas.push(
                     Math.round(canvasPixels.data[i] / 255 * (channelQuantity.value - 1)) * (255 / (channelQuantity.value - 1)),
                     Math.round(canvasPixels.data[i + 1] / 255 * (channelQuantity.value - 1)) * (255 / (channelQuantity.value - 1)),
                     Math.round(canvasPixels.data[i + 2] / 255 * (channelQuantity.value - 1)) * (255 / (channelQuantity.value - 1)),
-                    255
+                    Math.round(canvasPixels.data[i + 3] / 255 * (channelQuantity.value - 1)) * (255 / (channelQuantity.value - 1))
                 );
             }
+
+            //Get the colors
+            const colorArray = Uint8ClampedArrayToColorArray(finalCanvas);
+
+            //Get the color palette from the colorArray and put each color in the colors[] array under the form [r, g, b, a]
+            for (let i = 0; i < colorArray.length; i++) {
+                let color = colorArray[i];
+                let colorFound = false;
+                for (let j = 0; j < colors.length; j++) {
+                    if (colors[j][0] == color[0] && colors[j][1] == color[1] && colors[j][2] == color[2] && colors[j][3] == color[3]) {
+                        colorFound = true;
+                        break;
+                    }
+                }
+                if (!colorFound) colors.push(color);
+            }
+            palette = colors;
+
+            //Get the indexed colors
+            for (let i = 0; i < colorArray.length; i++) {
+                let color = colorArray[i];
+                for (let j = 0; j < colors.length; j++) {
+                    if (colors[j][0] == color[0] && colors[j][1] == color[1] && colors[j][2] == color[2] && colors[j][3] == color[3]) {
+                        indexedColors.push(j);
+                        break;
+                    }
+                }
+            }
+
             const finalCanvaData = new Uint8ClampedArray(finalCanvas);
             const finalImageData = new ImageData(finalCanvaData, shaderView.width, shaderView.height);
             ctx.clearRect(0, 0, size.width, size.height);
@@ -165,6 +199,8 @@ async function generateCode() {
             break;
     }
     
+    console.log(palette);
+
     //Downscale the image
     const image = new Image();
     const smallImage = new Image();
@@ -186,6 +222,37 @@ async function generateCode() {
     };
 
     smallImage.onload = function() {
+        
+        //Get the palette
+        palette = [];
+        indexedColors = [];
+        let formatedLowResImage = Uint8ClampedArrayToColorArray(lowRes_image.data);
+        for(let i = 0; i < formatedLowResImage.length; i++) {
+            let color = formatedLowResImage[i];
+            let colorFound = false;
+            for (let j = 0; j < palette.length; j++) {
+                if (palette[j][0] == color[0] && palette[j][1] == color[1] && palette[j][2] == color[2] && palette[j][3] == color[3]) {
+                    colorFound = true;
+                    break;
+                }
+            }
+            if (!colorFound) palette.push(color);
+        }
+        console.log(palette);
+
+        for (let i = 0; i < formatedLowResImage.length; i++) {
+            let color = formatedLowResImage[i];
+            for (let j = 0; j < palette.length; j++) {
+                if (palette[j][0] == color[0] && palette[j][1] == color[1] && palette[j][2] == color[2] && palette[j][3] == color[3]) {
+                    indexedColors.push(j);
+                    break;
+                }
+            }
+        }
+        console.log(indexedColors);
+        displayColorCount(palette.length);
+
+
         ctx.scale(inv_scaleFactor, inv_scaleFactor);
         ctx.clearRect(0, 0, shaderView.width, shaderView.height);
         ctx.drawImage(smallImage, 0, 0, shaderView.width * inv_scaleFactor**2, shaderView.height * inv_scaleFactor**2);
@@ -533,4 +600,13 @@ function DataCompletlyLoaded(tempDrawLogo, tempDrawLoadingBar) {
     codeLogo.style.paddingLeft = "0px";
     generatedBoxLogo.appendChild(codeLogo);
     hljs.highlightElement(generatedBoxLogo);
+}
+
+
+function Uint8ClampedArrayToColorArray(array){
+    let colorArray = [];
+    for (let i = 0; i < array.length; i += 4) {
+        colorArray.push([array[i], array[i + 1], array[i + 2], array[i + 3]]);
+    }
+    return colorArray;
 }

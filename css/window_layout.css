@@ -1,0 +1,89 @@
+svg {
+    color: white;
+}
+
+/* The sidebar menu */
+.sidebar {
+    /* height: 100%; */ /* Full-height: remove this if you want "auto" height */
+    width: fit-content; /* Set the width of the sidebar */
+    position: fixed; /* Fixed Sidebar (stay in place on scroll) */
+    z-index: 1; /* Stay on top */
+    bottom: 0; /* Stay at the top */
+    right: 0;
+    background-color: #222530; /* Black */
+    overflow-x: hidden; /* Disable horizontal scroll */
+    padding-top: 20px;
+    display: flex;
+    flex-direction: column;
+    border-radius: 20px 0 0 20px;
+}
+  
+/* The navigation menu links */
+.sidebar div#actions a {
+    padding: 0px 16px;
+    text-decoration: none;
+    font-size: 1em;
+    color: #b2b2b2;
+    display: block;
+    text-align: center;
+}
+  
+/* When you mouse over the navigation links, change their color */
+.sidebar div#actions a:hover {
+    color: #f1f1f1;
+}
+
+
+div#topDiv h1 {
+    font-size: 1.5em;
+    margin: 8px 16px;
+    padding: 8px 16px;
+    text-align: center;
+}
+
+div#bottomDiv {
+    width: fit-content;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    text-align: center;
+    align-items: center;
+    margin: 20px 0;
+    /* font-size: ; */
+}
+
+div#bottomDiv p#credits {
+    width: 80%;
+}
+
+.copyright {
+    font-size: 1em;
+    color: #ffffff;
+    text-align: center;
+    margin: 10px 0;
+    width: 75%;
+}
+
+
+/* Rainbow Text Animation */
+.rainbow {
+    background-image: linear-gradient(90deg, #ff0000, #de9f60, #ffff00, #00ff00, #4690d5, #8516d4, #ee82ee);
+    background-size: 400%;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    animation: rainbow 10s ease-in-out running infinite;
+    font-weight: bolder;
+}
+
+@keyframes rainbow {
+    0% {
+        background-position: 0%;
+    }
+    50% {
+        background-position: 100%;
+    }
+    100% {
+        background-position: 0%;
+    }
+}
