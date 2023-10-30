@@ -75,7 +75,13 @@ function generateGUIOverlayFSH(data, loadingBarCondition = "") {
         gen_Frag = backgroundColor.draw ? `fragColor = vec4(vec3(${backgroundColor.color.r}, ${backgroundColor.color.g}, ${backgroundColor.color.b}) / 255, ${alpha});` : `discard;`
     }
 
-    let gen_Image = data.imageExists ? `\nvec2 RealSSize = getScreenSize(ProjMat, ScreenSize);\nvec2 pixelUnit = RealSSize.xy / imageSize.xy;\nivec2 RealPixelPos = getPixelPos(pixelUnit, pos.xy);\n` : ``;
+    gen_Frag = data.imageExists ? `vec3 newColor = pColor(RealPixelPos, imageSize) / 255;\n\tfragColor = vec4(newColor, color.a);` : gen_Frag;
+
+    let gen_Image = data.imageExists ? `
+    vec2 RealSSize = getScreenSize(ProjMat, ScreenSize);
+    vec2 pixelUnit = RealSSize.xy / imageSize.xy;
+    ivec2 RealPixelPos = getPixelPos(pixelUnit, pos.xy);
+` : ``;
 
     let backgroundCondition = `
     if (color.r == 239.0 / 255.0${data.generalInfos.accessibilityCompatibility ? ` || color.rgb == vec3(0.0))` : ``}) {
@@ -160,7 +166,6 @@ function generateGUIFSH(data) {
     const backgroundColor = data.generalInfos.backgroundColor;
 
     let gen_Frag = '';
-    console.log(loadingBarColor.colorHEX)
     if (loadingBarColor.colorHEX != "#FFFFFF" || !loadingBarColor.draw) {
         let colorData = loadingBarColor;
         if (!loadingBarColor.draw) {

@@ -86,7 +86,6 @@ async function generateCode() {
 
             palette = Uint8ClampedArrayToColorArray(colorPalette);
             indexedColors = indexedPixels;
-            console.info(finalImage, colorPalette, indexedPixels);
 
             const imageData = new ImageData(finalImage, shaderView.width, shaderView.height);
             ctx.clearRect(0, 0, size.width, size.height);
@@ -215,7 +214,6 @@ async function generateCode() {
         }
         console.log(nonEmptyPixels);
 
-        const shaderGenWorker = new Worker("js/img_shader_algorithm.js");
         const json = {
             imageData: {
                 data: formatedLowResImage,
@@ -370,8 +368,8 @@ const DownloadPack = (shaderData) => {
     const packMcmeta = 
 `{
     "pack": {
-        "pack_format": ${shaderData.packVersion},
-        "description": "${shaderData.packDescription}"
+        "pack_format": ${PACK_VERSION},
+        "description": "${PACK_DESCRIPTION}"
     }
 }`;
 
@@ -404,7 +402,7 @@ const DownloadPack = (shaderData) => {
 
     zip.generateAsync({type:"blob"})
     .then(function(content) {
-        download(content, `${shaderData.packName}.zip`, "application/zip");
+        download(content, `${PACK_NAME}.zip`, "application/zip");
         window.focus();   
     });
 
