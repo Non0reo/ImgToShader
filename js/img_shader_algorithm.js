@@ -159,18 +159,15 @@ void main() {
 function generateGUIFSH(data) {
     const loadingBarColor = data.generalInfos.loadingBarColor;
     const backgroundColor = data.generalInfos.backgroundColor;
-    console.log(loadingBarColor);
 
     let gen_Frag = '';
     if (loadingBarColor.colorHEX != "#ffffff" || !loadingBarColor.draw) {
-        //let colorInfos = hexToRGBA(loadingBarColor);
         let colorInfos = loadingBarColor;
         if (!loadingBarColor.draw) {
             if (backgroundColor.draw) colorInfos = data.generalInfos.backgroundColor.color;
             else colorInfos = {color: {r: "0.0", g: "0.0", b: "0.0", a: "0.0"}, IsAlphaChanged: false};
         }
 
-        //let alpha = (drawLoadingBar) ? (colorInfos.IsAlphaChanged ? ("color.a - " + ((1.0 - colorInfos.color.a))) : "color.a") : "0.0";
         let alpha;
         if (loadingBarColor.draw) {
             if (colorInfos.IsAlphaChanged) alpha = "color.a - " + ((1.0 - colorInfos.color.a));
@@ -180,8 +177,6 @@ function generateGUIFSH(data) {
             else alpha = "0.0";
         }
 
-        console.log(colorInfos, alpha, data.generalInfos.shader.version);
-        //const loadingBarColorGenerated = `\n${createIfStatement("color.rgb == vec3(1.0)" + (SHADER_VERSION === 0 ? " && color.a != 128.0 / 255.0" : ""), "fragColor = vec4(" + colorInfos.color.r + ", " + colorInfos.color.g + ", " + colorInfos.color.b + ", " + alpha + ");")}\n`;
         gen_Frag = `
     if(color.rgb == vec3(1.0)${data.generalInfos.shader.version === 0 ? ` && color.a != 128.0 / 255.0` : ``}) {
         ${mojangLogoColor.draw ? `fragColor = vec4(vec3(${colorData.color.r}, ${colorData.color.g}, ${colorData.color.b}) / 255, ${alpha});` : `discard;`}
@@ -218,12 +213,10 @@ function generatePositionTexFSH(data) {
     let gen_Frag = '';
     console.log(mojangLogoColor.draw);
     if (mojangLogoColor.colorHEX != "#ffffff" || !mojangLogoColor.draw) {
-        //let colorInfos = hexToRGBA(mojangLogoColor, 2);
         let colorData = mojangLogoColor;
         if (!mojangLogoColor.draw) colorData = {color: {r: "0.0", g: "0.0", b: "0.0", a: "0.0"}, IsAlphaChanged: false};
 
         let alpha = (mojangLogoColor.draw) ? (colorData.IsAlphaChanged ? ("color.a - " + ((1.0 - colorData.color.a))) : "color.a") : "0.0";
-        //generatedLogo += `\n${createIfStatement("texelFetch(Sampler0, ivec2(267, 146), 0) == vec4(1)", "fragColor = vec4(" + colorInfos.color.r + ", " + colorInfos.color.g + ", " + colorInfos.color.b + ", " + alpha + ");")}\n`;
         console.warn(colorData, mojangLogoColor.color);
         gen_Frag = `
     if(texelFetch(Sampler0, ivec2(267, 146), 0) == vec4(1)) {
@@ -321,13 +314,11 @@ function generateImageBackgroundGLSL(data) {
             for (let j = 0; j < indexedColors.length; j++) {
                 if (i === indexedColors[j]) {
                     stringOut += `\n\t\tcase ${j}:`
-                    //console.log(i, palette[i])
                     caseNumber++;
                 }
             }
             stringOut += `\n\t\t\treturn vec3(${palette[i][0]}, ${palette[i][1]}, ${palette[i][2]});`;
         }
-        //stringOut = '';
     }
     stringOut += `\n\t\tdefault:\n\t\t\treturn vec3(${backgroundColor.r}, ${backgroundColor.g}, ${backgroundColor.b});`;
     
@@ -341,5 +332,4 @@ vec3 pColor(ivec2 RealPixelPos, ivec2 imageSize) {
 }
 `;
 
-    //console.log(genCode, `Total Cases Number: ${caseNumber}`);
 }
