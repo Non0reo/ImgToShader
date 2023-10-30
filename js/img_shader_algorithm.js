@@ -36,7 +36,6 @@ self.onmessage = function(e) {
         } else {
             this.postMessage({
                 guiOverlayFSH: generateGUIOverlayFSH(data),
-                guiOverlayVSH: generateGUIOverlayVSH(),
                 guiFSH: guiFSHcode,
                 positionTexFSH: generatePositionTexFSH(data),
                 shaderJson: result
@@ -162,15 +161,15 @@ function generateGUIFSH(data) {
 
     let gen_Frag = '';
     if (loadingBarColor.colorHEX != "#ffffff" || !loadingBarColor.draw) {
-        let colorInfos = loadingBarColor;
+        let colorData = loadingBarColor;
         if (!loadingBarColor.draw) {
-            if (backgroundColor.draw) colorInfos = data.generalInfos.backgroundColor.color;
-            else colorInfos = {color: {r: "0.0", g: "0.0", b: "0.0", a: "0.0"}, IsAlphaChanged: false};
+            if (backgroundColor.draw) colorData = data.generalInfos.backgroundColor.color;
+            else colorData = {color: {r: "0.0", g: "0.0", b: "0.0", a: "0.0"}, IsAlphaChanged: false};
         }
 
         let alpha;
         if (loadingBarColor.draw) {
-            if (colorInfos.IsAlphaChanged) alpha = "color.a - " + ((1.0 - colorInfos.color.a));
+            if (colorData.IsAlphaChanged) alpha = "color.a - " + ((1.0 - colorData.color.a));
             else alpha = "color.a";
         } else {
             if (backgroundColor.draw) alpha = "color.a";
@@ -179,7 +178,7 @@ function generateGUIFSH(data) {
 
         gen_Frag = `
     if(color.rgb == vec3(1.0)${data.generalInfos.shader.version === 0 ? ` && color.a != 128.0 / 255.0` : ``}) {
-        ${mojangLogoColor.draw ? `fragColor = vec4(vec3(${colorData.color.r}, ${colorData.color.g}, ${colorData.color.b}) / 255, ${alpha});` : `discard;`}
+        ${loadingBarColor.draw ? `fragColor = vec4(vec3(${colorData.color.r}, ${colorData.color.g}, ${colorData.color.b}) / 255, ${alpha});` : `discard;`}
     }
 `;
 
@@ -247,13 +246,6 @@ void main() {
     ${gen_Frag}
 }`;
 }
-
-//Essentialy the same as generateGUIoverlayFSH but for old versions of Minecraft
-function generatePositionColorFSH(data) {
-    const backgroundColor = data.generalInfos.backgroundColor;
-}
-
-
 
 function generateUtilsGLSL() {
 

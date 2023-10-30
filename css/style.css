@@ -389,6 +389,10 @@ button#downloadPack {
     display: none;
 }
 
+/* button#downloadPack .visible{
+    display: ;
+} */
+
 button#downloadPack:hover {
     background-color: rgb(96, 215, 96);
     padding: 10px 15px;
@@ -415,8 +419,7 @@ button#downloadPack img {
 
 p#warningText {
     font-size: 0.8em;
-    margin-left: 15px;
-    margin-top: 20px;
+    margin: 20px 15px 12px 15px;
     display: none;
 }
 

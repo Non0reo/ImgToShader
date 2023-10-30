@@ -4,18 +4,22 @@ hljs.highlightAll();
 const generatedBox = document.getElementById("generatedCode");
 const generatedBoxLogo = document.getElementById("generatedCodeLogo");
 const generatedBoxBar = document.getElementById("generatedCodeBar");
-const downloadPack = document.getElementById("downloadPack");
+const downloadPackBtn = document.getElementById("downloadPack");
 const warningText = document.getElementById("warningText");
 const useDithering = document.getElementById("useDithering");
 const betterQuality = document.getElementById("betterQuality");
 
+let PACK_VERSION = 15;
+let PACK_NAME = "CustomLoadingBackground";
+let PACK_DESCRIPTION = "Custom Loading Background";
+
+let generatedDataCache = {};
+
 async function generateCode() {
     draw();
 
-    //Wait for all data in the function to be loaded
-    //let promise = new Promise(resolve => setTimeout(() => resolve("done!"), 1000)/* ImagesData() */);
     if (imageStack.length == 0) { //Don't bother to make code if there is no image
-        const shaderGenWorker = new Worker("js/img_shader_algorithm.js");
+        
         const json = {
             imageExists: imageStack.length > 0,
             generalInfos: {
@@ -44,26 +48,7 @@ async function generateCode() {
                 }
             }
         };
-        //console.log(json);
-        const stringMessage = JSON.stringify(json);
-        shaderGenWorker.postMessage(stringMessage);
-
-        shaderGenWorker.onmessage = function(e) {
-            console.log(e.data);
-            
-            if (SHADER_VERSION === 1) DownloadPack({
-                guiOverlayFSH: e.data.guiOverlayFSH,
-                guiOverlayVSH: e.data.guiOverlayVSH,
-                guiFSH: e.data.guiFSH,
-                positionTexFSH: e.data.positionTexFSH,
-                utilsGLSL: e.data.utilsGLSL,
-                imagesAlgo: e.data.imagesAlgo,
-                shaderJson: e.data.shaderJson,
-                packVersion: 15,
-                packDescription: "Custom Loading Background",
-                packName: "CustomLoadingBackground"
-            });
-        }
+        generateShaderWithWorker(json);
         return;
     } 
 
@@ -267,27 +252,20 @@ async function generateCode() {
                 }
             }
         };
-        //console.log(json);
-        const stringMessage = JSON.stringify(json);
-        shaderGenWorker.postMessage(stringMessage);
-
-        shaderGenWorker.onmessage = function(e) {
-            console.log(e.data);
-            
-            if (SHADER_VERSION === 1) DownloadPack({
-                guiOverlayFSH: e.data.guiOverlayFSH,
-                guiOverlayVSH: e.data.guiOverlayVSH,
-                guiFSH: e.data.guiFSH,
-                positionTexFSH: e.data.positionTexFSH,
-                utilsGLSL: e.data.utilsGLSL,
-                imagesAlgo: e.data.imagesAlgo,
-                shaderJson: e.data.shaderJson,
-                packVersion: 15,
-                packDescription: "Custom Loading Background",
-                packName: "CustomLoadingBackground"
-            });
-        }
+        generateShaderWithWorker(json);
     } 
+}
+
+function generateShaderWithWorker(json) {
+    const shaderGenWorker = new Worker("js/img_shader_algorithm.js");
+    const stringMessage = JSON.stringify(json);
+    shaderGenWorker.postMessage(stringMessage);
+
+    shaderGenWorker.onmessage = function(e) {
+        console.log(e.data);
+        generatedDataCache = e.data;
+        downloadPack.style.display = "unset";
+    }
 }
 
 function imagedata_to_image(imagedata) {
@@ -332,6 +310,11 @@ function generateNumberFromSeed(seed) {
     let cripto = new Crypto();
     let number = cripto.md5(seed);
     return parseInt(number.substring(0, 8), 16);
+}
+
+async function DownlodPreparation() {
+    if(generatedDataCache == {}) await generateCode();
+    await DownloadPack(generatedDataCache);
 }
 
 function download(data, filename, type) {
