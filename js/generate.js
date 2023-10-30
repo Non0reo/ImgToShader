@@ -279,7 +279,29 @@ async function generateCode() {
             },
             palette: palette,
             indexedColors: indexedColors,
-            backgroundColor: hexToRgb(backgroundColor),
+            imageExists: imageStack.length > 0,
+            generalInfos: {
+                backgroundColor: {
+                    IsAlphaChanged: hexToRGBA(backgroundColor, 1/255).IsAlphaChanged,
+                    color: hexToRGBA(backgroundColor, 1/255).color,
+                    colorHEX: backgroundColor,
+                    draw: drawBackground,
+                },
+                loadingBarColor: {
+                    IsAlphaChanged: hexToRGBA(loadingBarColor, 1/255).IsAlphaChanged,
+                    color: hexToRGBA(loadingBarColor, 1/255).color,
+                    colorHEX: loadingBarColor,
+                    draw: drawLoadingBar,
+                },
+                mojangLogoColor: {
+                    IsAlphaChanged: hexToRGBA(mojangLogoColor, 1/255).IsAlphaChanged,
+                    color: hexToRGBA(mojangLogoColor, 1/255).color,
+                    colorHEX: mojangLogoColor,
+                    draw: drawLogo,
+                },
+                shaderVersion: SHADER_VERSION,
+                accessibilityCompatibility: accessibilityCompatibility,
+            }
         });
 
         shaderGenWorker.postMessage(stringMessage);
@@ -303,7 +325,7 @@ function imagedata_to_image(imagedata) {
 }
 
 //from https://stackoverflow.com/questions/5623838/rgb-to-hex-and-hex-to-rgb
-function hexToRgb(hex) {
+/* function hexToRgb(hex) {
     // Expand shorthand form (e.g. "03F") to full form (e.g. "0033FF")
     var shorthandRegex = /^#?([a-f\d])([a-f\d])([a-f\d])$/i;
     hex = hex.replace(shorthandRegex, function(m, r, g, b) {
@@ -316,7 +338,7 @@ function hexToRgb(hex) {
       g: parseInt(result[2], 16),
       b: parseInt(result[3], 16)
     } : null;
-  }
+  } */
 
 //Create if statement
 function createIfStatement(condition, code, IsElseIf, IsOneLine) {
@@ -340,7 +362,7 @@ ${code}
 }`;
 }
 
-function hexToDecimal(variable, devideBy) {
+function hexToRGBA(variable, devideBy) {
     let hexColor = variable.replace("#", "");
     let division = 1;
     if (devideBy != undefined) division = devideBy;
@@ -536,7 +558,7 @@ function DataCompletlyLoaded(tempDrawLogo, tempDrawLoadingBar) {
 
     //Change Background Color
     if (backgroundColor != "#EF323D" || !drawBackground) {
-        let colorInfos = hexToDecimal(backgroundColor);
+        let colorInfos = hexToRGBA(backgroundColor);
         if (!drawBackground) colorInfos = {color: {r: "0.0", g: "0.0", b: "0.0", a: "0.0"}, IsAlphaChanged: false};
         console.log(backgroundColor.replace("#", ""), colorInfos);
 
@@ -546,9 +568,9 @@ function DataCompletlyLoaded(tempDrawLogo, tempDrawLoadingBar) {
 
     //Change Loading Bar Color
     if (loadingBarColor != "#ffffff" || !drawLoadingBar) {
-        let colorInfos = hexToDecimal(loadingBarColor);
+        let colorInfos = hexToRGBA(loadingBarColor);
         if (!drawLoadingBar) {
-            if (drawBackground) colorInfos = hexToDecimal(backgroundColor);
+            if (drawBackground) colorInfos = hexToRGBA(backgroundColor);
             else colorInfos = {color: {r: "0.0", g: "0.0", b: "0.0", a: "0.0"}, IsAlphaChanged: false};
         }
         console.log(loadingBarColor.replace("#", ""), colorInfos);
@@ -571,7 +593,7 @@ function DataCompletlyLoaded(tempDrawLogo, tempDrawLoadingBar) {
 
     //Change the Logo Color
     if (mojangLogoColor != "#ffffff" || !drawLogo) {
-        let colorInfos = hexToDecimal(mojangLogoColor, 2);
+        let colorInfos = hexToRGBA(mojangLogoColor, 2);
         if (!drawLogo) colorInfos = {color: {r: "0.0", g: "0.0", b: "0.0", a: "0.0"}, IsAlphaChanged: false};
         console.log(mojangLogoColor.replace("#", ""), colorInfos.color);
 

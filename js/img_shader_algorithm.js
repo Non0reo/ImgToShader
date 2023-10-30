@@ -19,10 +19,10 @@ self.onmessage = function(e) {
 
     generateImageBackgroundGLSL(image);
 
-    /* this.postMessage({
+    this.postMessage({
         result: result,
         colorList: colorList
-    }); */
+    });
 
 }
 
@@ -30,6 +30,20 @@ self.onmessage = function(e) {
 
 
 function generateGUIOverlayFSH(image) {
+    const backgroundColor = image.generalInfos.backgroundColor;
+    console.log(backgroundColor);
+    let alpha;
+    let gen_Frag;
+    if (backgroundColor.colorHEX != "#EF323D" || !backgroundColor.draw) {
+        
+        //if (!backgroundColor.draw) backgroundColor = {color: {r: "0.0", g: "0.0", b: "0.0", a: "0.0"}, IsAlphaChanged: false};
+
+        alpha = (backgroundColor.draw) ? (backgroundColor.color.IsAlphaChanged ? ("color.a - " + ((1.0 - backgroundColor.color.a))) : "color.a") : "0.0";
+        gen_Frag = backgroundColor.draw ? `fragColor = vec4(vec3(${backgroundColor.color.r}, ${backgroundColor.color.g}, ${backgroundColor.color.b}) / 255, ${alpha});` : `discard;`
+    }
+
+    let gen_Image = image.imageExists ? `\n\tvec2 RealSSize = getScreenSize(ProjMat, ScreenSize);\n\tvec2 pixelUnit = RealSSize.xy / imageSize.xy;\n\tivec2 RealPixelPos = getPixelPos(pixelUnit, pos.xy);\n` : ``;
+
     let genCode = 
 `/*
 Generated from https://non0reo.github.io/ImgToShader/
@@ -59,14 +73,9 @@ void main() {
     if (color.a == 0.0) discard;
 
     fragColor = color * ColorModulator;
-
-    vec2 RealSSize = getScreenSize(ProjMat, ScreenSize);
-    vec2 pixelUnit = RealSSize.xy / imageSize.xy;
-    ivec2 RealPixelPos = getPixelPos(pixelUnit, pos.xy);
-
-    if ((color.r == 239.0 / 255.0 || color.rgb == vec3(0.0))) {
-        vec3 newColor = pColor(RealPixelPos, imageSize) / 255;
-        fragColor = vec4(newColor, color.a);
+    ${gen_Image}
+    if ((color.r == 239.0 / 255.0${image.generalInfos.accessibilityCompatibility ? ` || color.rgb == vec3(0.0))` : ``}) {
+        ${image.imageExists ? `vec3 newColor = pColor(RealPixelPos, imageSize) / 255;\n\t\tfragColor = vec4(newColor, color.a);` : gen_Frag}
     }
 }
     `;
@@ -117,40 +126,35 @@ ivec2 getPixelPos(vec2 pixelUnit, vec2 pos){
     `;
 }
 
-/* 
-vec3 pColor(ivec2 RealPixelPos, ivec2 imageSize) {
-    //int pixelI = RealPixelPos.y * imageSize.y + RealPixelPos.x;
-    int pixelI = RealPixelPos.y * imageSize.x + RealPixelPos.x;
-    switch(pixelI) {
-        case 0:
-            return vec3(0, 0, 0);
-        case 1:
-            return vec3(0, 255, 0);
-        case 29:
-            return vec3(0, 0, 255);
-        case 3:
-        case 4:
-        case 18:
-        case 22:
-        case 28:
-        case 30:
-        case 74:
-        case 12:
-            return vec3(255, 0, 0);
-        case 75:
-            return vec3(255, 0, 255);
-        case 143:
-            return vec3(255, 255, 0);
-        default:
-            return vec3(100, 130, 190);
-    }
+function generateShaderJson(filename) {
+return `{
+    "blend": {
+        "func": "add",
+        "srcrgb": "srcalpha",
+        "dstrgb": "1-srcalpha"
+    },
+    "vertex": "${filename}",
+    "fragment": "${filename}",
+    "attributes": [
+        "Color"
+    ],
+    "samplers": [
+    ],
+    "uniforms": [
+        { "name": "ModelViewMat", "type": "matrix4x4", "count": 16, "values": [ 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0 ] },
+        { "name": "ProjMat", "type": "matrix4x4", "count": 16, "values": [ 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0 ] },
+        { "name": "ColorModulator", "type": "float", "count": 4, "values": [ 1.0, 1.0, 1.0, 1.0 ] },
+        { "name": "ScreenSize", "type": "float", "count": 2, "values": [ 1.0, 1.0 ] }
+    ]
 }
-*/
+`;
+}
+
 
 function generateImageBackgroundGLSL(image) {
     const palette = image.palette;
     const indexedColors = image.indexedColors;
-    const backgroundColor = image.backgroundColor;
+    const backgroundColor = image.generalInfos.backgroundColor.color;
     console.log(backgroundColor);
 
     let stringOut = '';
@@ -185,5 +189,5 @@ vec3 pColor(ivec2 RealPixelPos, ivec2 imageSize) {
 }
     `;
 
-    console.log(genCode, `Total Cases Number: ${caseNumber}`);
+    //console.log(genCode, `Total Cases Number: ${caseNumber}`);
 }
