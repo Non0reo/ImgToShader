@@ -92,16 +92,64 @@ async function generateCode() {
     //= Added Functions =//
 
     //Get the data from the canvas
-    const tempDrawLogo = drawLogo;
+    /* const tempDrawLogo = drawLogo;
     const tempDrawLoadingBar = drawLoadingBar;
     drawLogo = false;
-    drawLoadingBar = false;
+    drawLoadingBar = false; */
     draw();
 
     //Wait for all data in the function to be loaded
     //let promise = new Promise(resolve => setTimeout(() => resolve("done!"), 1000)/* ImagesData() */);
     if (imageStack.length == 0) { //Don't bother to make code if there is no image
-        DataCompletlyLoaded(tempDrawLogo, tempDrawLoadingBar);
+        const shaderGenWorker = new Worker("js/img_shader_algorithm.js");
+        const json = {
+            imageExists: imageStack.length > 0,
+            generalInfos: {
+                backgroundColor: {
+                    IsAlphaChanged: hexToRGBA(backgroundColor, 1/255).IsAlphaChanged,
+                    color: hexToRGBA(backgroundColor, 1/255).color,
+                    colorHEX: backgroundColor,
+                    draw: drawBackground,
+                },
+                loadingBarColor: {
+                    IsAlphaChanged: hexToRGBA(loadingBarColor, 1/255).IsAlphaChanged,
+                    color: hexToRGBA(loadingBarColor, 1/255).color,
+                    colorHEX: loadingBarColor,
+                    draw: drawLoadingBar,
+                },
+                mojangLogoColor: {
+                    IsAlphaChanged: hexToRGBA(mojangLogoColor, 1/255).IsAlphaChanged,
+                    color: hexToRGBA(mojangLogoColor, 1/255).color,
+                    colorHEX: mojangLogoColor,
+                    draw: drawLogo,
+                },
+                accessibilityCompatibility: accessibilityCompatibility,
+                shader: {
+                    version: SHADER_VERSION,
+                    json: ['position_color']
+                }
+            }
+        };
+        //console.log(json);
+        const stringMessage = JSON.stringify(json);
+        shaderGenWorker.postMessage(stringMessage);
+
+        shaderGenWorker.onmessage = function(e) {
+            console.log(e.data);
+            
+            if (SHADER_VERSION === 1) DownloadPack({
+                guiOverlayFSH: e.data.guiOverlayFSH,
+                guiOverlayVSH: e.data.guiOverlayVSH,
+                guiFSH: e.data.guiFSH,
+                positionTexFSH: e.data.positionTexFSH,
+                utilsGLSL: e.data.utilsGLSL,
+                imagesAlgo: e.data.imagesAlgo,
+                shaderJson: e.data.shaderJson,
+                packVersion: 15,
+                packDescription: "Custom Loading Background",
+                packName: "CustomLoadingBackground"
+            });
+        }
         return;
     } 
 
@@ -109,7 +157,6 @@ async function generateCode() {
     ctx.clearRect(0, 0, shaderView.width, shaderView.height);
     drawAddedPictures();
     const scaleFactor = renderResolution.value / 100;
-    const inv_scaleFactor = 1 / scaleFactor;
 
     const canvasPixels = ctx.getImageData(0, 0, shaderView.width, shaderView.height);
     const canvasPixels32 = new Uint32Array(canvasPixels.data.buffer);
@@ -270,7 +317,7 @@ async function generateCode() {
         console.log(nonEmptyPixels);
 
         const shaderGenWorker = new Worker("js/img_shader_algorithm.js");
-        const stringMessage = JSON.stringify({
+        const json = {
             imageData: {
                 data: formatedLowResImage,
                 width: lowRes_image.width,
@@ -299,15 +346,32 @@ async function generateCode() {
                     colorHEX: mojangLogoColor,
                     draw: drawLogo,
                 },
-                shaderVersion: SHADER_VERSION,
                 accessibilityCompatibility: accessibilityCompatibility,
+                shader: {
+                    version: SHADER_VERSION,
+                    json: ['rendertype_gui_overlay']
+                }
             }
-        });
-
+        };
+        //console.log(json);
+        const stringMessage = JSON.stringify(json);
         shaderGenWorker.postMessage(stringMessage);
 
         shaderGenWorker.onmessage = function(e) {
             console.log(e.data);
+            
+            if (SHADER_VERSION === 1) DownloadPack({
+                guiOverlayFSH: e.data.guiOverlayFSH,
+                guiOverlayVSH: e.data.guiOverlayVSH,
+                guiFSH: e.data.guiFSH,
+                positionTexFSH: e.data.positionTexFSH,
+                utilsGLSL: e.data.utilsGLSL,
+                imagesAlgo: e.data.imagesAlgo,
+                shaderJson: e.data.shaderJson,
+                packVersion: 15,
+                packDescription: "Custom Loading Background",
+                packName: "CustomLoadingBackground"
+            });
         }
     } 
 }
@@ -424,6 +488,51 @@ function download(data, filename, type) {
             window.URL.revokeObjectURL(url);  
         }, 0);
     }
+}
+
+const DownloadPack = (shaderData) => {
+
+    const packMcmeta = 
+`{
+    "pack": {
+        "pack_format": ${shaderData.packVersion},
+        "description": "${shaderData.packDescription}"
+    }
+}`;
+
+    zip = new JSZip();
+    zip.file("pack.mcmeta", packMcmeta.toString());
+    let assets = zip.folder("assets");
+    let minecraft = assets.folder("minecraft");
+    let shaders = minecraft.folder("shaders");
+    let core = shaders.folder("core");
+    let include = shaders.folder("include");
+
+    if(SHADER_VERSION === 0) {
+        if(shaderData.positionColorFSH) core.file("position_color.fsh", finalCode)
+        if(shaderData.positionTexFSH) core.file("position_tex.fsh", finalCodeLogo);
+        if(shaderData.shaderJson) shaderData.shaderJson.forEach(element => {
+            core.file(element[1] + ".json", element[0]);
+        });
+    } else {
+        if(shaderData.guiOverlayFSH) core.file("rendertype_gui_overlay.fsh", shaderData.guiOverlayFSH);
+        if(shaderData.guiOverlayVSH) core.file("rendertype_gui_overlay.vsh", shaderData.guiOverlayVSH);
+        if(shaderData.guiFSH) core.file("rendertype_gui.fsh", shaderData.guiFSH);
+        if(shaderData.positionTexFSH) core.file("position_tex.fsh", shaderData.positionTexFSH);
+        if(shaderData.shaderJson) shaderData.shaderJson.forEach(element => {
+            core.file(element[1] + ".json", element[0]);
+        });
+
+        if(shaderData.utilsGLSL) include.file("utils.glsl", shaderData.utilsGLSL);
+        if(shaderData.imagesAlgo) include.file("image/canvas1.glsl", shaderData.imagesAlgo);
+    }
+
+    zip.generateAsync({type:"blob"})
+    .then(function(content) {
+        download(content, `${shaderData.packName}.zip`, "application/zip");
+        window.focus();   
+    });
+
 }
 
 const DownlodPreparation = () => {
