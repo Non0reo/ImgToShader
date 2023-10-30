@@ -17,8 +17,8 @@ const autoSizeParam = document.getElementById("autoSize");
 
 
 
-let mojangLogoColor = "#ffffff";
-let loadingBarColor = "#ffffff";
+let mojangLogoColor = "#FFFFFF";
+let loadingBarColor = "#FFFFFF";
 let backgroundColor = "#EF323D";
 let drawLogo = drawLogoParam.checked;
 let drawLoadingBar = drawLoadingBarParam.checked;
@@ -388,8 +388,12 @@ function changeUserScrollLevel(pos){
 }
 
 function displayWaningText(){
-    if (fileModified && downloadPack.style.display == "unset") warningText.style.display = "unset";
+    if (fileModified && downloadPack.style.display == "unset") {
+        warningText.style.display = "unset";
+        downloadPackBtn.style.marginTop = "10px";
+    }
     fileModified = true;
+    
 }
 
 window.onload = function(){

@@ -84,7 +84,7 @@ function generateGUIOverlayFSH(data, loadingBarCondition = "") {
 `;
 
     return data.imageExists ? `/*
-    Generated from https://non0reo.github.io/ImgToShader/
+ Generated from https://non0reo.github.io/ImgToShader/
 */
 
 #version 150
@@ -114,7 +114,7 @@ void main() {
     ${gen_Image}
     ${gen_Frag ? backgroundCondition : ''}${loadingBarCondition}
 }` : `/*
-    Generated from https://non0reo.github.io/ImgToShader/
+ Generated from https://non0reo.github.io/ImgToShader/
 */
 
 #version 150
@@ -160,7 +160,8 @@ function generateGUIFSH(data) {
     const backgroundColor = data.generalInfos.backgroundColor;
 
     let gen_Frag = '';
-    if (loadingBarColor.colorHEX != "#ffffff" || !loadingBarColor.draw) {
+    console.log(loadingBarColor.colorHEX)
+    if (loadingBarColor.colorHEX != "#FFFFFF" || !loadingBarColor.draw) {
         let colorData = loadingBarColor;
         if (!loadingBarColor.draw) {
             if (backgroundColor.draw) colorData = data.generalInfos.backgroundColor.color;
@@ -185,7 +186,7 @@ function generateGUIFSH(data) {
     }
 
     return [`/*
-    Generated from https://non0reo.github.io/ImgToShader/
+ Generated from https://non0reo.github.io/ImgToShader/
 */
 
 #version 150
@@ -210,13 +211,11 @@ function generatePositionTexFSH(data) {
     const mojangLogoColor = data.generalInfos.mojangLogoColor;
 
     let gen_Frag = '';
-    console.log(mojangLogoColor.draw);
-    if (mojangLogoColor.colorHEX != "#ffffff" || !mojangLogoColor.draw) {
+    if (mojangLogoColor.colorHEX != "#FFFFFF" || !mojangLogoColor.draw) {
         let colorData = mojangLogoColor;
         if (!mojangLogoColor.draw) colorData = {color: {r: "0.0", g: "0.0", b: "0.0", a: "0.0"}, IsAlphaChanged: false};
 
         let alpha = (mojangLogoColor.draw) ? (colorData.IsAlphaChanged ? ("color.a - " + ((1.0 - colorData.color.a))) : "color.a") : "0.0";
-        console.warn(colorData, mojangLogoColor.color);
         gen_Frag = `
     if(texelFetch(Sampler0, ivec2(267, 146), 0) == vec4(1)) {
         ${mojangLogoColor.draw ? `fragColor = vec4(vec3(${colorData.color.r}, ${colorData.color.g}, ${colorData.color.b}) / 255, ${alpha});` : `discard;`}
@@ -226,7 +225,7 @@ function generatePositionTexFSH(data) {
     }
 
     return `/*
-    Generated from https://non0reo.github.io/ImgToShader/
+ Generated from https://non0reo.github.io/ImgToShader/
 */
 
 #version 150
@@ -250,8 +249,8 @@ void main() {
 function generateUtilsGLSL() {
 
 return `/*
-    Generated from https://non0reo.github.io/ImgToShader/
-    Code by Titruc and Maxboxx, Modified by Non0reo
+ Generated from https://non0reo.github.io/ImgToShader/
+ Code by Titruc and Maxboxx, Modified by Non0reo
 */
 
 int guiScale(mat4 ProjMat, vec2 ScreenSize) {
@@ -315,7 +314,10 @@ function generateImageBackgroundGLSL(data) {
     stringOut += `\n\t\tdefault:\n\t\t\treturn vec3(${backgroundColor.r}, ${backgroundColor.g}, ${backgroundColor.b});`;
     
 
-return `
+return `/*
+ Generated from https://non0reo.github.io/ImgToShader/
+*/
+
 vec3 pColor(ivec2 RealPixelPos, ivec2 imageSize) {
     int pixelI = RealPixelPos.y * imageSize.x + RealPixelPos.x;
     switch(pixelI) {

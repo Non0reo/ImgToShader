@@ -383,20 +383,17 @@ button#downloadPack {
     font-size: 1.0em;
     padding: 7px 10px;
     margin: 15px 20px;
-    margin-bottom: 5px;
-    transition: 0.5s;
+    margin-bottom: 0;
+    margin-top: 25px;
+    transition: padding 0.5s, background-color 0.5s;
     animation: glint 1s infinite;
     display: none;
 }
 
-/* button#downloadPack .visible{
-    display: ;
-} */
-
 button#downloadPack:hover {
     background-color: rgb(96, 215, 96);
     padding: 10px 15px;
-    transition: 0.5s;
+    transition: padding 0.5s, background-color 0.5s;
     animation: glint 1s infinite;
     cursor: pointer;
 }

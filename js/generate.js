@@ -1,9 +1,9 @@
 //Code colorisation with highlight.js
 hljs.highlightAll();
 
-const generatedBox = document.getElementById("generatedCode");
-const generatedBoxLogo = document.getElementById("generatedCodeLogo");
-const generatedBoxBar = document.getElementById("generatedCodeBar");
+const previewCode_background = document.getElementById("generatedCode");
+const previewCode_logo = document.getElementById("generatedCodeLogo");
+const previewCode_bar = document.getElementById("generatedCodeBar");
 const downloadPackBtn = document.getElementById("downloadPack");
 const warningText = document.getElementById("warningText");
 const useDithering = document.getElementById("useDithering");
@@ -265,6 +265,36 @@ function generateShaderWithWorker(json) {
         console.log(e.data);
         generatedDataCache = e.data;
         downloadPack.style.display = "unset";
+        downloadPackBtn.style.marginTop = "25px";
+
+        //Remove existing preview boxes content
+        previewCode_background.innerHTML = previewCode_logo.innerHTML = previewCode_bar.innerHTML = '';
+        warningText.style.display = "none";
+
+        //Display the code in the preview boxes
+        const code_background = document.createElement("code");
+        code_background.innerHTML = escapeHtml(SHADER_VERSION === 0 ? e.data.positionColorFSH : e.data.guiOverlayFSH);
+        code_background.style.whiteSpace = "pre-wrap";
+        code_background.style.paddingLeft = "0px";
+        previewCode_background.appendChild(code_background);
+        hljs.highlightElement(previewCode_background);
+
+        const code_logo = document.createElement("code");
+        code_logo.innerHTML = escapeHtml(e.data.positionTexFSH);
+        code_logo.style.whiteSpace = "pre-wrap";
+        code_logo.style.paddingLeft = "0px";
+        previewCode_logo.appendChild(code_logo);
+        hljs.highlightElement(previewCode_logo);
+
+        if (SHADER_VERSION === 1) {
+            previewCode_bar.style.display = "block";
+            const code_bar = document.createElement("code");
+            code_bar.innerHTML = escapeHtml(e.data.guiFSH);
+            code_bar.style.whiteSpace = "pre-wrap";
+            code_bar.style.paddingLeft = "0px";
+            previewCode_bar.appendChild(code_bar);
+            hljs.highlightElement(previewCode_bar);
+        } else previewCode_bar.style.display = "none";
     }
 }
 
