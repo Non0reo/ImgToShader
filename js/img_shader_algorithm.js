@@ -84,7 +84,7 @@ function generateGUIOverlayFSH(data, loadingBarCondition = "") {
 ` : ``;
 
     let backgroundCondition = `
-    if (color.r == 239.0 / 255.0${data.generalInfos.accessibilityCompatibility ? ` || color.rgb == vec3(0.0))` : ``}) {
+    if (color.r == 239.0 / 255.0${data.generalInfos.accessibilityCompatibility ? ` || color.rgb == vec3(0.0)` : ``}) {
         ${gen_Frag}
     }
 `;
@@ -220,7 +220,7 @@ function generatePositionTexFSH(data) {
         let colorData = mojangLogoColor;
         if (!mojangLogoColor.draw) colorData = {color: {r: "0.0", g: "0.0", b: "0.0", a: "0.0"}, IsAlphaChanged: false};
 
-        let alpha = (mojangLogoColor.draw) ? (colorData.IsAlphaChanged ? ("color.a - " + ((1.0 - colorData.color.a))) : "color.a") : "0.0";
+        let alpha = (mojangLogoColor.draw) ? (colorData.IsAlphaChanged ? ("color.a * ColorModulator.a - " + ((1.0 - colorData.color.a))) : "color.a * ColorModulator.a") : "0.0";
         gen_Frag = `
     if(texelFetch(Sampler0, ivec2(267, 146), 0) == vec4(1)) {
         ${mojangLogoColor.draw ? `fragColor = vec4(vec3(${colorData.color.r}, ${colorData.color.g}, ${colorData.color.b}) / 255, ${alpha});` : `discard;`}

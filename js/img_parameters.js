@@ -13,10 +13,30 @@ const elementWidthSliderParam = document.getElementById('elementWidthSlider');
 const elementHeightSliderParam = document.getElementById('elementHeightSlider');
 const elementRotationSliderParam = document.getElementById('elementRotationSlider');
 
+const settingRender = document.getElementById('settingRender');
 
 //linkSizeParam.checked = false;
 let linkSize = linkSizeParam.checked;
 let selected; // Which div is selected (index number)
+
+//When docummend is clicked, unselect every images
+document.addEventListener("click", function(event) {
+    console.log(event)
+    if (event.target == document.getElementById("tool") || event.target == document.getElementById("imageListBox")) {
+        unselectEveryImages();
+    }
+});
+
+function unselectEveryImages() {
+    imageStack.forEach(element => {
+        element.className = element.className.replace(" selected", "");
+    });
+    dataStack.forEach(el => {
+        el.IsSelected = false;
+    });
+    selected = undefined;
+    assignObjectToList("empty");
+}
 
 function addEventListenerToList() { 
     imageStack.forEach(element => {
@@ -60,6 +80,7 @@ function assignObjectToList(objectIndex) {
         normalizeCoordsParam.disabled = false;
         linkSizeParam.disabled = false;
 
+        settingRender.style.flexDirection = "column-reverse";
     }
     else {
         elementPosXParam.value = "";
@@ -77,6 +98,8 @@ function assignObjectToList(objectIndex) {
         elementRotationParam.disabled = true;
         normalizeCoordsParam.disabled = true;
         linkSizeParam.disabled = true;
+
+        settingRender.style.flexDirection = "column";
     }
 }
 
