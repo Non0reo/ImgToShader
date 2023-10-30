@@ -116,7 +116,6 @@ async function generateCode() {
     let palette = [];
     let indexedColors = [];
 
-    console.log(compressionMode)
     switch (compressionMode) {
         case "quant":
             //Image Quaternization Method
@@ -143,7 +142,6 @@ async function generateCode() {
             indexedColors = indexedPixels;
             console.info(finalImage, colorPalette, indexedPixels);
 
-            console.log(finalImage, shaderView.width * 4 * shaderView.height);
             const imageData = new ImageData(finalImage, shaderView.width, shaderView.height);
             ctx.clearRect(0, 0, size.width, size.height);
             ctx.putImageData(imageData, 0, 0);
@@ -194,12 +192,9 @@ async function generateCode() {
             const finalCanvaData = new Uint8ClampedArray(finalCanvas);
             const finalImageData = new ImageData(finalCanvaData, shaderView.width, shaderView.height);
             ctx.clearRect(0, 0, size.width, size.height);
-            console.log(finalCanvas, canvasPixels);
             ctx.putImageData(finalImageData, 0, 0);
             break;
     }
-    
-    console.log(palette);
 
     //Downscale the image
     const image = new Image();
@@ -208,17 +203,16 @@ async function generateCode() {
 
     let lowRes_image;
     let highRes_image;
-    highRes_image = ctx.getImageData(0, 0, shaderView.width, shaderView.height);
 
+    highRes_image = ctx.getImageData(0, 0, shaderView.width, shaderView.height);
 
     image.onload = function() {
         ctx.clearRect(0, 0, shaderView.width, shaderView.height);
-        ctx.scale(scaleFactor, scaleFactor);
-        ctx.drawImage(image, 0, 0, shaderView.width / inv_scaleFactor, shaderView.height / inv_scaleFactor);
-        lowRes_image = ctx.getImageData(0, 0, shaderView.width / inv_scaleFactor, shaderView.height / inv_scaleFactor);
-        smallImage.src = shaderView.toDataURL();
-        console.log(highRes_image);
-        console.log(lowRes_image);            
+        //ctx.scale(scaleFactor, scaleFactor);
+        ctx.drawImage(image, 0, 0, shaderView.width * scaleFactor, shaderView.height * scaleFactor);
+        lowRes_image = ctx.getImageData(0, 0, shaderView.width * scaleFactor, shaderView.height * scaleFactor);
+        smallImage.src = imagedata_to_image(lowRes_image).src;
+
     };
 
     smallImage.onload = function() {
@@ -253,8 +247,8 @@ async function generateCode() {
         displayColorCount(palette.length);
 
 
-        ctx.scale(inv_scaleFactor, inv_scaleFactor);
-        /* ctx.clearRect(0, 0, shaderView.width, shaderView.height);
+        //ctx.scale(inv_scaleFactor, inv_scaleFactor);
+        ctx.clearRect(0, 0, shaderView.width, shaderView.height);
 
         drawLogo = drawLogoParam.checked
         drawLoadingBar = drawLoadingBarParam.checked
@@ -263,16 +257,66 @@ async function generateCode() {
 
         //Draw only on top of transparent pixels
         ctx.globalCompositeOperation = "destination-over";
-        ctx.drawImage(smallImage, 0, 0, shaderView.width * inv_scaleFactor**2, shaderView.height * inv_scaleFactor**2);
-        ctx.globalCompositeOperation = "source-over"; */
+        ctx.drawImage(smallImage, 0, 0, shaderView.width , shaderView.height);
+        ctx.globalCompositeOperation = "source-over";
 
-        console.log(image.width, image.height, image)
-        console.log(smallImage.width, smallImage.height, smallImage)
+        //console.log(image.width, image.height)
+        console.log(`width: ${smallImage.width}, height: ${smallImage.height} ; total: ${smallImage.width * smallImage.height}`);
+        //nomber of non empty pixels in the image
+        let nonEmptyPixels = 0;
+        for (let i = 0; i < lowRes_image.data.length; i += 4) {
+            if (lowRes_image.data[i + 3] != 0) nonEmptyPixels++;
+        }
+        console.log(nonEmptyPixels);
 
-    }
-    
-    
+        const shaderGenWorker = new Worker("js/img_shader_algorithm.js");
+        const stringMessage = JSON.stringify({
+            imageData: {
+                data: formatedLowResImage,
+                width: lowRes_image.width,
+                height: lowRes_image.height,
+                length: formatedLowResImage.length,
+            },
+            palette: palette,
+            indexedColors: indexedColors,
+            backgroundColor: hexToRgb(backgroundColor),
+        });
+
+        shaderGenWorker.postMessage(stringMessage);
+
+        shaderGenWorker.onmessage = function(e) {
+            console.log(e.data);
+        }
+    } 
 }
+
+function imagedata_to_image(imagedata) {
+    let canvas = document.createElement('canvas');
+    let ctx = canvas.getContext('2d');
+    canvas.width = imagedata.width;
+    canvas.height = imagedata.height;
+    ctx.putImageData(imagedata, 0, 0);
+
+    let image = new Image();
+    image.src = canvas.toDataURL();
+    return image;
+}
+
+//from https://stackoverflow.com/questions/5623838/rgb-to-hex-and-hex-to-rgb
+function hexToRgb(hex) {
+    // Expand shorthand form (e.g. "03F") to full form (e.g. "0033FF")
+    var shorthandRegex = /^#?([a-f\d])([a-f\d])([a-f\d])$/i;
+    hex = hex.replace(shorthandRegex, function(m, r, g, b) {
+      return r + r + g + g + b + b;
+    });
+  
+    var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+    return result ? {
+      r: parseInt(result[1], 16),
+      g: parseInt(result[2], 16),
+      b: parseInt(result[3], 16)
+    } : null;
+  }
 
 //Create if statement
 function createIfStatement(condition, code, IsElseIf, IsOneLine) {
@@ -388,7 +432,8 @@ const DownlodPreparation = () => {
     "uniforms": [
         { "name": "ModelViewMat", "type": "matrix4x4", "count": 16, "values": [ 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0 ] },
         { "name": "ProjMat", "type": "matrix4x4", "count": 16, "values": [ 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0 ] },
-        { "name": "ColorModulator", "type": "float", "count": 4, "values": [ 1.0, 1.0, 1.0, 1.0 ] }
+        { "name": "ColorModulator", "type": "float", "count": 4, "values": [ 1.0, 1.0, 1.0, 1.0 ] },
+        { "name": "ScreenSize", "type": "float", "count": 2, "values": [ 1.0, 1.0 ] }
     ]
 }
 `;
@@ -408,8 +453,11 @@ const DownlodPreparation = () => {
             core.file("position_tex.fsh", finalCodeLogo);
         } else {
             core.file("rendertype_gui_overlay.fsh", finalCode);
+            core.file("rendertype_gui_overlay.vsh", finalCode);
+            core.file("rendertype_gui_overlay.json", jsonColor);
+
             core.file("rendertype_gui.fsh", finalCodeBar);
-            //core.file("rendertype_gui_overlay.json", jsonColor);
+            
             core.file("position_tex.fsh", finalCodeLogo);
         }
 
@@ -418,44 +466,6 @@ const DownlodPreparation = () => {
             download(content, "CustomLoadingBackground.zip", "application/zip");
             window.focus();   
         });
-
-    /* let color = new URLSearchParams();
-    let tex = new URLSearchParams();
-    color.append("color", finalCode);
-    tex.append("tex", finalCodeLogo);
-    //console.log(`${url}?${color.toString()}&${tex.toString()}`)
-    window.open(`${url}?${color.toString()}&${tex.toString()}`, '_blank');
-    return; */
-
-    /* let zip = new JSZip();
-        zip.file("pack.mcmeta", packMcmeta.toString());
-        let assets = zip.folder("assets");
-        let minecraft = assets.folder("minecraft");
-        let shaders = minecraft.folder("shaders");
-        let core = shaders.folder("core");
-        core.file("position_color.fsh", finalCode);
-        core.file("position_tex.fsh", finalCodeLogo);
-        zip.generateAsync({type:"blob"})
-        .then(function(content) {
-            // console.log(content);
-            // let save = saveAs(content, "ChangedBackground.zip");
-            // console.log(save);
-            let color = new URLSearchParams();
-            let tex = new URLSearchParams();
-            color.append("color", finalCode);
-            tex.append("tex", finalCodeLogo);
-            //console.log(`${url}?${color.toString()}&${tex.toString()}`)
-            window.open(`${url}?${color.toString()}&${tex.toString()}`, '_blank');
-                // let data = new URLSearchParams();
-                // data.append("data", content);
-                // window.open(`${url}?${data.toString()}`, '_blank');
-            //data.append("name", "ChangedBackground.zip");
-            //download(data, "ChangedBackground.zip", "application/zip");
-            window.focus();            
-        });
-    //window.stop();
-    //window.location.href = `${url}?` + param.toString();
-     */
 }
 
 async function ImagesData() {

@@ -23,7 +23,7 @@ function loadImage(event) {
                 height: img.naturalHeight/2,
                 rotation: 0,
                 AreCoordsNormalized: true,
-                IsSizeLinked: false,
+                IsSizeLinked: true,
                 imageRatio: img.naturalWidth/img.naturalHeight,
                 boundingBox: [[shaderView.width/2 - img.naturalWidth/2, shaderView.height/2 - img.naturalHeight/2],
                             [shaderView.width/2 + img.naturalWidth/2, shaderView.height/2 - img.naturalHeight/2],
