@@ -36,6 +36,7 @@ let autoSize = autoSizeParam.checked;
 widthParam.value = shaderView.width;
 heightParam.value = shaderView.height;
 let size = {width: shaderView.width, height: shaderView.height};
+let m_pos = {x:0, y:0};
 
 let fileModified = false;
 
