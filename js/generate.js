@@ -402,7 +402,7 @@ const DownloadPack = (shaderData) => {
 
     zip.generateAsync({type:"blob"})
     .then(function(content) {
-        download(content, `${PACK_NAME}.zip`, "application/zip");
+        download(content, `${PACK_NAME}`, "application/zip");
         window.focus();   
     });
 
