@@ -20,6 +20,8 @@ self.onmessage = function(e) {
     const guiFSHcode = generateGUIFSH(data)[0];
     const loadingBarCondition = generateGUIFSH(data)[1];
 
+    const imgBackground = data.imageExists ? generateImageBackgroundGLSL(data) : ["", 0];
+
     //Shader +1.20
     if(data.generalInfos.shader.version === 1) {
 
@@ -30,15 +32,23 @@ self.onmessage = function(e) {
                 guiFSH: guiFSHcode,
                 positionTexFSH: generatePositionTexFSH(data),
                 utilsGLSL: generateUtilsGLSL(),
-                imagesAlgo: generateImageBackgroundGLSL(data),
-                shaderJson: result
+                imagesAlgo: imgBackground[0],
+                shaderJson: result,
+                genInfos: {
+                    imageExists: true,
+                    caseCount: [imgBackground[1]]
+                }
             });
         } else {
             this.postMessage({
                 guiOverlayFSH: generateGUIOverlayFSH(data),
                 guiFSH: guiFSHcode,
                 positionTexFSH: generatePositionTexFSH(data),
-                shaderJson: result
+                shaderJson: result,
+                genInfos: {
+                    imageExists: false,
+                    caseCount: [imgBackground[1]]
+                }
             });
         }
 
@@ -49,14 +59,22 @@ self.onmessage = function(e) {
                 positionColorFSH: generateGUIOverlayFSH(data, loadingBarCondition),
                 positionTexFSH: generatePositionTexFSH(data),
                 utilsGLSL: generateUtilsGLSL(),
-                imagesAlgo: generateImageBackgroundGLSL(data),
-                shaderJson: result
+                imagesAlgo: imgBackground[0],
+                shaderJson: result,
+                genInfos: {
+                    imageExists: true,
+                    caseCount: [imgBackground[1]]
+                }
             });
         } else {
             this.postMessage({
                 positionColorFSH: generateGUIOverlayFSH(data, loadingBarCondition),
                 positionTexFSH: generatePositionTexFSH(data),
-                shaderJson: result
+                shaderJson: result,
+                genInfos: {
+                    imageExists: false,
+                    caseCount: [imgBackground[1]]
+                }
             });
         }
 
@@ -306,7 +324,8 @@ function generateImageBackgroundGLSL(data) {
     let stringOut = '';
     let caseNumber = 0;
     for (let i = 0; i < palette.length; i++) {
-        if (palette[i].toString() !== [0, 0, 0, 0].toString()) { // If the color is not transparent
+        console.log(palette[i].toString(), [backgroundColor.r, backgroundColor.g, backgroundColor.b, parseInt(backgroundColor.a * 255)].toString(), palette[i].toString() !== [backgroundColor.r, backgroundColor.g, backgroundColor.b, parseInt(backgroundColor.a * 255)].toString())
+        if (palette[i].toString() !== [0, 0, 0, 0].toString() && palette[i].toString() !== [backgroundColor.r, backgroundColor.g, backgroundColor.b, parseInt(backgroundColor.a * 255)].toString()) { // If the color is not transparent and not the background color
             for (let j = 0; j < indexedColors.length; j++) {
                 if (i === indexedColors[j]) {
                     stringOut += `\n\t\tcase ${j}:`
@@ -319,7 +338,7 @@ function generateImageBackgroundGLSL(data) {
     stringOut += `\n\t\tdefault:\n\t\t\treturn vec3(${backgroundColor.r}, ${backgroundColor.g}, ${backgroundColor.b});`;
     
 
-return `/*
+return [`/*
  Generated from https://non0reo.github.io/ImgToShader/
 */
 
@@ -329,6 +348,6 @@ vec3 pColor(ivec2 RealPixelPos, ivec2 imageSize) {
         ${stringOut}
     }
 }
-`;
+`, caseNumber];
 
 }

@@ -1,6 +1,7 @@
 //Code colorisation with highlight.js
 hljs.highlightAll();
 
+const shaderGeneratedInfos = document.getElementById("shaderGeneratedInfos");
 const previewCode_background = document.getElementById("generatedCode");
 const previewCode_logo = document.getElementById("generatedCodeLogo");
 const previewCode_bar = document.getElementById("generatedCodeBar");
@@ -9,8 +10,30 @@ const warningText = document.getElementById("warningText");
 const useDithering = document.getElementById("useDithering");
 const betterQuality = document.getElementById("betterQuality");
 
-let PACK_VERSION = 15;
-let PACK_NAME = "CustomLoadingBackground";
+const genFolderName = document.getElementById("genFolderName");
+const genPackVersion = document.getElementById("genPackVersion");
+const genCaseCount = document.getElementById("genCaseCount");
+
+let lookupVersion = {
+    7: "1.17-1.17.1",
+    8: "1.18-1.18.2",
+    9: "1.19-1.19.2",
+    10: "1.19.2-22w41a",
+    11: "22w42a-22w44a",
+    12: "1.19.3",
+    13: "1.19.4",
+    14: "23w14a-23w16a",
+    15: "1.20-1.20.1",
+    16: "23w31a",
+    17: "23w32a-1.20.2-pre1",
+    18: "1.20.2",
+    19: "23w42a",
+    20: "23w43a-now",
+}
+
+gameVersion.innerText = lookupVersion[packVersion.value];
+let PACK_VERSION = parseInt(packVersion.value);
+let PACK_NAME = folderName.value;
 let PACK_DESCRIPTION = "Custom Loading Background";
 
 let generatedDataCache = {};
@@ -293,6 +316,11 @@ function generateShaderWithWorker(json) {
             previewCode_bar.appendChild(code_bar);
             hljs.highlightElement(previewCode_bar);
         } else previewCode_bar.style.display = "none";
+
+        shaderGeneratedInfos.style.display = "block";
+        genCaseCount.innerText = e.data.genInfos.imageExists ? `Case count: ${e.data.genInfos.caseCount}` : `Case count: 0 (no image)`;
+        genPackVersion.innerText = `Pack version: ${PACK_VERSION}`;
+        genFolderName.innerText = `Folder name: ${PACK_NAME}`;
     }
 }
 

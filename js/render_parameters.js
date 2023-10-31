@@ -14,16 +14,19 @@ let compressionMode;
 
 paletteQuality.addEventListener('input', () => {
     paletteQualityValue.textContent = paletteQuality.value;
+    displayWaningText();
 });
 
 renderResolution.addEventListener('input', () => {
     renderResolutionValue.textContent = renderResolution.value;
+    displayWaningText();
 });
 
 channelQuantity.addEventListener('input', () => {
     channelQuantityValue.textContent = channelQuantity.value;
     colorAmount.textContent = `☞ There are ${(channelQuantity.value**3)} possible colors.`;
     displayColorCount(0);
+    displayWaningText();
 });
 
 function modifyValue(value, element) {
@@ -35,6 +38,7 @@ function modifyValue(value, element) {
         colorAmount.textContent = `☞ There are ${el.value**3} possible colors.`;
         displayColorCount(0);
     }
+    displayWaningText();
 }
 
 function displayColorCount(count) {

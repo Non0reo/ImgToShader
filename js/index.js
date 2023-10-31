@@ -5,9 +5,10 @@ const version1Param = document.getElementById("shaderVersion1");
 const version2Param = document.getElementById("shaderVersion2");
 const widthParam = document.getElementById("shaderWidth");
 const heightParam = document.getElementById("shaderHeight");
-//const backgroundColorParam = document.getElementById("backgroundColor");
-//const logoColorParam = document.getElementById("logoColor");
-//const loadingBarColorParam = document.getElementById("loadingBarColor");
+const packVersion = document.getElementById("packVersion");
+const gameVersion = document.getElementById("gameVersion");
+const folderName = document.getElementById("folderName");
+
 const logoSizeParam = document.getElementById("logoSize");
 const drawLogoParam = document.getElementById("drawLogo");
 const drawLoadingBarParam = document.getElementById("drawLoadingBar");
@@ -148,10 +149,14 @@ function changeVersion(version) {
         case 0:
             version1Param.className = "versionBtn selected";
             version2Param.className = "versionBtn";
+            PACK_VERSION = packVersion.value = 13;
+            gameVersion.innerText = lookupVersion[packVersion.value];
             break;
         case 1:
             version2Param.className = "versionBtn selected";
             version1Param.className = "versionBtn";
+            PACK_VERSION = packVersion.value = 18;
+            gameVersion.innerText = lookupVersion[packVersion.value];
             break;
         default:
             break;
@@ -238,6 +243,15 @@ drawLogoParam.addEventListener("input", function(){
 drawLoadingBarParam.addEventListener("input", function(){
     drawLoadingBar = drawLoadingBarParam.checked;
     draw();
+});
+
+packVersion.addEventListener("input", function(){
+    PACK_VERSION = parseInt(packVersion.value);
+    gameVersion.innerText = lookupVersion[packVersion.value];
+});
+
+folderName.addEventListener("input", function(){
+    PACK_NAME = folderName.value;
 });
 
 

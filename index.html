@@ -32,47 +32,72 @@
                     <button id="shaderVersion1" class="versionBtn" onclick="changeVersion(0)">1.17 - 1.19.4</button>
                     <button id="shaderVersion2" class="versionBtn selected" onclick="changeVersion(1)">+1.20</button>
                 </div>
-                <div class="parameter">
-                    <label for="width">Width</label>
-                    <input type="number" id="shaderWidth" value="">
-                    <input type="checkbox" id="linkCanvasSize" checked>
+                <div class="paramFamily">
+                    <div class="parameter">
+                        <label for="width">Width</label>
+                        <input type="number" id="shaderWidth" value="">
+                        <input type="checkbox" id="linkCanvasSize" checked>
+                    </div>
+                    <div class="parameter">
+                        <label for="height">Height</label>
+                        <input type="number" id="shaderHeight" value="">
+                    </div>
                 </div>
-                <div class="parameter">
-                    <label for="height">Height</label>
-                    <input type="number" id="shaderHeight" value="">
+                <div class="paramFamily">
+                    <div class="parameter colorIn">
+                        <input class="color-picker" type="color" id="backgroundColor" value="#EF323D">
+                        <label for="backColor">Background color</label>
+                    </div>
+                    <div class="parameter colorIn">
+                        <input class="color-picker" type="color" id="logoColor" value="#0000ff">
+                        <label for="logoColor">Logo Color</label>
+                    </div>
+                    <div class="parameter colorIn">
+                        <input class="color-picker" type="color" id="loadingBarColor" value="#ffffff">
+                        <label for="loadingBarColor">Loading Bar Color</label>
+                    </div>
+                    <div class="parameter">
+                        <label for="blackScreen">Enable monochrome screen compatibility</label>
+                        <input type="checkbox" id="accessibilityCompatibility" name="blackScreen" value="blackScreen" checked="false">
+                    </div>
                 </div>
-                <div class="parameter">
-                    <label for="backColor">Background color</label>
-                    <input class="color-picker" type="color" id="backgroundColor" value="#EF323D">
-                    <label for="blackScreen">Enable monochrome screen compatibility</label>
-                    <input type="checkbox" id="accessibilityCompatibility" name="blackScreen" value="blackScreen" checked="false">
-                </div>
-                <div class="parameter">
-                    <label for="logoColor">Logo Color</label>
-                    <input class="color-picker" type="color" id="logoColor" value="#0000ff">
-                </div>
-                <div class="parameter">
-                    <label for="loadingBarColor">Loading Bar Color</label>
-                    <input class="color-picker" type="color" id="loadingBarColor" value="#ffffff">
-                </div>
-                <div class="parameter">
-                    <label for="drawBackground">Draw Background</label>
-                    <input type="checkbox" id="drawBackground" name="drawBackground" value="drawBackground" checked="true">
-                </div>
-                <div class="parameter">
-                    <label for="drawLogo">Draw Logo</label>
-                    <input type="checkbox" id="drawLogo" name="drawLogo" value="drawLogo" checked="true">
-                </div>
-                <div class="parameter">
-                    <label for="drawLoadingBar">Draw Loading Bar</label>
-                    <input type="checkbox" id="drawLoadingBar" name="drawLoadingBar" value="drawLoadingBar" checked="true">
+                <div class="paramFamily">
+                    <div class="parameter">
+                        <label for="drawBackground">Draw Background</label>
+                        <input type="checkbox" id="drawBackground" name="drawBackground" value="drawBackground" checked="true">
+                    </div>
+                    <div class="parameter">
+                        <label for="drawLogo">Draw Logo</label>
+                        <input type="checkbox" id="drawLogo" name="drawLogo" value="drawLogo" checked="true">
+                    </div>
+                    <div class="parameter">
+                        <label for="drawLoadingBar">Draw Loading Bar</label>
+                        <input type="checkbox" id="drawLoadingBar" name="drawLoadingBar" value="drawLoadingBar" checked="true">
+                    </div>
                 </div>
                 <br>
-                <div class="parameter">
-                    <label for="logoSize">Logo Size (visual)</label>
-                    <input type="range" id="logoSize" class="slider" value="480" min="1" max="1000">
-                    <label for="autoSize">Auto</label>
-                    <input type="checkbox" id="autoSize" name="autoSize" value="autoSize">
+                <div class="paramFamily">
+                    <div class="parameter">
+                        <label for="logoSize">Preview Logo Size</label>
+                        <input type="range" id="logoSize" class="slider" value="480" min="1" max="1000">
+                    </div>
+                    <div class="parameter">
+                        <label for="autoSize">Auto Size</label>
+                        <input type="checkbox" id="autoSize" name="autoSize" value="autoSize">
+                    </div>
+                </div>
+                <div id="shaderConfig">
+                    <h3>Shader Config</h3>
+                    <div class="parameter">
+                        <!-- <label for="fileName">File Name</label> -->
+                        <input type="text" id="folderName" value="CustomLoadingBackgournd">
+                        <!-- <label for="packVersion">Pack Version</label> -->
+                        <br>
+                        <div style="display: flex; vertical-align: middle; align-items: center;">
+                            <input type="number" class="numberBar" id="packVersion" value="18" min="7" max="20">
+                            <p class="infoText" id="gameVersion" style="padding-top: 0.2em;"></p>
+                        </div>
+                    </div>
                 </div>
     
                 <div class="topBtnDiv">
@@ -100,7 +125,7 @@
     
             <div id="settingRender">
                 <div class="settingsImage">
-                    <h3 style="margin: 5px;">Render Properties</h3>
+                    <h3>Render Properties</h3>
                     <div class="parameter">
                         <div class="paramFamily">
                             <input type="radio" id="quantAlgoButton" name="algo" value="quant" onclick="displayMethod('quant')" checked>
@@ -162,7 +187,7 @@
                 </div>
     
                 <div class="settingsImage" id="imageParam">
-                    <h3 style="margin: 5px;">Image Properties</h3>
+                    <h3>Image Properties</h3>
                     <div class="parameter">
                         <label class="label-resize" id="elementPosXSlider" for="elem_posX">Pos X</label>
                         <input class="numberBar" type="number" id="elementPosX" value="">
@@ -198,6 +223,11 @@
             <button id="downloadPack" onclick="DownlodPreparation()"><img src="assets/default/icon/download_white.png"> Download</button>
             <div id="generatedCodeDiv">
                 <p class="preventSelection">Generated:</p>
+                <div id="shaderGeneratedInfos">
+                    <p class="preventSelection infoShader" id="genFolderName">Folder Name:</p>
+                    <p class="preventSelection infoShader" id="genPackVersion">Pack Version:</p>
+                    <p class="preventSelection infoShader" id="genCaseCount">Case Number:</p>
+                </div>
                 <pre><code class="glsl" id="generatedCode"></code></pre>
                 
                 <pre><code class="glsl" id="generatedCodeLogo"></code></pre>

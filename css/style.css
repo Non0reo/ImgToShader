@@ -8,13 +8,31 @@ body {
 }
 
 .pickr {
-    vertical-align: middle;
-    margin-bottom: 7px;
-    margin-left: 5px;
+    /* vertical-align: middle; */
+    
+    margin: 0 5px;
+    /* margin-bottom: 5px; */
+    /* margin: 5px 7px; */
+}
+
+.colorIn {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    text-align: center;
+    margin: 5px 0;
+}
+
+.colorIn label {
+    padding: 4px 0 0 4px;
 }
 
 .code {
     font-family: "Lucida Console"
+}
+
+h3 {
+    margin: 5px;
 }
 
 canvas#shaderView {
@@ -290,7 +308,7 @@ div.settingsImage input#linkSize {
     margin-bottom: 20px;
 }
 
-div.settingsImage input.numberBar {
+input.numberBar {
     width: 50px;
     margin-right: 10px;
 }
@@ -442,6 +460,19 @@ code#generatedCode {
     /* width: 50%; */
     width: 500px;
     color: #ffffff65;
+    vertical-align: baseline;
+    
+}
+
+.infoShader {
+    width: auto;
+    color: #ffffff65;
+    font-size: 0.7em;
+    margin: 00;
+}
+
+#shaderGeneratedInfos {
+    display: none
 }
 
 .paramFamily {
