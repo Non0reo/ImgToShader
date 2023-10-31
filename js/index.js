@@ -14,6 +14,7 @@ const drawLoadingBarParam = document.getElementById("drawLoadingBar");
 const drawBackgroundParam = document.getElementById("drawBackground");
 const accessibilityCompatibilityParam = document.getElementById("accessibilityCompatibility");
 const autoSizeParam = document.getElementById("autoSize");
+const linkCanvasSizeParam = document.getElementById("linkCanvasSize");
 
 
 
@@ -23,14 +24,19 @@ let backgroundColor = "#EF323D";
 let drawLogo = drawLogoParam.checked;
 let drawLoadingBar = drawLoadingBarParam.checked;
 let drawBackground = drawBackgroundParam.checked;
+let linkCanvasSize = linkCanvasSizeParam.checked;
+
 accessibilityCompatibilityParam.checked = false;
-autoSizeParam.checked = false;
+autoSizeParam.checked = true;
+heightParam.disabled = linkCanvasSize;
+
 let accessibilityCompatibility = accessibilityCompatibilityParam.checked;
 let autoSize = autoSizeParam.checked;
-let m_pos = {x:0, y:0};
+
 widthParam.value = shaderView.width;
 heightParam.value = shaderView.height;
 let size = {width: shaderView.width, height: shaderView.height};
+
 let fileModified = false;
 
 const backgroundColorOptions = {
@@ -111,8 +117,9 @@ document.addEventListener("mousedown", function (e) {
         document.addEventListener("mouseup", stopResize, false);
 
         function resizeCanvas(e) {
-            widthParam.value = shaderView.width = size.width = startWidth + e.pageX - shaderView.offsetLeft - startX;
-            heightParam.value = shaderView.height = size.height = startHeight + e.pageY - shaderView.offsetTop - startY;
+            widthParam.value = shaderView.width = size.width = Math.abs(startWidth + e.pageX - shaderView.offsetLeft - startX);
+            if(!linkCanvasSize) heightParam.value = shaderView.height = Math.abs(size.height = startHeight + e.pageY - shaderView.offsetTop - startY);
+            else heightParam.value = shaderView.height = size.height = Math.round(shaderView.width / (16 / 9));
             redrawProcess();
         }
 
@@ -131,44 +138,6 @@ function redrawProcess() {
     draw();
     ctx.imageSmoothingEnabled = false;
 }
-
-/* shaderView.addEventListener("mousedown", function(e){
-    if (e.offsetX > BORDER_SIZE) {
-        m_pos.x = e.x;
-        document.addEventListener("mousemove", resizeX, false);
-    }
-    if (e.offsetY > BORDER_SIZE) {
-        m_pos.y = e.y;
-        document.addEventListener("mousemove", resizeY, false);
-    }
-}, false);
-
-document.addEventListener("mouseup", function(){
-    shaderView.width = size.width = supposedSize.width;
-    shaderView.height = size.height = supposedSize.height;
-    //document.removeEventListener("keydown");
-    document.removeEventListener("mousemove", resizeX, false);
-    document.removeEventListener("mousemove", resizeY, false);
-}, false);
-
-function resizeX(e){
-    console.log(e)
-    const dx = e.x - m_pos.x;
-    m_pos.x = e.x;
-    supposedSize.width = widthParam.value = (parseInt(getComputedStyle(shaderView, '').width) + dx);
-    if (autoSize) SetSizeElement();
-    //addedSize.width += dx;
-    draw();
-}
-
-function resizeY(e){
-    const dy = e.y - m_pos.y;
-    m_pos.y = e.y;
-    supposedSize.height = heightParam.value = (parseInt(getComputedStyle(shaderView, '').height) + dy);
-    if (autoSize) SetSizeElement();
-    //addedSize.height += dy;
-    draw();
-} */
 
 //PARAMETERS
 
@@ -189,16 +158,27 @@ function changeVersion(version) {
 }
 
 widthParam.addEventListener("input", function(){
-    size.width = parseInt(widthParam.value);
+    size.width = Math.abs(parseInt(widthParam.value));
     shaderView.width = size.width;
     widthParam.value = size.width;
     redrawProcess();
 });
 heightParam.addEventListener("input", function(){
-    size.height = parseInt(heightParam.value);
+    size.height = Math.abs(parseInt(heightParam.value));
     shaderView.height = size.height;
     heightParam.value = size.height;
     redrawProcess();
+});
+
+linkCanvasSizeParam.addEventListener("input", function(){
+    linkCanvasSize = linkCanvasSizeParam.checked;
+    if (linkCanvasSize) {
+        heightParam.disabled = true;
+        heightParam.value = shaderView.height = size.height = Math.round(widthParam.value / (16 / 9));
+    } else {
+        heightParam.disabled = false;
+    }
+    draw();
 });
 
 //Background Color
@@ -273,6 +253,8 @@ testImg.src = "./assets/default/Banner.png";
 let logoSize = {width: logoSizeParam.value, height: logoSizeParam.value / 4};
 let loadingBarSize = {width: logoSizeParam.value, height: logoSizeParam.value / 24};
 
+//Set the siee of the logo and bar if auto size is checked
+if(autoSize) SetSizeElement();
 
 //draw an image onto the canvas
 mojangLogo.onload = function(){
@@ -327,7 +309,7 @@ mojangLogo.onload = function(){
 
 
 loadingBar.onload = function(){
-    let loadingBarPosition = {x: (size.width / 2 - loadingBarSize.width / 2), y: (size.height / 2 - loadingBarSize.height / 2  + 50 + logoSize.height / 1.5)};
+    let loadingBarPosition = {x: (size.width / 2 - loadingBarSize.width / 2), y: (size.height / 2 - loadingBarSize.height / 2 /*  + 50  */+ logoSize.height / 0.75)};
 
     ctx.fillStyle = loadingBarColor;
     ctx.fillRect(loadingBarPosition.x, loadingBarPosition.y, loadingBarSize.width, loadingBarSize.height);
@@ -340,12 +322,6 @@ loadingBar.onload = function(){
 
     ctx.globalCompositeOperation = "source-over";
 }
-
-/* testImg.onload = function(){
-    ctx.globalCompositeOperation = "destination-over";
-    ctx.drawImage(testImg, 0, 0, size.width, size.height);
-    ctx.globalCompositeOperation = "source-over";
-} */
 
 //Draw all element on the canvas
 function draw() {
@@ -399,39 +375,3 @@ function displayWaningText(){
 window.onload = function(){
     assignObjectToList("empty");
 }
-
-
-
-
-
-    /* document.addEventListener("keydown", function(f){
-        console.log(f.key);
-        if (f.key == "Control") {
-            if (e.offsetX > BORDER_SIZE) {
-                m_pos.x = e.x;
-                document.addEventListener("mousemove", resizeX, false);
-            }
-            if (e.offsetY > BORDER_SIZE) {
-                m_pos.y = e.y;
-                document.addEventListener("mousemove", resizeY, false);
-            }
-        } else {
-            if (e.offsetX > BORDER_SIZE + shaderView.style.height) {
-                m_pos.x = e.x;
-                document.addEventListener("mousemove", resizeX, false);
-            }
-            if (e.offsetY > BORDER_SIZE + shaderView.style.height) {
-                m_pos.y = e.y;
-                document.addEventListener("mousemove", resizeY, false);
-            }
-        }
-    }); */
-    // if (e.offsetX > shaderView.style.width - BORDER_SIZE/*  + shaderView.style.height */) {
-    //     m_pos.x = e.x;
-    //     document.addEventListener("mousemove", resizeX, false);
-    // }
-    // if (e.offsetY > shaderView.style.height - BORDER_SIZE/*  + shaderView.style.height */) {
-    //     m_pos.y = e.y;
-    //     document.addEventListener("mousemove", resizeY, false);
-    // }
-    

@@ -22,7 +22,6 @@ let selected; // Which div is selected (index number)
 
 //When docummend is clicked, unselect every images
 document.addEventListener("click", function(event) {
-    console.log(event)
     if (event.target == document.getElementById("tool") || event.target == document.getElementById("imageListBox")) {
         unselectEveryImages();
     }
