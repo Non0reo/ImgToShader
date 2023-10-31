@@ -14,6 +14,7 @@ const elementHeightSliderParam = document.getElementById('elementHeightSlider');
 const elementRotationSliderParam = document.getElementById('elementRotationSlider');
 
 const settingRender = document.getElementById('settingRender');
+const imageParam = document.getElementById('imageParam');
 
 //linkSizeParam.checked = false;
 let linkSize = linkSizeParam.checked;
@@ -59,6 +60,8 @@ function addEventListenerToList() {
 
 function assignObjectToList(objectIndex) {
     if (objectIndex != "empty") {
+        imageParam.style.display = "flex";
+
         elementPosXParam.value = dataStack[objectIndex].x;
         elementPosYParam.value = dataStack[objectIndex].y;
         elementWidthParam.value = dataStack[objectIndex].width;
@@ -83,6 +86,8 @@ function assignObjectToList(objectIndex) {
         settingRender.style.flexDirection = "column-reverse";
     }
     else {
+        imageParam.style.display = "none";
+        
         elementPosXParam.value = "";
         elementPosYParam.value = "";
         elementWidthParam.value = "";

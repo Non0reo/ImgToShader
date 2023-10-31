@@ -357,7 +357,7 @@ function draw() {
 
     drawAddedPictures(); //draw anything that the user added to the canvas
     displayWaningText()
-    if (imageStack.length > 0) assignObjectToList(selected);
+    //if (imageStack.length > 0) assignObjectToList(selected);
 
     //testImg.onload(); //draw test picture
 }
