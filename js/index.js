@@ -122,6 +122,7 @@ document.addEventListener("mousedown", function (e) {
             widthParam.value = shaderView.width = size.width = Math.abs(startWidth + e.pageX - shaderView.offsetLeft - startX);
             if(!linkCanvasSize) heightParam.value = shaderView.height = Math.abs(size.height = startHeight + e.pageY - shaderView.offsetTop - startY);
             else heightParam.value = shaderView.height = size.height = Math.round(shaderView.width / (16 / 9));
+            displayWaningText();
             redrawProcess();
         }
 
@@ -248,10 +249,12 @@ drawLoadingBarParam.addEventListener("input", function(){
 packVersion.addEventListener("input", function(){
     PACK_VERSION = parseInt(packVersion.value);
     gameVersion.innerText = lookupVersion[packVersion.value];
+    displayWaningText();
 });
 
 folderName.addEventListener("input", function(){
     PACK_NAME = folderName.value;
+    displayWaningText();
 });
 
 
@@ -348,7 +351,7 @@ function draw() {
 
     drawAddedPictures(); //draw anything that the user added to the canvas
     displayWaningText()
-    //if (imageStack.length > 0) assignObjectToList(selected);
+    if (imageStack.length > 0) assignObjectToList(selected); //update the setting box with the selected element
 
     //testImg.onload(); //draw test picture
 }

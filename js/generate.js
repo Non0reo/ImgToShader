@@ -410,8 +410,8 @@ const DownloadPack = (shaderData) => {
     let include = shaders.folder("include");
 
     if(SHADER_VERSION === 0) {
-        if(shaderData.positionColorFSH) core.file("position_color.fsh", finalCode)
-        if(shaderData.positionTexFSH) core.file("position_tex.fsh", finalCodeLogo);
+        if(shaderData.positionColorFSH) core.file("position_color.fsh", shaderData.positionColorFSH)
+        if(shaderData.positionTexFSH) core.file("position_tex.fsh", shaderData.positionTexFSH);
         if(shaderData.shaderJson) shaderData.shaderJson.forEach(element => {
             core.file(element[1] + ".json", element[0]);
         });

@@ -42,7 +42,6 @@ function addEventListenerToList() {
     imageStack.forEach(element => {
         element.addEventListener('click', function(event) {
             let index = parseInt(element.className.replace("addedImgBox image", "").replace(" selected", ""));
-            console.log(index, dataStack[index], dataStack.length);
             if (dataStack.length <= index) index -= 1;
 
             if (dataStack.length > 0 && (event.target == imageStack[index] || event.target == imageStack[index].children[1])) {
