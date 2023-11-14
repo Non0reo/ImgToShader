@@ -350,7 +350,7 @@ function draw() {
 
     drawAddedPictures(); //draw anything that the user added to the canvas
     displayWaningText()
-    if (imageStack.length > 0) assignObjectToList(selected); //update the setting box with the selected element
+    if (imageStack.length > 0 && selected) assignObjectToList(selected); //update the setting box with the selected element
 
     //testImg.onload(); //draw test picture
 }

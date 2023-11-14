@@ -323,6 +323,21 @@ function generateShaderWithWorker(json) {
         genCaseCount.innerText = e.data.genInfos.imageExists ? `Case count: ${e.data.genInfos.caseCount}` : `Case count: 0 (no image)`;
         genPackVersion.innerText = `Pack version: ${PACK_VERSION}`;
         genFolderName.innerText = `Folder name: ${PACK_NAME}`;
+
+
+        //Draw the zone on the canvas 'ctx' using a rectangle with a random color
+        //That is for debug, but I'll leave it beacause it's super cool !!!!
+        /* const zones = e.data.genInfos.zones;
+        if(zones) {
+            for (let i = 0; i < zones.length; i++) {
+                const zone = zones[i];
+                //const color = zone.color;
+                //ctx.fillStyle = `rgba(${color[0]}, ${color[1]}, ${color[2]}, ${color[3]})`;
+                ctx.fillStyle = `rgba(${Math.floor(Math.random() * 255)}, ${Math.floor(Math.random() * 255)}, ${Math.floor(Math.random() * 255)}, 1.0)`;
+                const scale = renderResolution.value / 100;
+                ctx.fillRect(zone.x / scale, zone.y / scale, zone.width / scale, zone.height / scale);
+            }
+        } */
     }
 }
 

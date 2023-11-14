@@ -36,7 +36,8 @@ self.onmessage = function(e) {
                 shaderJson: result,
                 genInfos: {
                     imageExists: true,
-                    caseCount: [imgBackground[1]]
+                    caseCount: imgBackground[1].caseCount,
+                    zones: imgBackground[1].zones
                 }
             });
         } else {
@@ -47,7 +48,8 @@ self.onmessage = function(e) {
                 shaderJson: result,
                 genInfos: {
                     imageExists: false,
-                    caseCount: [imgBackground[1]]
+                    caseCount: imgBackground[1].caseCount,
+                    zones: imgBackground[1].zones
                 }
             });
         }
@@ -63,7 +65,8 @@ self.onmessage = function(e) {
                 shaderJson: result,
                 genInfos: {
                     imageExists: true,
-                    caseCount: [imgBackground[1]]
+                    caseCount: imgBackground[1].caseCount,
+                    zones: imgBackground[1].zones
                 }
             });
         } else {
@@ -73,7 +76,8 @@ self.onmessage = function(e) {
                 shaderJson: result,
                 genInfos: {
                     imageExists: false,
-                    caseCount: [imgBackground[1]]
+                    caseCount: imgBackground[1].caseCount,
+                    zones: imgBackground[1].zones
                 }
             });
         }
@@ -353,35 +357,10 @@ vec3 pColor(ivec2 RealPixelPos, ivec2 imageSize) {
         ${stringOut}
     }
 }
-`, caseNumber];
+`, {caseCount: caseNumber}];
 
         case 'if':
-
-        /*  Algorithm explanation:
-        1. Iterate through every non marcked pixel on the image
-        2. If the pixel is not transparent, not the background color and not marcked yet, add it to the list of marcked pixels and start a new array with the index inside
-        3. If the pixel after is the same color, add it to the array.
-        4. If the next pixel is not the same color, look at the pixel under the last pixel of the array. If it's the same color, add it to the array too. and check line where the pixel is.
-        5. If the pixel 
-        */
-
-            console.warn("The if render method is not supported yet, using the case method instead.")
-            /* for (let i = 0; i < palette.length; i++) {
-                console.log(palette[i].toString(), [backgroundColor.r, backgroundColor.g, backgroundColor.b, parseInt(backgroundColor.a * 255)].toString(), palette[i].toString() !== [backgroundColor.r, backgroundColor.g, backgroundColor.b, parseInt(backgroundColor.a * 255)].toString())
-                
-                if (palette[i].toString() !== [0, 0, 0, 0].toString() && palette[i].toString() !== [backgroundColor.r, backgroundColor.g, backgroundColor.b, parseInt(backgroundColor.a * 255)].toString()) { // If the color is not transparent and not the background color
-                    
-                    for (let j = 0; j < indexedColors.length; j++) {
-                        // if (i === indexedColors[j]) {
-                        //     stringOut += `\n\t\tcase ${j}:`
-                        //     caseNumber++;
-                        // }
-                    }
-                    stringOut += `\n\t\t\treturn vec3(${palette[i][0]}, ${palette[i][1]}, ${palette[i][2]});`;
-                }
-            }
-            stringOut += `\n\t\tdefault:\n\t\t\treturn vec3(${backgroundColor.r}, ${backgroundColor.g}, ${backgroundColor.b});`; */
-
+       
             //Actual Pixel by number : RealPixelPos.y * imageSize.x + RealPixelPos.x
             let markedPixels = [];
             let finalZones = [];
@@ -403,20 +382,11 @@ vec3 pColor(ivec2 RealPixelPos, ivec2 imageSize) {
                             y: 0
                         };
 
-                        //Check each pixel on the line where the pixel is
-                        /* const checkLine = (max) => {
-                            for(let line = x; line < max ; line++) {
-                                if(palette[indexedColors[pixelI + line]] === actualPixelColor) return false;
-                            }
-                            return true;
-                        } */
-
+                        //Check if the zone contains the same color
                         const checkZone = (param) => {
                             for(let line = param.pos1.y; line < param.pos2.y + 1 ; line++) {
                                 for(let column = param.pos1.x; column < param.pos2.x + 1 ; column++) {
-                                    //console.log(palette[indexedColors[/* pixelI */ column + line * imageData.width]]!== param.color, [column, line])
-                                    if(palette[indexedColors[/* pixelI +  */column + line * imageData.width]] !== param.color) {
-                                        console.warn(column, line);
+                                    if(palette[indexedColors[column + line * imageData.width]] !== param.color) {
                                         differencePos = {
                                             x: column,
                                             y: line
@@ -496,16 +466,16 @@ vec3 pColor(ivec2 RealPixelPos, ivec2 imageSize) {
 
                         const bestZone = getBestZone(zoneList);
                         markAllPixels(bestZone, [x, y]);
-                        console.log(pixelI, {x, y, width: bestZone.width + 1, height: bestZone.height + 1})
+                        //console.log(pixelI, {x, y, width: bestZone.width + 1, height: bestZone.height + 1})
                         finalZones.push({
                             x: x,
                             y: y,
                             x2: x + bestZone.width - 1,
                             y2: y + bestZone.height - 1,
                             width: bestZone.width + 1,
-                            height: bestZone.height + 1
+                            height: bestZone.height + 1,
+                            color: palette[indexedColors[pixelI]]
                         });
-                        caseNumber++;
                     }                      
                 }
             }
@@ -522,7 +492,7 @@ vec3 pColor(ivec2 RealPixelPos, ivec2 imageSize) {
         ${stringOut}
     }
 }
-`, caseNumber];
+`, {caseCount: finalZones.length, zones: finalZones}];
 
     }
 }
