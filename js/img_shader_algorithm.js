@@ -320,26 +320,31 @@ function generateImageBackgroundGLSL(data) {
     const palette = data.palette;
     const indexedColors = data.indexedColors;
     const backgroundColor = data.generalInfos.backgroundColor.color;
+    const imageData = data.imageData;
 
     let stringOut = '';
     let caseNumber = 0;
-    for (let i = 0; i < palette.length; i++) {
-        console.log(palette[i].toString(), [backgroundColor.r, backgroundColor.g, backgroundColor.b, parseInt(backgroundColor.a * 255)].toString(), palette[i].toString() !== [backgroundColor.r, backgroundColor.g, backgroundColor.b, parseInt(backgroundColor.a * 255)].toString())
-        if (palette[i].toString() !== [0, 0, 0, 0].toString() && palette[i].toString() !== [backgroundColor.r, backgroundColor.g, backgroundColor.b, parseInt(backgroundColor.a * 255)].toString()) { // If the color is not transparent and not the background color
-            for (let j = 0; j < indexedColors.length; j++) {
-                if (i === indexedColors[j]) {
-                    stringOut += `\n\t\tcase ${j}:`
-                    caseNumber++;
+
+    switch (data.generalInfos.shader.renderMethod) {
+        case 'case':
+            
+            for (let i = 0; i < palette.length; i++) {
+                console.log(palette[i].toString(), [backgroundColor.r, backgroundColor.g, backgroundColor.b, parseInt(backgroundColor.a * 255)].toString(), palette[i].toString() !== [backgroundColor.r, backgroundColor.g, backgroundColor.b, parseInt(backgroundColor.a * 255)].toString())
+                if (palette[i].toString() !== [0, 0, 0, 0].toString() && palette[i].toString() !== [backgroundColor.r, backgroundColor.g, backgroundColor.b, parseInt(backgroundColor.a * 255)].toString()) { // If the color is not transparent and not the background color
+                    for (let j = 0; j < indexedColors.length; j++) {
+                        if (i === indexedColors[j]) {
+                            stringOut += `\n\t\tcase ${j}:`
+                            caseNumber++;
+                        }
+                    }
+                    stringOut += `\n\t\t\treturn vec3(${palette[i][0]}, ${palette[i][1]}, ${palette[i][2]});`;
                 }
             }
-            stringOut += `\n\t\t\treturn vec3(${palette[i][0]}, ${palette[i][1]}, ${palette[i][2]});`;
-        }
-    }
-    stringOut += `\n\t\tdefault:\n\t\t\treturn vec3(${backgroundColor.r}, ${backgroundColor.g}, ${backgroundColor.b});`;
-    
+            stringOut += `\n\t\tdefault:\n\t\t\treturn vec3(${backgroundColor.r}, ${backgroundColor.g}, ${backgroundColor.b});`;
+            
 
 return [`/*
- Generated from https://non0reo.github.io/ImgToShader/
+Generated from https://non0reo.github.io/ImgToShader/
 */
 
 vec3 pColor(ivec2 RealPixelPos, ivec2 imageSize) {
@@ -350,4 +355,174 @@ vec3 pColor(ivec2 RealPixelPos, ivec2 imageSize) {
 }
 `, caseNumber];
 
+        case 'if':
+
+        /*  Algorithm explanation:
+        1. Iterate through every non marcked pixel on the image
+        2. If the pixel is not transparent, not the background color and not marcked yet, add it to the list of marcked pixels and start a new array with the index inside
+        3. If the pixel after is the same color, add it to the array.
+        4. If the next pixel is not the same color, look at the pixel under the last pixel of the array. If it's the same color, add it to the array too. and check line where the pixel is.
+        5. If the pixel 
+        */
+
+            console.warn("The if render method is not supported yet, using the case method instead.")
+            /* for (let i = 0; i < palette.length; i++) {
+                console.log(palette[i].toString(), [backgroundColor.r, backgroundColor.g, backgroundColor.b, parseInt(backgroundColor.a * 255)].toString(), palette[i].toString() !== [backgroundColor.r, backgroundColor.g, backgroundColor.b, parseInt(backgroundColor.a * 255)].toString())
+                
+                if (palette[i].toString() !== [0, 0, 0, 0].toString() && palette[i].toString() !== [backgroundColor.r, backgroundColor.g, backgroundColor.b, parseInt(backgroundColor.a * 255)].toString()) { // If the color is not transparent and not the background color
+                    
+                    for (let j = 0; j < indexedColors.length; j++) {
+                        // if (i === indexedColors[j]) {
+                        //     stringOut += `\n\t\tcase ${j}:`
+                        //     caseNumber++;
+                        // }
+                    }
+                    stringOut += `\n\t\t\treturn vec3(${palette[i][0]}, ${palette[i][1]}, ${palette[i][2]});`;
+                }
+            }
+            stringOut += `\n\t\tdefault:\n\t\t\treturn vec3(${backgroundColor.r}, ${backgroundColor.g}, ${backgroundColor.b});`; */
+
+            //Actual Pixel by number : RealPixelPos.y * imageSize.x + RealPixelPos.x
+            let markedPixels = [];
+            let finalZones = [];
+            let differencePos = {}; //Position of the pixel that is different from the actual pixel (used in the checkZone function)
+
+            for (let y = 0 ; y < imageData.height; y++) {
+
+                for(let x = 0 ; x < imageData.width ; x++) {
+                    const pixelI = y * imageData.width + x;
+
+                    if(palette[indexedColors[pixelI]].toString() !== [0, 0, 0, 0].toString() && 
+                    palette[indexedColors[pixelI]].toString() !== [backgroundColor.r, backgroundColor.g, backgroundColor.b, parseInt(backgroundColor.a * 255)].toString() && 
+                        !markedPixels.includes(pixelI)) {
+
+                            //for(let xOffset = x ; x )
+                        let actualPixelColor = palette[indexedColors[pixelI]];
+                        let offset = {
+                            x: 0,
+                            y: 0
+                        };
+
+                        //Check each pixel on the line where the pixel is
+                        /* const checkLine = (max) => {
+                            for(let line = x; line < max ; line++) {
+                                if(palette[indexedColors[pixelI + line]] === actualPixelColor) return false;
+                            }
+                            return true;
+                        } */
+
+                        const checkZone = (param) => {
+                            for(let line = param.pos1.y; line < param.pos2.y + 1 ; line++) {
+                                for(let column = param.pos1.x; column < param.pos2.x + 1 ; column++) {
+                                    //console.log(palette[indexedColors[/* pixelI */ column + line * imageData.width]]!== param.color, [column, line])
+                                    if(palette[indexedColors[/* pixelI +  */column + line * imageData.width]] !== param.color) {
+                                        console.warn(column, line);
+                                        differencePos = {
+                                            x: column,
+                                            y: line
+                                        };
+                                        return [column, line];
+                                    }
+                                }
+                            }
+                            differencePos = {x: -1, y: -1}
+                            return true;
+                        }
+
+                        while (palette[indexedColors[pixelI + offset.x]] === actualPixelColor &&
+                            !markedPixels.includes(pixelI + offset.x) &&
+                            x + offset.x < imageData.width ) {
+                            
+                            //markedPixels.push(pixelI + offset.x);
+                            offset.x++;
+                            
+                        }
+                        offset.x--;
+
+                        
+                        let zoneList = [];
+
+                        while(x <= x + offset.x && y <= y + offset.y) {
+                            let offsetedActualPixel = pixelI + offset.x + offset.y * imageData.width;
+                            while (palette[indexedColors[offsetedActualPixel]] === actualPixelColor &&
+                                !markedPixels.includes(offsetedActualPixel) &&
+                                y + offset.y < imageData.height &&
+                                checkZone({
+                                    pos1: {
+                                        x: x,
+                                        y: y
+                                    },
+                                    pos2: {
+                                        x: x + offset.x,
+                                        y: y + offset.y
+                                    },
+                                    color: palette[indexedColors[offsetedActualPixel]]
+                                }) === true) {
+                                
+                                //markedPixels.push(pixelI + offset.x);
+                                offset.y++;
+                                offsetedActualPixel = pixelI + offset.x + offset.y * imageData.width;
+                            }
+                            offset.y--;
+                            zoneList.push([offset.x, offset.y]);
+                            offset.x--;
+                            //offset.x = differencePos.x;
+                            offset.y = 0;
+                        }  
+                        
+                        const getBestZone = (zoneList) => {
+                            let bestZone = {
+                                width: 0,
+                                height: 0
+                            };
+                            for(let i = 0 ; i < zoneList.length ; i++) {
+                                if((zoneList[i][0] + 1) * (zoneList[i][1] + 1) > (bestZone.width + 1) * (bestZone.height + 1)) {
+                                    bestZone = {
+                                        width: zoneList[i][0],
+                                        height: zoneList[i][1]
+                                    };
+                                }
+                            }
+                            return bestZone;
+                        }
+
+                        const markAllPixels = (zone, [x, y]) => {
+                            for(let line = y ; line < zone.height + y + 1 ; line++) {
+                                for(let column = x ; column < zone.width + x + 1 ; column++) {
+                                    markedPixels.push(column + line * imageData.width);
+                                }
+                            }
+                        }
+
+                        const bestZone = getBestZone(zoneList);
+                        markAllPixels(bestZone, [x, y]);
+                        console.log(pixelI, {x, y, width: bestZone.width + 1, height: bestZone.height + 1})
+                        finalZones.push({
+                            x: x,
+                            y: y,
+                            x2: x + bestZone.width - 1,
+                            y2: y + bestZone.height - 1,
+                            width: bestZone.width + 1,
+                            height: bestZone.height + 1
+                        });
+                        caseNumber++;
+                    }                      
+                }
+            }
+
+                      
+
+return [`/*
+Generated from https://non0reo.github.io/ImgToShader/
+*/
+
+vec3 pColor(ivec2 RealPixelPos, ivec2 imageSize) {
+    int pixelI = RealPixelPos.y * imageSize.x + RealPixelPos.x;
+    switch(pixelI) {
+        ${stringOut}
+    }
+}
+`, caseNumber];
+
+    }
 }

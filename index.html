@@ -89,6 +89,16 @@
                 <div id="shaderConfig">
                     <h3>Shader Config</h3>
                     <div class="parameter">
+                        <div class="paramFamily">
+                            <h5>Render Method</h5>
+                            <input type="radio" id="caseMethodButton" name="render" value="case" onclick="setRenderMethod('case')" checked>
+                            <label for="caseMethodButton">Case Method</label><br>
+                            <input type="radio" id="ifMethodButton" name="render" value="if" onclick="setRenderMethod('if')">
+                            <label for="ifMethodButton">Conditional Zones Method</label><br>
+                            <p class="infoText">• The Case Method will asign a color for each pixel. Useful when using a detailled image with lots of colors.<br>• The Conditional Zones Method will segment the image into block of the same color. Efficient when using a pixel art or low-color images.</p>
+                        </div>
+                    </div>
+                    <div class="parameter">
                         <!-- <label for="fileName">File Name</label> -->
                         <input type="text" id="folderName" value="CustomLoadingBackgournd">
                         <!-- <label for="packVersion">Pack Version</label> -->
@@ -132,7 +142,7 @@
                             <label for="quantAlgoButton">Quaternization Compression</label><br>
                             <input type="radio" id="bitsAlgoButton" name="algo" value="bits" onclick="displayMethod('bits')">
                             <label for="bitsAlgoButton">Color per pixels Compression</label><br>
-                            <p class="infoText">• Quaternization Compression (recommended) will seach for the best color palette among the image average colors.<br>• Color per pixel Compression will search for each pixel the closest color using aproximated RGB values</p>
+                            <p class="infoText">• Quaternization Compression (recommended) will search for the best color palette among the image average colors.<br>• Color per pixel Compression will search for each pixel the closest color using aproximated RGB values</p>
                         </div>
                     </div>
                     <div id="quant">

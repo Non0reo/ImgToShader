@@ -1,4 +1,3 @@
-let SHADER_VERSION = 1;
 const BORDER_SIZE = 10;
 const shaderView = document.getElementById("shaderView");
 const version1Param = document.getElementById("shaderVersion1");

@@ -32,6 +32,7 @@ let lookupVersion = {
 }
 
 gameVersion.innerText = lookupVersion[packVersion.value];
+let SHADER_VERSION = 1;
 let PACK_VERSION = parseInt(packVersion.value);
 let PACK_NAME = folderName.value;
 let PACK_DESCRIPTION = "Custom Loading Background";
@@ -41,7 +42,7 @@ let generatedDataCache = {};
 async function generateCode() {
     draw();
 
-    if (imageStack.length == 0) { //Don't bother to make code if there is no image
+    if (imageStack.length == 0) { //No Images
         
         const json = {
             imageExists: imageStack.length > 0,
@@ -268,6 +269,7 @@ async function generateCode() {
                 },
                 accessibilityCompatibility: accessibilityCompatibility,
                 shader: {
+                    renderMethod: renderMethod,
                     version: SHADER_VERSION,
                     json: ['rendertype_gui_overlay']
                 }

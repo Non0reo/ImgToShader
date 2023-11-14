@@ -10,6 +10,7 @@ const quantDiv = document.querySelector('#quant');
 const bitsDiV = document.querySelector('#bits');
 
 let compressionMode;
+let renderMethod;
 
 
 paletteQuality.addEventListener('input', () => {
@@ -53,4 +54,10 @@ function displayMethod(method) {
     bitsDiV.style.display = method == "bits" ? "block" : "none";
 }
 
+function setRenderMethod(method) {
+    renderMethod = method;
+}
+
+
 displayMethod("quant");
+setRenderMethod("case");
