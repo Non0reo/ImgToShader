@@ -97,7 +97,18 @@ function generateGUIOverlayFSH(data, loadingBarCondition = "") {
         gen_Frag = backgroundColor.draw ? `fragColor = vec4(vec3(${backgroundColor.color.r}, ${backgroundColor.color.g}, ${backgroundColor.color.b}) / 255, ${alpha});` : `discard;`
     }
 
-    gen_Frag = data.imageExists ? `vec3 newColor = pColor(RealPixelPos, imageSize) / 255;\n\tfragColor = vec4(newColor, color.a);` : gen_Frag;
+    if (data.imageExists) {
+        switch (data.generalInfos.shader.renderMethod) {
+            case 'case':
+                gen_Frag = `vec3 newColor = pColor(RealPixelPos, imageSize) / 255;\n\tfragColor = vec4(newColor, color.a);`;
+                break;
+            case 'if':
+                gen_Frag = `vec4 f = vec4(0.0);\n\tpColor(RealPixelPos, f, color.a);\n\tfragColor = f;`;
+                break;
+            default:
+                break;
+        }
+    }
 
     let gen_Image = data.imageExists ? `
     vec2 RealSSize = getScreenSize(ProjMat, ScreenSize);
@@ -464,33 +475,41 @@ vec3 pColor(ivec2 RealPixelPos, ivec2 imageSize) {
                             }
                         }
 
+                        const color = palette[indexedColors[pixelI]];
                         const bestZone = getBestZone(zoneList);
                         markAllPixels(bestZone, [x, y]);
                         //console.log(pixelI, {x, y, width: bestZone.width + 1, height: bestZone.height + 1})
-                        finalZones.push({
+
+                        const zone ={
                             x: x,
                             y: y,
-                            x2: x + bestZone.width - 1,
-                            y2: y + bestZone.height - 1,
+                            x2: x + bestZone.width,
+                            y2: y + bestZone.height,
                             width: bestZone.width + 1,
                             height: bestZone.height + 1,
-                            color: palette[indexedColors[pixelI]]
-                        });
+                            color: color
+                        }
+
+                        finalZones.push(zone);
+
+                        stringOut += `\n\tif(f.a == 0) zCol(r, ${x + y * imageData.width}, ${zone.x2 + zone.y2 * imageData.width}, vec3(${color[0]}, ${color[1]}, ${color[2]}), f, t);`;
                     }                      
                 }
-            }
-
-                      
+            }                      
 
 return [`/*
 Generated from https://non0reo.github.io/ImgToShader/
 */
 
-vec3 pColor(ivec2 RealPixelPos, ivec2 imageSize) {
-    int pixelI = RealPixelPos.y * imageSize.x + RealPixelPos.x;
-    switch(pixelI) {
-        ${stringOut}
-    }
+void zCol(ivec2 r, int pI1, int pI2, vec3 c, out vec4 f, float t) {
+	ivec2 p1 = ivec2(pI1 % ${imageData.width}, pI1 / ${imageData.width});
+	ivec2 p2 = ivec2(pI2 % ${imageData.width}, pI2 / ${imageData.width});
+	if(p1.x <= r.x && r.x <= p2.x && p1.y <= r.y && r.y <= p2.y) f = vec4(c / 255, t);
+}
+
+void pColor(ivec2 r, out vec4 f, float t) {
+    ${stringOut}
+    ${data.generalInfos.backgroundColor.draw ? `if(f.a == 0) f = vec4(vec3(${backgroundColor.r}, ${backgroundColor.g}, ${backgroundColor.b}) / 255, t);` : ``}
 }
 `, {caseCount: finalZones.length, zones: finalZones}];
 

@@ -38,8 +38,9 @@ let PACK_NAME = folderName.value;
 let PACK_DESCRIPTION = "Custom Loading Background";
 
 let generatedDataCache = {};
+let zones = [];
 
-async function generateCode() {
+async function generateCode(previewOnly = false) {
     draw();
 
     if (imageStack.length == 0) { //No Images
@@ -238,44 +239,46 @@ async function generateCode() {
         }
         console.log(nonEmptyPixels);
 
-        const json = {
-            imageData: {
-                data: formatedLowResImage,
-                width: lowRes_image.width,
-                height: lowRes_image.height,
-                length: formatedLowResImage.length,
-            },
-            palette: palette,
-            indexedColors: indexedColors,
-            imageExists: imageStack.length > 0,
-            generalInfos: {
-                backgroundColor: {
-                    IsAlphaChanged: hexToRGBA(backgroundColor, 1/255).IsAlphaChanged,
-                    color: hexToRGBA(backgroundColor, 1/255).color,
-                    colorHEX: backgroundColor,
-                    draw: drawBackground,
+        if(!previewOnly){
+            const json = {
+                imageData: {
+                    data: formatedLowResImage,
+                    width: lowRes_image.width,
+                    height: lowRes_image.height,
+                    length: formatedLowResImage.length,
                 },
-                loadingBarColor: {
-                    IsAlphaChanged: hexToRGBA(loadingBarColor, 1/255).IsAlphaChanged,
-                    color: hexToRGBA(loadingBarColor, 1/255).color,
-                    colorHEX: loadingBarColor,
-                    draw: drawLoadingBar,
-                },
-                mojangLogoColor: {
-                    IsAlphaChanged: hexToRGBA(mojangLogoColor, 1/255).IsAlphaChanged,
-                    color: hexToRGBA(mojangLogoColor, 1/255).color,
-                    colorHEX: mojangLogoColor,
-                    draw: drawLogo,
-                },
-                accessibilityCompatibility: accessibilityCompatibility,
-                shader: {
-                    renderMethod: renderMethod,
-                    version: SHADER_VERSION,
-                    json: ['rendertype_gui_overlay']
+                palette: palette,
+                indexedColors: indexedColors,
+                imageExists: imageStack.length > 0,
+                generalInfos: {
+                    backgroundColor: {
+                        IsAlphaChanged: hexToRGBA(backgroundColor, 1/255).IsAlphaChanged,
+                        color: hexToRGBA(backgroundColor, 1/255).color,
+                        colorHEX: backgroundColor,
+                        draw: drawBackground,
+                    },
+                    loadingBarColor: {
+                        IsAlphaChanged: hexToRGBA(loadingBarColor, 1/255).IsAlphaChanged,
+                        color: hexToRGBA(loadingBarColor, 1/255).color,
+                        colorHEX: loadingBarColor,
+                        draw: drawLoadingBar,
+                    },
+                    mojangLogoColor: {
+                        IsAlphaChanged: hexToRGBA(mojangLogoColor, 1/255).IsAlphaChanged,
+                        color: hexToRGBA(mojangLogoColor, 1/255).color,
+                        colorHEX: mojangLogoColor,
+                        draw: drawLogo,
+                    },
+                    accessibilityCompatibility: accessibilityCompatibility,
+                    shader: {
+                        renderMethod: renderMethod,
+                        version: SHADER_VERSION,
+                        json: ['rendertype_gui_overlay']
+                    }
                 }
-            }
-        };
-        generateShaderWithWorker(json);
+            };
+            generateShaderWithWorker(json);
+        }
     } 
 }
 
@@ -327,17 +330,21 @@ function generateShaderWithWorker(json) {
 
         //Draw the zone on the canvas 'ctx' using a rectangle with a random color
         //That is for debug, but I'll leave it beacause it's super cool !!!!
-        /* const zones = e.data.genInfos.zones;
-        if(zones) {
-            for (let i = 0; i < zones.length; i++) {
-                const zone = zones[i];
-                //const color = zone.color;
-                //ctx.fillStyle = `rgba(${color[0]}, ${color[1]}, ${color[2]}, ${color[3]})`;
-                ctx.fillStyle = `rgba(${Math.floor(Math.random() * 255)}, ${Math.floor(Math.random() * 255)}, ${Math.floor(Math.random() * 255)}, 1.0)`;
-                const scale = renderResolution.value / 100;
-                ctx.fillRect(zone.x / scale, zone.y / scale, zone.width / scale, zone.height / scale);
-            }
-        } */
+        zones = e.data.genInfos.zones;
+        //debugRender();
+    }
+}
+
+function debugRender() {
+    if(zones) {
+        for (let i = 0; i < zones.length; i++) {
+            const zone = zones[i];
+            //const color = zone.color;
+            //ctx.fillStyle = `rgba(${color[0]}, ${color[1]}, ${color[2]}, ${color[3]})`;
+            ctx.fillStyle = `rgba(${Math.floor(Math.random() * 255)}, ${Math.floor(Math.random() * 255)}, ${Math.floor(Math.random() * 255)}, 1.0)`;
+            const scale = renderResolution.value / 100;
+            ctx.fillRect(zone.x / scale, zone.y / scale, zone.width / scale, zone.height / scale);
+        }
     }
 }
 

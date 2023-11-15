@@ -376,6 +376,18 @@ button#generateButton {
     color: black;
 }
 
+button#previewButton {
+    margin: 3px 0;
+    padding: 0 10px;
+    width: fit-content;
+    font-family: 'Poppins', sans-serif;
+    color: black;
+    border-radius: 10px;
+    background-color: #9dabc1;
+    border: transparent;
+}
+
+
 div#generated {
     border: 2px solid rgb(14, 17, 56);
     background-color: rgb(27, 32, 43);
