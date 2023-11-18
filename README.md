@@ -15,11 +15,11 @@ I recently made this tool that allows you to change the background color, the lo
 
 ## How does it works? 📄
 
+Too learn how to use this tool, look at the [Project Wiki](https://github.com/Non0reo/ImgToShader/wiki)
+
 Go on the [website](https://non0reo.github.io/ImgToShader/). You will see one big canvas, some options, the `Generate` button, and the generated code.<br>
 Change the color of the elements, hide them, or even add your own background. When you are done, click on the `Generate` button and download the resource pack underneath.<br>
 The script convert the color that you have chosen for the elements and transcribe them in core shader GLSL code (the language for shaders)
-
-For further information, see the [Project Wiki](https://github.com/Non0reo/ImgToShader/wiki) (soon)
 
 ### Specifications:
 * This tool is made to break as less things as possible in the game. If you encounter any issues, let me know by writing a [Ticket](https://github.com/Non0reo/ImgToShader/issues)
