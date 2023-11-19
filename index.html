@@ -142,7 +142,7 @@
                             <label for="quantAlgoButton">Quaternization Compression</label><br>
                             <input type="radio" id="bitsAlgoButton" name="algo" value="bits" onclick="displayMethod('bits')">
                             <label for="bitsAlgoButton">Color per pixels Compression</label><br>
-                            <p class="infoText">• Quaternization Compression (recommended) will search for the best color palette among the image average colors.<br>• Color per pixel Compression will search for each pixel the closest color using aproximated RGB values</p>
+                            <p class="infoText">• Quaternization Compression (recommended) will search for the best color palette among the image average colors.<br>• Color per pixel Compression will search for each pixel the closest color using approximated RGB values</p>
                         </div>
                     </div>
                     <div id="quant">
@@ -206,7 +206,7 @@
                         <input class="numberBar" type="number" id="elementPosY" value="">
                         <button class="actionBtn" id="horizontalAlign" onclick="actionBtn.alignHorizontal()"></button><button class="actionBtn" id="verticalAlign" onclick="actionBtn.alignVertical()"></button>
                     </div>
-                    <div class="parameter">
+                    <div class="parameter" style="display: none;">
                         <label for="elem_normalizeCoords">Normalize position in the final background</label>
                         <input type="checkbox" id="normalizeCoords" name="elem_normalizeCoords" value="elem_normalizeCoords" checked="true">
                     </div>
@@ -253,7 +253,8 @@
             <h1 class="rainbow">ImgToShader</h1>
         </div>
         <div id="actions">
-            <a href="https://github.com/Non0reo/ImgToShader/issues">Any Issue/Feedback?</a>
+            <a href="https://github.com/Non0reo/ImgToShader/wiki">→ Project Wiki</a>
+            <a href="https://github.com/Non0reo/ImgToShader/issues">→ Any Issue/Feedback?</a>
             <!-- <a href="#">Doc</a> -->
         </div>
         <div id="bottomDiv">

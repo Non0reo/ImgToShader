@@ -16,7 +16,8 @@ const accessibilityCompatibilityParam = document.getElementById("accessibilityCo
 const autoSizeParam = document.getElementById("autoSize");
 const linkCanvasSizeParam = document.getElementById("linkCanvasSize");
 
-
+let ctx = shaderView.getContext("2d", { willReadFrequently: true });
+ctx.imageSmoothingEnabled = false;
 
 let mojangLogoColor = "#FFFFFF";
 let loadingBarColor = "#FFFFFF";
@@ -56,8 +57,8 @@ const backgroundColorOptions = {
         hue: true,
         interaction: {
             input: true,
-            clear: true,
-            save: true
+            clear: false,
+            save: false
         }
     }
 };
@@ -78,8 +79,8 @@ const logoColorOptions = {
         hue: true,
         interaction: {
             input: true,
-            clear: true,
-            save: true
+            clear: false,
+            save: false
         }
     }
 };
@@ -87,23 +88,6 @@ const logoColorOptions = {
 const backgroundColorParam = Pickr.create(backgroundColorOptions);
 const logoColorParam = Pickr.create(logoColorOptions);
 const loadingBarColorParam = Pickr.create(logoColorOptions);
-
-
-// document.addEventListener("keydown", function (f) {
-//     shaderView.addEventListener("mousedown", function(e){
-//         if (f.key == "Control") {
-//             if (e.offsetX > BORDER_SIZE) {
-//                 m_pos.x = e.x;
-//                 document.addEventListener("mousemove", resizeX, false);
-//             }
-//             if (e.offsetY > BORDER_SIZE) {
-//                 m_pos.y = e.y;
-//                 document.addEventListener("mousemove", resizeY, false);
-//             }
-//         }
-//     }, false);
-// });
-
 
 //Canvas resize
 document.addEventListener("mousedown", function (e) {
@@ -140,6 +124,48 @@ function redrawProcess() {
     draw();
     ctx.imageSmoothingEnabled = false;
 }
+
+//When the mouse go on a div with the class 'colorIn', add to this div a button with the id 'colorPick'. Remove it when the mouse leave the div
+/* const colorIn = document.getElementsByClassName("colorIn");
+for (let i = 0; i < colorIn.length; i++) {
+    colorIn[i].addEventListener("mouseenter", function(e, i){
+        const button = document.createElement("button");
+        button.type = "button";
+        button.id = "colorPick";
+        button.className = "colorPickerButton";
+        button.onclick = function() {
+            shaderView.style.cursor = "crosshair";
+            shaderView.addEventListener("click", () => {
+                const rect = shaderView.getBoundingClientRect();
+                let scaleX = shaderView.width / rect.width;    // relationship bitmap vs. element for x
+                let scaleY = shaderView.height / rect.height;  // relationship bitmap vs. element for y
+                const x = (e.clientX - rect.left) * scaleX;
+                const y = (e.clientY - rect.top) * scaleY;
+                // const x = e.offsetX - rect.left;
+                // const y = e.offsetY - rect.top;
+
+                console.log(x, y, e)
+                const imageData = ctx.getImageData(x, y, 1, 1);
+                const data = imageData.data;
+                const rgb = `rgb(${data[0]}, ${data[1]}, ${data[2]}, ${data[3]})`;
+                console.log(rgb);
+                ctx.fillStyle = 'rgb(0, 0, 255)';
+                ctx.fillRect(x, y, 10, 10);
+                ctx.fillRect(10, 10, x, y);
+                //change the color of the corresponding Pickr
+                
+                shaderView.style.cursor = "default";
+            }, {once: true});
+
+        }
+        this.appendChild(button);
+    }, false);
+    colorIn[i].addEventListener("mouseleave", function(e){
+        const button = document.getElementById("colorPick");
+        this.removeChild(button);
+    }, false);
+} */
+
 
 //PARAMETERS
 
@@ -257,13 +283,11 @@ folderName.addEventListener("input", function(){
 });
 
 
-let ctx = shaderView.getContext("2d", { willReadFrequently: true });
-ctx.imageSmoothingEnabled = false;
+
 let mojangLogo = new Image();
 let loadingBar = new Image();
 let testImg = new Image();
 mojangLogo.src = "./assets/img/mojangstudios.png";
-//mojangLogo.src = "./assets/img/mojangstudios_inverted.png";
 loadingBar.src = "./assets/img/loading_bar.png";
 testImg.src = "./assets/default/Banner.png";
 

@@ -203,37 +203,37 @@ let sliderMove = {
     x: function(e){
         const dx = e.x - m_pos.x;
         m_pos.x = e.x;
-        dataStack[selected].x += parseInt(dx);
+        elementPosXParam.value = dataStack[selected].x += parseInt(dx);
         draw();
     },
     y: function(e){
         const dx = e.x - m_pos.x;
         m_pos.x = e.x;
-        dataStack[selected].y += dx;
+        elementPosYParam.value = dataStack[selected].y += dx;
         draw();
     },
     width: function(e){
         const dx = e.x - m_pos.x;
         m_pos.x = e.x;
-        dataStack[selected].width += dx;
-        if (dataStack[selected].width < 0) dataStack[selected].width = 0;
-        if (dataStack[selected].IsSizeLinked) dataStack[selected].height = Math.floor(dataStack[selected].width / dataStack[selected].imageRatio);
+        elementWidthParam.value = dataStack[selected].width += dx;
+        if (dataStack[selected].width < 0) elementWidthParam.value = dataStack[selected].width = 0;
+        if (dataStack[selected].IsSizeLinked) elementWidthParam.value = dataStack[selected].height = Math.floor(dataStack[selected].width / dataStack[selected].imageRatio);
         draw();
     },
     height: function(e){
         const dx = e.x - m_pos.x;
         m_pos.x = e.x;
-        dataStack[selected].height += dx;
-        if (dataStack[selected].height < 0) dataStack[selected].height = 0;
+        elementHeightParam.value = dataStack[selected].height += dx;
+        if (dataStack[selected].height < 0) elementHeightParam.value = dataStack[selected].height = 0;
         draw();
     },
     rotation: function(e){
         const dx = e.x - m_pos.x;
         m_pos.x = e.x;
-        dataStack[selected].rotation += dx;
+        elementRotationParam.value = dataStack[selected].rotation += dx;
 
-        if (dataStack[selected].rotation >= 360) dataStack[selected].rotation = 0;
-        else if (dataStack[selected].rotation < 0) dataStack[selected].rotation = 359;
+        if (dataStack[selected].rotation >= 360) elementRotationParam.value = dataStack[selected].rotation = 0;
+        else if (dataStack[selected].rotation < 0) elementRotationParam.value = dataStack[selected].rotation = 359;
         //dataStack[selected].rotation = elementRotationParam.value;
         draw();
     }
@@ -255,27 +255,27 @@ let userTextBoxInteraction = {
 let actionBtn = {
     alignHorizontal: function(){
         if (selected != undefined) {
-            dataStack[selected].x = Math.floor(shaderView.width / 2);
+            elementPosXParam.value = dataStack[selected].x = Math.floor(shaderView.width / 2);
             draw();
         }
     },
     alignVertical: function(){
         if (selected != undefined) {
-            dataStack[selected].y = Math.floor(shaderView.height / 2);
+            elementPosYParam.value = dataStack[selected].y = Math.floor(shaderView.height / 2);
             draw();
         }
     },
     expandVertical: function(){
         if (selected != undefined) {
-            dataStack[selected].height = shaderView.height;
-            if (dataStack[selected].IsSizeLinked) dataStack[selected].height = dataStack[selected].width / dataStack[selected].imageRatio;
+            elementHeightParam.value = dataStack[selected].height = shaderView.height;
+            if (dataStack[selected].IsSizeLinked) elementHeightParam.value = dataStack[selected].height = dataStack[selected].width / dataStack[selected].imageRatio;
             draw();
         }
     },
     expandHorizontal: function(){
         if (selected != undefined) {
-            dataStack[selected].width = shaderView.width;
-            if (dataStack[selected].IsSizeLinked) dataStack[selected].height = dataStack[selected].width / dataStack[selected].imageRatio;
+            elementWidthParam.value = dataStack[selected].width = shaderView.width;
+            if (dataStack[selected].IsSizeLinked) elementHeightParam.value = dataStack[selected].height = dataStack[selected].width / dataStack[selected].imageRatio;
             draw();
         }
     },

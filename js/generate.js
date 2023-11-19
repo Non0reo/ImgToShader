@@ -43,7 +43,7 @@ let zones = [];
 async function generateCode(previewOnly = false) {
     draw();
 
-    if (imageStack.length == 0) { //No Images
+    if (imageStack.length == 0 && !previewOnly) { //No Images
         
         const json = {
             imageExists: imageStack.length > 0,

@@ -493,3 +493,22 @@ code#generatedCode {
     padding: 3px 6px;
     border-radius: 5px;
 }
+
+#colorPick {
+    width: 20px;
+    height: 20px;
+    margin-left: 10px;
+    background-image: url('https://api.iconify.design/mingcute:color-picker-fill.svg?color=%23ffffff');
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: 20px 20px;
+    background-color: transparent;
+    border: none;
+    border-radius: 5px;
+}
+
+#colorPick:hover {
+    background-color: #ffffff65;
+    transition: 0.5s;
+    cursor: pointer;
+}

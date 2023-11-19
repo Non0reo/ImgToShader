@@ -103,7 +103,8 @@ function generateGUIOverlayFSH(data, loadingBarCondition = "") {
                 gen_Frag = `vec3 newColor = pColor(RealPixelPos, imageSize) / 255;\n\tfragColor = vec4(newColor, color.a);`;
                 break;
             case 'if':
-                gen_Frag = `vec4 f = vec4(0.0);\n\tpColor(RealPixelPos, f, color.a);\n\tfragColor = f;`;
+                //gen_Frag = `vec4 f = vec4(0.0);\n\tpColor(RealPixelPos, f, color.a);\n\tfragColor = f;`;
+                gen_Frag = `pColor(RealPixelPos, fragColor, color.a);`;
                 break;
             default:
                 break;
