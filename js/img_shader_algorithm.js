@@ -1,12 +1,4 @@
 
-/*
-    Explanation of the algorithm:
-    1. The worker receives the image, its data, the color palette and the index of the color to be replaced.
-    2. The generated code will be placed in the "result" variable.
-    3. The generated code contains a switch statement that will be used to replace the color.
-
-
-*/
 
 self.onmessage = function(e) {
 
@@ -339,6 +331,7 @@ function generateImageBackgroundGLSL(data) {
     const imageData = data.imageData;
 
     let stringOut = '';
+    let ColorOut = '';
     let caseNumber = 0;
 
     switch (data.generalInfos.shader.renderMethod) {
@@ -376,7 +369,21 @@ vec3 pColor(ivec2 RealPixelPos, ivec2 imageSize) {
             //Actual Pixel by number : RealPixelPos.y * imageSize.x + RealPixelPos.x
             let markedPixels = [];
             let finalZones = [];
+            let finalColors = [];
             let differencePos = {}; //Position of the pixel that is different from the actual pixel (used in the checkZone function)
+
+            //build the string ColorOut
+            for(let i = 0 ; i < palette.length ; i++) {
+                if(palette[i].toString() !== [0, 0, 0, 0].toString() && palette[i].toString() !== [backgroundColor.r, backgroundColor.g, backgroundColor.b, parseInt(backgroundColor.a * 255)].toString()) {
+                    finalColors.push(palette[i]);
+                }
+            }
+
+            for(let i = 0 ; i < finalColors.length ; i++) {
+                ColorOut += `\tvec3(${finalColors[i][0]}, ${finalColors[i][1]}, ${finalColors[i][2]})`;
+                if(i !== finalColors.length - 1) ColorOut += ',\n';
+            }
+            
 
             for (let y = 0 ; y < imageData.height; y++) {
 
@@ -493,10 +500,29 @@ vec3 pColor(ivec2 RealPixelPos, ivec2 imageSize) {
 
                         finalZones.push(zone);
 
-                        stringOut += `\n\tif(f.a == 0) zCol(r, ${x + y * imageData.width}, ${zone.x2 + zone.y2 * imageData.width}, vec3(${color[0]}, ${color[1]}, ${color[2]}), f, t);`;
+                        //compare the actual color with the parlette and get the index
+                        let colorIndex = 0;
+                        for(let i = 0 ; i < finalColors.length ; i++) {
+                            if(finalColors[i].toString() === color.toString()) {
+                                colorIndex = i;
+                                break;
+                            }
+                        }
+                        
+                        //stringOut += `\n\tif(f.a == 0) zCol(r, ${x + y * imageData.width}, ${zone.x2 + zone.y2 * imageData.width}, vec3(${color[0]}, ${color[1]}, ${color[2]}), f, t);`;
+                        const pixelI1 = x + y * imageData.width;
+                        const pixelI2 = zone.x2 + zone.y2 * imageData.width;
+
+                        if(pixelI1 === pixelI2) stringOut += `\n\tif(f.a == 0 && r == ivec2(${x}, ${y})) f = vec4(c[${colorIndex}] / 255, t);`;
+                        else stringOut += `\n\tif(f.a == 0) zCol(r, ${x + y * imageData.width}, ${zone.x2 + zone.y2 * imageData.width}, c[${colorIndex}], f, t);`;
+                        
                     }                      
                 }
-            }                      
+            }
+            
+
+            console.log(finalColors);                  
+
 
 return [`/*
 Generated from https://non0reo.github.io/ImgToShader/
@@ -507,6 +533,10 @@ void zCol(ivec2 r, int pI1, int pI2, vec3 c, out vec4 f, float t) {
 	ivec2 p2 = ivec2(pI2 % ${imageData.width}, pI2 / ${imageData.width});
 	if(p1.x <= r.x && r.x <= p2.x && p1.y <= r.y && r.y <= p2.y) f = vec4(c / 255, t);
 }
+
+vec3[] c = vec3[](
+${ColorOut}
+);
 
 void pColor(ivec2 r, out vec4 f, float t) {
     ${stringOut}

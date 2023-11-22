@@ -139,19 +139,31 @@ for (let i = 0; i < colorIn.length; i++) {
                 const rect = shaderView.getBoundingClientRect();
                 let scaleX = shaderView.width / rect.width;    // relationship bitmap vs. element for x
                 let scaleY = shaderView.height / rect.height;  // relationship bitmap vs. element for y
-                const x = (e.clientX - rect.left) * scaleX;
-                const y = (e.clientY - rect.top) * scaleY;
+                // const x = (e.clientX - rect.left) * scaleX;
+                // const y = (e.clientY - rect.top) * scaleY;
                 // const x = e.offsetX - rect.left;
                 // const y = e.offsetY - rect.top;
+                // const x = e.x;
+                // const y = e.y;
+                const x = ((e.clientX - rect.left) / rect.width * shaderView.width);
+                const y = ((e.clientY - rect.top) / rect.height * shaderView.height);
 
-                console.log(x, y, e)
+                console.log(x, y, rect, e)
                 const imageData = ctx.getImageData(x, y, 1, 1);
                 const data = imageData.data;
                 const rgb = `rgb(${data[0]}, ${data[1]}, ${data[2]}, ${data[3]})`;
                 console.log(rgb);
                 ctx.fillStyle = 'rgb(0, 0, 255)';
                 ctx.fillRect(x, y, 10, 10);
-                ctx.fillRect(10, 10, x, y);
+                //draw line from 0,0 to x,y
+                ctx.beginPath();
+                ctx.moveTo(0, 0);
+                ctx.lineTo(y / 2, x / 2);
+                ctx.strokeStyle = 'rgb(0, 255, 255)';
+                ctx.lineWidth = 5;
+                ctx.stroke();
+
+                //ctx.fillRect(10, 10, x, y);
                 //change the color of the corresponding Pickr
                 
                 shaderView.style.cursor = "default";
@@ -193,6 +205,7 @@ widthParam.addEventListener("input", function(){
     size.width = Math.abs(parseInt(widthParam.value));
     shaderView.width = size.width;
     widthParam.value = size.width;
+    if(linkCanvasSize) heightParam.value = shaderView.height = size.height = Math.round(shaderView.width / (16 / 9));
     redrawProcess();
 });
 heightParam.addEventListener("input", function(){
@@ -314,38 +327,13 @@ mojangLogo.onload = function(){
     ctx.fillRect(logoPosition.x, logoPosition.y, logoSize.width, logoSize.height);
     ctx.globalCompositeOperation = "source-over";
 
-    ctx.globalCompositeOperation = "destination-in";
-
     // set composite mode
+    ctx.globalCompositeOperation = "destination-in";
 
     // draw image
     ctx.drawImage(mojangLogo, logoPosition.x, logoPosition.y, logoSize.width, logoSize.height);
-
     ctx.globalCompositeOperation = "source-over";
 
-
-
-
-    //ctx.globalCompositeOperation = "source-over";
-
-    
-
-
-    //let diference = {width: (shaderView.width - size.width) / 2, height: (shaderView.height - size.height) / 2};
-    //return { x: a - c * 0.5, y: b - d * 0.5, w: c, h: d };
-    //
-    // ctx.moveTo(size.width / 2, 0);
-    // ctx.lineTo(size.width / 2, size.height);
-    // ctx.stroke();
-    // ctx.moveTo(0, size.height / 2);
-    // ctx.lineTo(size.width, size.height / 2);
-    // ctx.stroke();
-    //ctx.drawImage(mojangLogo, logoPosition.x + diference.width, logoPosition.y + diference.height, logoSizeWidth + diference.width / 4, logoSizeHeight + diference.height / 4);
-    
-    //ctx.drawImage(mojangLogo, size.width / 2 - logoSizeWidth / 2, size.height / 2 - logoSizeHeight / 2, logoSizeWidth + diference.width, logoSizeHeight + diference.height / 2);
-    //ctx.drawImage(mojangLogo, (size.width - logoSizeWidth) / 2 - addedSize.width / 2, (size.height - logoSizeHeight) / 2 + addedSize.height / 2, logoSizeWidth - addedSize.width, logoSizeHeight - addedSize.height);
-    
-    //ctx.drawImage(mojangLogo, size.width / 2 - logoSizeWidth / 2 - diference.width, size.height / 2 - logoSizeHeight / 2 - diference.height, logoSizeWidth - diference.width, logoSizeHeight - diference.height);
 }
 
 

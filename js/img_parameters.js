@@ -16,7 +16,6 @@ const elementRotationSliderParam = document.getElementById('elementRotationSlide
 const settingRender = document.getElementById('settingRender');
 const imageParam = document.getElementById('imageParam');
 
-//linkSizeParam.checked = false;
 let linkSize = linkSizeParam.checked;
 let selected; // Which div is selected (index number)
 
