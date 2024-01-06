@@ -69,7 +69,7 @@ async function generateCode(previewOnly = false) {
                 accessibilityCompatibility: accessibilityCompatibility,
                 shader: {
                     version: SHADER_VERSION,
-                    json: ['position_color']
+                    json: SHADER_VERSION === 0 ? ['position_color'] : ['rendertype_gui_overlay'],
                 }
             }
         };
@@ -273,7 +273,7 @@ async function generateCode(previewOnly = false) {
                     shader: {
                         renderMethod: renderMethod,
                         version: SHADER_VERSION,
-                        json: ['rendertype_gui_overlay']
+                        json: SHADER_VERSION === 0 ? ['position_color'] : ['rendertype_gui_overlay'],
                     }
                 }
             };
@@ -439,10 +439,12 @@ const DownloadPack = (shaderData) => {
         if(shaderData.shaderJson) shaderData.shaderJson.forEach(element => {
             core.file(element[1] + ".json", element[0]);
         });
+        //exactly the same as the guiOverlay shader (using the same file, just renamed)
+        if(shaderData.guiOverlayVSH) core.file("position_color.vsh", shaderData.guiOverlayVSH);
 
         if(shaderData.utilsGLSL) include.file("utils.glsl", shaderData.utilsGLSL);
         if(shaderData.imagesAlgo) include.file("image/canvas1.glsl", shaderData.imagesAlgo);
-        
+
     } else {
         if(shaderData.guiOverlayFSH) core.file("rendertype_gui_overlay.fsh", shaderData.guiOverlayFSH);
         if(shaderData.guiOverlayVSH) core.file("rendertype_gui_overlay.vsh", shaderData.guiOverlayVSH);

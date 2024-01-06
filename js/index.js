@@ -199,6 +199,7 @@ function changeVersion(version) {
         default:
             break;
     }
+    displayWaningText();
 }
 
 widthParam.addEventListener("input", function(){

@@ -280,7 +280,7 @@ let actionBtn = {
     },
     resetRotate: function(){
         if (selected != undefined) {
-            dataStack[selected].rotation = 0;
+            elementRotationParam.value = dataStack[selected].rotation = 0;
             draw();
         }
     }

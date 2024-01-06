@@ -46,12 +46,14 @@ self.onmessage = function(e) {
             });
         }
 
+    //Shader -1.20
     } else {
 
         if(data.imageExists) {
             this.postMessage({
                 positionColorFSH: generateGUIOverlayFSH(data, loadingBarCondition),
                 positionTexFSH: generatePositionTexFSH(data),
+                guiOverlayVSH: generateGUIOverlayVSH(), //used as positionColorVSH
                 utilsGLSL: generateUtilsGLSL(),
                 imagesAlgo: imgBackground[0],
                 shaderJson: result,
