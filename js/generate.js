@@ -178,7 +178,6 @@ async function generateCode(previewOnly = false) {
 
     image.onload = function() {
         ctx.clearRect(0, 0, shaderView.width, shaderView.height);
-        //ctx.scale(scaleFactor, scaleFactor);
         ctx.drawImage(image, 0, 0, shaderView.width * scaleFactor, shaderView.height * scaleFactor);
         lowRes_image = ctx.getImageData(0, 0, shaderView.width * scaleFactor, shaderView.height * scaleFactor);
         smallImage.src = imagedata_to_image(lowRes_image).src;
@@ -213,11 +212,8 @@ async function generateCode(previewOnly = false) {
                 }
             }
         }
-        console.log(indexedColors);
         displayColorCount(palette.length);
 
-
-        //ctx.scale(inv_scaleFactor, inv_scaleFactor);
         ctx.clearRect(0, 0, shaderView.width, shaderView.height);
 
         drawLogo = drawLogoParam.checked
@@ -230,14 +226,12 @@ async function generateCode(previewOnly = false) {
         ctx.drawImage(smallImage, 0, 0, shaderView.width , shaderView.height);
         ctx.globalCompositeOperation = "source-over";
 
-        //console.log(image.width, image.height)
-        console.log(`width: ${smallImage.width}, height: ${smallImage.height} ; total: ${smallImage.width * smallImage.height}`);
         //nomber of non empty pixels in the image
         let nonEmptyPixels = 0;
         for (let i = 0; i < lowRes_image.data.length; i += 4) {
             if (lowRes_image.data[i + 3] != 0) nonEmptyPixels++;
         }
-        console.log(nonEmptyPixels);
+        console.log(`width: ${smallImage.width}, height: ${smallImage.height} ; total: ${smallImage.width * smallImage.height} ; colored pixels: ${nonEmptyPixels}`);
 
         if(!previewOnly){
             const json = {
