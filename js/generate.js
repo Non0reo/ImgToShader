@@ -28,7 +28,20 @@ let lookupVersion = {
     17: "23w32a-1.20.2-pre1",
     18: "1.20.2",
     19: "23w42a",
-    20: "23w43a-now",
+    20: "23w43a-23w45a",
+    21: "23w45a-23w44a",
+    22: "1.20.3-1.20.4",
+    23: "23w51b-24w03a",
+    24: "24w04a-24w05b",
+    25: "24w05a-24w05b",
+    26: "24w06a-24w07a",
+    27: "24w07a-24w09a",
+    28: "24w09a-24w10a",
+    29: "24w11a",
+    30: "24w12a-24w13a",
+    31: "24w13a-1.20.5-pre3",
+    32: "1.20.5-1.20.6",
+    33: "24w18a-now",
 }
 
 gameVersion.innerText = lookupVersion[packVersion.value];
@@ -416,6 +429,10 @@ const DownloadPack = (shaderData) => {
     "pack": {
         "pack_format": ${PACK_VERSION},
         "description": "${PACK_DESCRIPTION}"
+    },
+    "supported_formats": {
+        "min_inclusive": 15,
+        "max_inclusive": 40
     }
 }`;
 
