@@ -1,5 +1,8 @@
 # ImgToShader
 
+### Don't be shy, star this project ⭐
+___
+
 Hi!
 
 I recently made this tool that allows you to change the background color, the logo color, the loading bar color and so add Images and logo to the Minecraft loading screen. 
