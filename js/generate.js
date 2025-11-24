@@ -14,6 +14,7 @@ const genFolderName = document.getElementById("genFolderName");
 const genPackVersion = document.getElementById("genPackVersion");
 const genCaseCount = document.getElementById("genCaseCount");
 
+// Extended pack_format → version mapping (used by UI)
 let lookupVersion = {
     7: "1.17-1.17.1",
     8: "1.18-1.18.2",
@@ -42,8 +43,16 @@ let lookupVersion = {
     31: "24w13a-1.20.5-pre3",
     32: "1.20.5-1.20.6",
     33: "24w18a-now",
-}
+    34: "1.21-1.21.1",
+    42: "1.21.2-1.21.3",
+    46: "1.21.4",
+    55: "1.21.5",
+    63: "1.21.6",
+    64: "1.21.7-1.21.8",
+    69: "1.21.9-1.21.10",
+};
 
+// These are shared with index.js (changeVersion, etc.)
 gameVersion.innerText = lookupVersion[packVersion.value];
 let SHADER_VERSION = 1;
 let PACK_VERSION = parseInt(packVersion.value);
@@ -106,7 +115,7 @@ async function generateCode(previewOnly = false) {
             var opts = {
                 colors: paletteQuality.value,             /*  desired palette size  */
                 dithering: useDithering.checked,         /*  whether to use dithering or not  */
-                pixels: canvasPixels32,         /*  source pixels in RGBA 32 bits  */
+                pixels: canvasPixels32,                  /*  source pixels in RGBA 32 bits  */
                 width: shaderView.width, 
                 height: shaderView.height
             };
@@ -297,7 +306,7 @@ function generateShaderWithWorker(json) {
     shaderGenWorker.onmessage = function(e) {
         console.log(e.data);
         generatedDataCache = e.data;
-        downloadPack.style.display = "unset";
+        downloadPackBtn.style.display = "unset";
         downloadPackBtn.style.marginTop = "25px";
 
         //Remove existing preview boxes content
@@ -334,9 +343,6 @@ function generateShaderWithWorker(json) {
         genPackVersion.innerText = `Pack version: ${PACK_VERSION}`;
         genFolderName.innerText = `Folder name: ${PACK_NAME}`;
 
-
-        //Draw the zone on the canvas 'ctx' using a rectangle with a random color
-        //That is for debug, but I'll leave it beacause it's super cool !!!!
         zones = e.data.genInfos.zones;
         //debugRender();
     }
@@ -346,8 +352,6 @@ function debugRender() {
     if(zones) {
         for (let i = 0; i < zones.length; i++) {
             const zone = zones[i];
-            //const color = zone.color;
-            //ctx.fillStyle = `rgba(${color[0]}, ${color[1]}, ${color[2]}, ${color[3]})`;
             ctx.fillStyle = `rgba(${Math.floor(Math.random() * 255)}, ${Math.floor(Math.random() * 255)}, ${Math.floor(Math.random() * 255)}, 1.0)`;
             const scale = renderResolution.value / 100;
             ctx.fillRect(zone.x / scale, zone.y / scale, zone.width / scale, zone.height / scale);
@@ -357,10 +361,10 @@ function debugRender() {
 
 function imagedata_to_image(imagedata) {
     let canvas = document.createElement('canvas');
-    let ctx = canvas.getContext('2d');
+    let ctx2 = canvas.getContext('2d');
     canvas.width = imagedata.width;
     canvas.height = imagedata.height;
-    ctx.putImageData(imagedata, 0, 0);
+    ctx2.putImageData(imagedata, 0, 0);
 
     let image = new Image();
     image.src = canvas.toDataURL();
@@ -391,7 +395,6 @@ function hexToRGBA(variable, devideBy) {
 function escapeHtml(str){
     return new Option(str).innerHTML;
 }
-
 
 function generateNumberFromSeed(seed) {
     let cripto = new Crypto();
@@ -428,11 +431,8 @@ const DownloadPack = (shaderData) => {
 `{
     "pack": {
         "pack_format": ${PACK_VERSION},
-        "description": "${PACK_DESCRIPTION}"
-    },
-    "supported_formats": {
-        "min_inclusive": 15,
-        "max_inclusive": 40
+        "description": "${PACK_DESCRIPTION}",
+        "supported_formats": [7, 69]
     }
 }`;
 

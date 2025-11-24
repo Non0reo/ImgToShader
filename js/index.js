@@ -2,6 +2,8 @@ const BORDER_SIZE = 10;
 const shaderView = document.getElementById("shaderView");
 const version1Param = document.getElementById("shaderVersion1");
 const version2Param = document.getElementById("shaderVersion2");
+const version3Param = document.getElementById("shaderVersion3"); // NEW: 1.21+ button
+
 const widthParam = document.getElementById("shaderWidth");
 const heightParam = document.getElementById("shaderHeight");
 const packVersion = document.getElementById("packVersion");
@@ -125,80 +127,46 @@ function redrawProcess() {
     ctx.imageSmoothingEnabled = false;
 }
 
-//When the mouse go on a div with the class 'colorIn', add to this div a button with the id 'colorPick'. Remove it when the mouse leave the div
-/* const colorIn = document.getElementsByClassName("colorIn");
-for (let i = 0; i < colorIn.length; i++) {
-    colorIn[i].addEventListener("mouseenter", function(e, i){
-        const button = document.createElement("button");
-        button.type = "button";
-        button.id = "colorPick";
-        button.className = "colorPickerButton";
-        button.onclick = function() {
-            shaderView.style.cursor = "crosshair";
-            shaderView.addEventListener("click", () => {
-                const rect = shaderView.getBoundingClientRect();
-                let scaleX = shaderView.width / rect.width;    // relationship bitmap vs. element for x
-                let scaleY = shaderView.height / rect.height;  // relationship bitmap vs. element for y
-                // const x = (e.clientX - rect.left) * scaleX;
-                // const y = (e.clientY - rect.top) * scaleY;
-                // const x = e.offsetX - rect.left;
-                // const y = e.offsetY - rect.top;
-                // const x = e.x;
-                // const y = e.y;
-                const x = ((e.clientX - rect.left) / rect.width * shaderView.width);
-                const y = ((e.clientY - rect.top) / rect.height * shaderView.height);
+// PARAMETERS
 
-                console.log(x, y, rect, e)
-                const imageData = ctx.getImageData(x, y, 1, 1);
-                const data = imageData.data;
-                const rgb = `rgb(${data[0]}, ${data[1]}, ${data[2]}, ${data[3]})`;
-                console.log(rgb);
-                ctx.fillStyle = 'rgb(0, 0, 255)';
-                ctx.fillRect(x, y, 10, 10);
-                //draw line from 0,0 to x,y
-                ctx.beginPath();
-                ctx.moveTo(0, 0);
-                ctx.lineTo(y / 2, x / 2);
-                ctx.strokeStyle = 'rgb(0, 255, 255)';
-                ctx.lineWidth = 5;
-                ctx.stroke();
-
-                //ctx.fillRect(10, 10, x, y);
-                //change the color of the corresponding Pickr
-                
-                shaderView.style.cursor = "default";
-            }, {once: true});
-
-        }
-        this.appendChild(button);
-    }, false);
-    colorIn[i].addEventListener("mouseleave", function(e){
-        const button = document.getElementById("colorPick");
-        this.removeChild(button);
-    }, false);
-} */
-
-
-//PARAMETERS
-
+// UPDATED: support 3 buttons and make 1.21 → pack_format 34
 function changeVersion(version) {
-    SHADER_VERSION = version;
+    // reset button styles
+    version1Param.className = "versionBtn";
+    version2Param.className = "versionBtn";
+    if (version3Param) {
+        version3Param.className = "versionBtn";
+    }
+
     switch (version) {
+        // 1.17–1.19.4 (legacy shaders)
         case 0:
+            SHADER_VERSION = 0;
             version1Param.className = "versionBtn selected";
-            version2Param.className = "versionBtn";
             PACK_VERSION = packVersion.value = 13;
-            gameVersion.innerText = lookupVersion[packVersion.value];
             break;
+
+        // 1.20–1.20.6 (modern shaders)
         case 1:
+            SHADER_VERSION = 1;
             version2Param.className = "versionBtn selected";
-            version1Param.className = "versionBtn";
             PACK_VERSION = packVersion.value = 18;
-            gameVersion.innerText = lookupVersion[packVersion.value];
             break;
+
+        // 1.21+ (modern shaders) → use pack_format 34
+        case 2:
+            SHADER_VERSION = 1;
+            if (version3Param) {
+                version3Param.className = "versionBtn selected";
+            }
+            PACK_VERSION = packVersion.value = 34;
+            break;
+
         default:
             break;
     }
+
+    gameVersion.innerText = lookupVersion[packVersion.value];
     displayWaningText();
 }
 
@@ -296,8 +264,6 @@ folderName.addEventListener("input", function(){
     displayWaningText();
 });
 
-
-
 let mojangLogo = new Image();
 let loadingBar = new Image();
 let testImg = new Image();
@@ -308,16 +274,12 @@ testImg.src = "./assets/default/Banner.png";
 let logoSize = {width: logoSizeParam.value, height: logoSizeParam.value / 4};
 let loadingBarSize = {width: logoSizeParam.value, height: logoSizeParam.value / 24};
 
-//Set the siee of the logo and bar if auto size is checked
+//Set the size of the logo and bar if auto size is checked
 if(autoSize) SetSizeElement();
 
 //draw an image onto the canvas
 mojangLogo.onload = function(){
     let logoPosition = {x: (size.width / 2 - logoSize.width / 2), y: (size.height / 2 - logoSize.height / 2)};
-    
-    // ctx.globalCompositeOperation = "destination-out";
-    // ctx.fillStyle = backgroundColor;
-    // ctx.fillRect(logoPosition.x, logoPosition.y, logoSize.width, logoSize.height);
     
     ctx.globalCompositeOperation = "source-over";
     ctx.fillStyle = backgroundColor;
@@ -336,7 +298,6 @@ mojangLogo.onload = function(){
     ctx.globalCompositeOperation = "source-over";
 
 }
-
 
 loadingBar.onload = function(){
     let loadingBarPosition = {x: (size.width / 2 - loadingBarSize.width / 2), y: (size.height / 2 - loadingBarSize.height / 2 /*  + 50  */+ logoSize.height / 0.75)};
@@ -394,7 +355,8 @@ function changeUserScrollLevel(pos){
 }
 
 function displayWaningText(){
-    if (fileModified && downloadPack.style.display == "unset") {
+    // FIX: use downloadPackBtn safely instead of undefined downloadPack
+    if (fileModified && typeof downloadPackBtn !== "undefined" && downloadPackBtn.style.display == "unset") {
         warningText.style.display = "unset";
         downloadPackBtn.style.marginTop = "10px";
     }
