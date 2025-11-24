@@ -28,10 +28,35 @@
         </div>
         <div class="optionBar preventSelection">
             <div class="settings">
+
+                <!-- UPDATED BUTTONS (Option C) -->
                 <div class="parameter" style="display: flex; align-self: center;">
-                    <button id="shaderVersion1" class="versionBtn" onclick="changeVersion(0)">1.17 - 1.19.4</button>
-                    <button id="shaderVersion2" class="versionBtn selected" onclick="changeVersion(1)">+1.20</button>
+                    <button
+                        id="shaderVersion1"
+                        class="versionBtn"
+                        onclick="changeVersion(0)"
+                        title="Use legacy shader format for Minecraft 1.17–1.19.4">
+                        (1.17–1.19.4)
+                    </button>
+
+                    <button
+                        id="shaderVersion2"
+                        class="versionBtn selected"
+                        onclick="changeVersion(1)"
+                        title="Use modern shader format for Minecraft 1.20+">
+                        (1.20 - 1.20.6)
+                    </button>
+
+                    <button
+                        id="shaderVersion3"
+                        class="versionBtn selected"
+                        onclick="changeVersion(2)"
+                        title="Use modern shader format for Minecraft 1.21+">
+                        (1.21+)
+                    </button>
                 </div>
+                <!-- END UPDATED BUTTONS -->
+
                 <div class="paramFamily">
                     <div class="parameter">
                         <label for="width">Width</label>
@@ -99,12 +124,11 @@
                         </div>
                     </div>
                     <div class="parameter">
-                        <!-- <label for="fileName">File Name</label> -->
                         <input type="text" id="folderName" value="CustomLoadingBackgournd">
-                        <!-- <label for="packVersion">Pack Version</label> -->
                         <br>
+
+                        <!-- UPDATED packVersion RANGE -->
                         <div style="display: flex; vertical-align: middle; align-items: center;">
-                            <!-- UPDATED: allow 1.21.x formats and default to 46 (1.21.4) -->
                             <input
                                 type="number"
                                 class="numberBar"
@@ -114,6 +138,7 @@
                                 max="69">
                             <p class="infoText" id="gameVersion" style="padding-top: 0.2em;"></p>
                         </div>
+                        <!-- END UPDATED packVersion -->
                     </div>
                 </div>
     
@@ -123,12 +148,9 @@
             </div>
     
             <div id="imageListBox">
-                <!-- <input type="file" accept=".png, .jpg, .jpeg, .webp" id="BtnUploadLogo" hidden oninput="loadLogo(event)" onclick="this.value=null;"/>
-                <label class="imgUpload" for="BtnUploadLogo" id="uploadLogo">Upload Logo</label> -->
                 <input type="file" accept=".png, .jpg, .jpeg, .webp" id="BtnUploadImage" hidden oninput="loadImage(event)" onclick="this.value=null;"/>
                 <label class="imgUpload" for="BtnUploadImage" id="uploadImage">Upload Background Image</label>
-                <div id="imageList">
-                </div>
+                <div id="imageList"></div>
             </div>
     
             <div id="settingRender">
@@ -140,7 +162,7 @@
                             <label for="quantAlgoButton">Quaternization Compression</label><br>
                             <input type="radio" id="bitsAlgoButton" name="algo" value="bits" onclick="displayMethod('bits')">
                             <label for="bitsAlgoButton">Color per pixels Compression</label><br>
-                            <p class="infoText">• Quaternization Compression (recommended) will search for the best color palette among the image average colors.<br>• Color per pixel Compression will search for each pixel the closest color using approximated RGB values</p>
+                            <p class="infoText">• Quaternization Compression will search for the best color palette among the image average colors.<br>• Color per pixel Compression finds the closest available RGB value.</p>
                         </div>
                     </div>
                     <div id="quant">
@@ -152,7 +174,6 @@
                                     <button class="actionBtn numberBtn" onclick="modifyValue(-1, paletteQuality)">-</button>
                                     <label for="paletteQuality" id="paletteQualityValue" class="code">15</label>
                                     <button class="actionBtn numberBtn" onclick="modifyValue(1, paletteQuality)">+</button>
-                                    <p class="infoText">► The number of colors present in the final render. Too many colors may make the shader too heavy and thus, prevent the shader to load</p>
                                 </div>
                             </div>
                             <div class="parameter">
@@ -160,11 +181,8 @@
                                 <input type="checkbox" id="useDithering" checked="true">
                             </div>
                             <div class="parameter">
-                                <div class="paramFamily">
-                                    <label>Better Quality</label>
-                                    <input type="checkbox" id="betterQuality" checked="true">
-                                    <p class="infoText">► Makes the image closer from the original, may introduce more dither. Process time might also be longer when you click on Generate</p>
-                                </div>
+                                <label>Better Quality</label>
+                                <input type="checkbox" id="betterQuality" checked="true">
                             </div>
                         </div>
                     </div>
@@ -176,21 +194,17 @@
                                 <button class="actionBtn numberBtn" onclick="modifyValue(-1, channelQuantity)">-</button>
                                 <label for="channelQuantity" id="channelQuantityValue" class="code">4</label>
                                 <button class="actionBtn numberBtn" onclick="modifyValue(1, channelQuantity)">+</button>
-                                <p class="infoText">► Defines the amount of available values in each channel</p>
                                 <p class="infoText" id="colorAmount">☞ There are 64 possible colors</p>
                                 <p class="infoText" id="colorCount" style="display: none; font-weight: bolder;">The generated image color palette contains 0 colors</p>
                             </div>
                         </div>
                     </div>
                     <div class="parameter">
-                        <div class="paramFamily">
-                            <label for="renderResolution">Render Resolution</label>
-                            <input type="range" id="renderResolution" class="slider" value="15" min="1" max="100">
-                            <button class="actionBtn numberBtn" onclick="modifyValue(-1, renderResolution)">-</button>
-                            <label for="renderResolution" id="renderResolutionValue" class="code">15</label>
-                            <button class="actionBtn numberBtn" onclick="modifyValue(1, renderResolution)">+</button>
-                            <p class="infoText">► Resolution percentage from the actual canvas. The less the value is, the more the shader will display a pixalated image. Big values may cause to not load the shader at all</p>
-                        </div>
+                        <label for="renderResolution">Render Resolution</label>
+                        <input type="range" id="renderResolution" class="slider" value="15" min="1" max="100">
+                        <button class="actionBtn numberBtn" onclick="modifyValue(-1, renderResolution)">-</button>
+                        <label for="renderResolution" id="renderResolutionValue" class="code">15</label>
+                        <button class="actionBtn numberBtn" onclick="modifyValue(1, renderResolution)">+</button>
                     </div>
                     <button id="previewButton" onclick="generateCode(true)">Preview Only</button>
                 </div>
@@ -202,7 +216,8 @@
                         <input class="numberBar" type="number" id="elementPosX" value="">
                         <label class="label-resize" id="elementPosYSlider" for="elem_posY">Pos Y</label>
                         <input class="numberBar" type="number" id="elementPosY" value="">
-                        <button class="actionBtn" id="horizontalAlign" onclick="actionBtn.alignHorizontal()"></button><button class="actionBtn" id="verticalAlign" onclick="actionBtn.alignVertical()"></button>
+                        <button class="actionBtn" id="horizontalAlign" onclick="actionBtn.alignHorizontal()"></button>
+                        <button class="actionBtn" id="verticalAlign" onclick="actionBtn.alignVertical()"></button>
                     </div>
                     <div class="parameter" style="display: none;">
                         <label for="elem_normalizeCoords">Normalize position in the final background</label>
@@ -213,7 +228,8 @@
                         <input class="numberBar" type="number" id="elementWidth" min="0" value="">
                         <label class="label-resize" id="elementHeightSlider" for="elem_height">Height</label>
                         <input class="numberBar" type="number" id="elementHeight" min="0" value="">
-                        <button class="actionBtn" id="horizontalExpand" onclick="actionBtn.expandHorizontal()"></button><button class="actionBtn" id="verticalExpand" onclick="actionBtn.expandVertical()"></button>
+                        <button class="actionBtn" id="horizontalExpand" onclick="actionBtn.expandHorizontal()"></button>
+                        <button class="actionBtn" id="verticalExpand" onclick="actionBtn.expandVertical()"></button>
                     </div>
                     <div class="parameter">
                         <label for="elem_linkSize">Link Size</label>
@@ -227,6 +243,7 @@
                 </div>
             </div>
         </div>
+
         <div class="generated" id="generated">
             <p id="warningText"><u>Warning:</u> Remember that your file has been changed.<br>Please regenerate to have your new version</p>
             <button id="downloadPack" onclick="DownlodPreparation()"><img src="assets/default/icon/download_white.png"> Download</button>
@@ -238,13 +255,12 @@
                     <p class="preventSelection infoShader" id="genCaseCount">Case Number:</p>
                 </div>
                 <pre><code class="glsl" id="generatedCode"></code></pre>
-                
                 <pre><code class="glsl" id="generatedCodeLogo"></code></pre>
-    
                 <pre><code class="glsl" id="generatedCodeBar"></code></pre>
             </div>
         </div>
     </div>
+
     <div id="sidebar">
         <button id="sidebarBtn" onclick="toggleSidebar()"></button>
         <div id="topDiv">
@@ -256,15 +272,27 @@
         </div>
         <div id="bottomDiv">
             <p class="infoText" id="credits">Thanks to Titruc, Maxboxx, fayer3 and the OneiricForge Team!</p>
-            <p class="copyright code">Made by <a class="copyright" href="https://github.com/Non0reo" target="_blank" rel="noreferrer noopener">Non0reo</a> with ❤️</p>
+            <p class="copyright code">
+                Made by <a class="copyright" href="https://github.com/Non0reo" target="_blank" rel="noreferrer noopener">Non0reo</a> with ❤️
+            </p>
             <div id="contact">
-                <a href="https://github.com/Non0reo" target="_blank" rel="noreferrer noopener"><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><path fill="currentColor" d="M12 2A10 10 0 0 0 2 12c0 4.42 2.87 8.17 6.84 9.5c.5.08.66-.23.66-.5v-1.69c-2.77.6-3.36-1.34-3.36-1.34c-.46-1.16-1.11-1.47-1.11-1.47c-.91-.62.07-.6.07-.6c1 .07 1.53 1.03 1.53 1.03c.87 1.52 2.34 1.07 2.91.83c.09-.65.35-1.09.63-1.34c-2.22-.25-4.55-1.11-4.55-4.92c0-1.11.38-2 1.03-2.71c-.1-.25-.45-1.29.1-2.64c0 0 .84-.27 2.75 1.02c.79-.22 1.65-.33 2.5-.33c.85 0 1.71.11 2.5.33c1.91-1.29 2.75-1.02 2.75-1.02c.55 1.35.2 2.39.1 2.64c.65.71 1.03 1.6 1.03 2.71c0 3.82-2.34 4.66-4.57 4.91c.36.31.69.92.69 1.85V21c0 .27.16.59.67.5C19.14 20.16 22 16.42 22 12A10 10 0 0 0 12 2Z"/></svg></a>
-                <a href="https://www.oneiricforge.com/" target="_blank" rel="noopener noreferrer"><img src="https://www.oneiricforge.com/assets/logo.png" alt="" width="32" height="32"></a>
-                <a href="https://discord.gg/GT2drck" target="_blank" rel="noreferrer noopener"><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><path fill="currentColor" d="M19.27 5.33C17.94 4.71 16.5 4.26 15 4a.09.09 0 0 0-.07.03c-.18.33-.39.76-.53 1.09a16.09 16.09 0 0 0-4.8 0c-.14-.34-.35-.76-.54-1.09c-.01-.02-.04-.03-.07-.03c-1.5.26-2.93.71-4.27 1.33c-.01 0-.02.01-.03.02c-2.72 4.07-3.47 8.03-3.1 11.95c0 .02.01.04.03.05c1.8 1.32 3.53 2.12 5.24 2.65c.03.01.06 0 .07-.02c.4-.55.76-1.13 1.07-1.74c.02-.04 0-.08-.04-.09c-.57-.22-1.11-.48-1.64-.78c-.04-.02-.04-.08-.01-.11c.11-.08.22-.17.33-.25c.02-.02.05-.02.07-.01c3.44 1.57 7.15 1.57 10.55 0c.02-.01.05-.01.07.01c.11.09.22.17.33.26c.04.03.04.09-.01.11c-.52.31-1.07.56-1.64.78c-.04.01-.05.06-.04.09c.32.61.68 1.19 1.07 1.74c.03.01.06.02.09.01c1.72-.53 3.45-1.33 5.25-2.65c.02-.01.03-.03.03-.05c.44-4.53-.73-8.46-3.1-11.95c-.01-.01-.02-.02-.04-.02zM8.52 14.91c-1.03 0-1.89-.95-1.89-2.12s.84-2.12 1.89-2.12c1.06 0 1.9.96 1.89 2.12c0 1.17-.84 2.12-1.89 2.12zm6.97 0c-1.03 0-1.89-.95-1.89-2.12s.84-2.12 1.89-2.12c1.06 0 1.9.96 1.89 2.12c0 1.17-.83 2.12-1.89 2.12z"/></svg></a>
+                <a href="https://github.com/Non0reo" target="_blank" rel="noreferrer noopener">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24">
+                        <path fill="currentColor" d="M12 2A10 10 0 0 0 2 12c0 4.42 2.87 8.17 6.84 9.5c.5.08.66-.23.66-.5v-1.69c-2.77.6-3.36-1.34-3.36-1.34c-.46-1.16-1.11-1.47-1.11-1.47c-.91-.62.07-.6.07-.6c1 .07 1.53 1.03 1.53 1.03c.87 1.52 2.34 1.07 2.91.83c.09-.65.35-1.09.63-1.34c-2.22-.25-4.55-1.11-4.55-4.92c0-1.11.38-2 1.03-2.71c-.1-.25-.45-1.29.1-2.64c0 0 .84-.27 2.75 1.02c.79-.22 1.65-.33 2.5-.33c.85 0 1.71.11 2.5.33c1.91-1.29 2.75-1.02 2.75-1.02c.55 1.35.2 2.39.1 2.64c.65.71 1.03 1.6 1.03 2.71c0 3.82-2.34 4.66-4.57 4.91c.36.31.69.92.69 1.85V21c0 .27.16.59.67.5C19.14 20.16 22 16.42 22 12A10 10 0 0 0 12 2Z"/>
+                    </svg>
+                </a>
+                <a href="https://www.oneiricforge.com/" target="_blank" rel="noopener noreferrer">
+                    <img src="https://www.oneiricforge.com/assets/logo.png" alt="" width="32" height="32">
+                </a>
+                <a href="https://discord.gg/GT2drck" target="_blank" rel="noreferrer noopener">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24">
+                        <path fill="currentColor" d="M19.27 5.33C17.94 4.71 16.5 4.26 15 4a.09.09 0 0 0-.07.03c-.18.33-.39.76-.53 1.09a16.09 16.09 0 0 0-4.8 0c-.14-.34-.35-.76-.54-1.09c-.01-.02-.04-.03-.07-.03c-1.5.26-2.93.71-4.27 1.33c-.01 0-.02.01-.03.02c-2.72 4.07-3.47 8.03-3.1 11.95c0 .02.01.04.03.05c1.8 1.32 3.53 2.12 5.24 2.65c.03.01.06 0 .07-.02c.4-.55.76-1.13 1.07-1.74c.02-.04 0-.08-.04-.09c-.57-.22-1.11-.48-1.64-.78c-.04-.02-.04-.08-.01-.11c.11-.08.22-.17.33-.25c.02-.02.05-.02.07-.01c3.44 1.57 7.15 1.57 10.55 0c.02-.01.05-.01.07.01c.11.09.22.17.33.26c.04.03.04.09-.01.11c-.52.31-1.07.56-1.64.78c-.04.01-.05.06-.04.09c.32.61.68 1.19 1.07 1.74c.03.01.06.02.09.01c1.72-.53 3.45-1.33 5.25-2.65c.02-.01.03-.03.03-.05c.44-4.53-.73-8.46-3.1-11.95c-.01-.01-.02-.02-.04-.02zM8.52 14.91c-1.03 0-1.89-.95-1.89-2.12s.84-2.12 1.89-2.12c1.06 0 1.9.96 1.89 2.12c0 1.17-.84 2.12-1.89 2.12zm6.97 0c-1.03 0-1.89-.95-1.89-2.12s.84-2.12 1.89-2.12c1.06 0 1.9.96 1.89 2.12c0 1.17-.83 2.12-1.89 2.12z"/>
+                    </svg>
+                </a>
             </div>
         </div>
     </div>
-    <!-- <script src="js/img_shader_algorithm.js"></script> -->
+
     <script src="js/img_parameters.js"></script>
     <script src="js/layout.js"></script>
     <script src="js/render_parameters.js"></script>
