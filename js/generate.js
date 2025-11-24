@@ -49,7 +49,7 @@ let lookupVersion = {
     63: "1.21.6",
     64: "1.21.7-1.21.8",
     69: "1.21.9-1.21.10",
-}
+};
 
 gameVersion.innerText = lookupVersion[packVersion.value];
 let SHADER_VERSION = 1;
@@ -407,7 +407,10 @@ function generateNumberFromSeed(seed) {
 }
 
 async function DownlodPreparation() {
-    if(generatedDataCache == {}) await generateCode();
+    // if cache is empty, generate first
+    if (Object.keys(generatedDataCache).length === 0) {
+        await generateCode();
+    }
     await DownloadPack(generatedDataCache);
 }
 
@@ -430,21 +433,26 @@ function download(data, filename, type) {
 }
 
 const DownloadPack = (shaderData) => {
+    // compatibility band for supported_formats
+    const minSupported = 15; // 1.20–1.20.1+
+    const maxSupported = 69; // up to 1.21.9–1.21.10
 
-    const packMcmeta = 
-`{
-    "pack": {
-        "pack_format": ${PACK_VERSION},
-        "description": "${PACK_DESCRIPTION}"
-    },
-    "supported_formats": {
-        "min_inclusive": 15,
-        "max_inclusive": 40
-    }
-}`;
+    const packMcmetaObj = {
+        pack: {
+            pack_format: PACK_VERSION,
+            description: PACK_DESCRIPTION,
+            supported_formats: {
+                min_inclusive: minSupported,
+                max_inclusive: maxSupported
+            }
+        }
+    };
 
-    zip = new JSZip();
-    zip.file("pack.mcmeta", packMcmeta.toString());
+    const packMcmeta = JSON.stringify(packMcmetaObj, null, 4);
+
+    let zip = new JSZip();
+    zip.file("pack.mcmeta", packMcmeta);
+
     let assets = zip.folder("assets");
     let minecraft = assets.folder("minecraft");
     let shaders = minecraft.folder("shaders");
@@ -478,7 +486,8 @@ const DownloadPack = (shaderData) => {
 
     zip.generateAsync({type:"blob"})
     .then(function(content) {
-        download(content, `${PACK_NAME}`, "application/zip");
+        const fileName = PACK_NAME.endsWith(".zip") ? PACK_NAME : `${PACK_NAME}.zip`;
+        download(content, fileName, "application/zip");
         window.focus();   
     });
 
