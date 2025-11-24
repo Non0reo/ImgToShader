@@ -104,7 +104,14 @@
                         <!-- <label for="packVersion">Pack Version</label> -->
                         <br>
                         <div style="display: flex; vertical-align: middle; align-items: center;">
-                            <input type="number" class="numberBar" id="packVersion" value="18" min="7" max="40">
+                            <!-- UPDATED: allow 1.21.x formats and default to 46 (1.21.4) -->
+                            <input
+                                type="number"
+                                class="numberBar"
+                                id="packVersion"
+                                value="46"
+                                min="7"
+                                max="69">
                             <p class="infoText" id="gameVersion" style="padding-top: 0.2em;"></p>
                         </div>
                     </div>
@@ -121,15 +128,6 @@
                 <input type="file" accept=".png, .jpg, .jpeg, .webp" id="BtnUploadImage" hidden oninput="loadImage(event)" onclick="this.value=null;"/>
                 <label class="imgUpload" for="BtnUploadImage" id="uploadImage">Upload Background Image</label>
                 <div id="imageList">
-                    <!-- <div class="addedImgBox">
-                        <span class="moveButton">
-                            <button class="upButton" onclick="changeImageStackPostion(event)"><img src="assets/default/icon/expand_less.png"></button>
-                            <button class="downButton" onclick="changeImageStackPostion(event)"><img src="assets/default/icon/expand_more.png"></button>
-                        </span>
-                        <img class="addedImg" src="assets/default/Banner.png">
-                        <input type="checkbox" class="IsVisible" checked="true">
-                        <button class="removeImg" onclick="removeImg(event)"><img src="assets/default/icon/delete.png"></button>
-                    </div> -->
                 </div>
             </div>
     
@@ -248,14 +246,13 @@
         </div>
     </div>
     <div id="sidebar">
-        <button id="sidebarBtn" onclick="toggleSidebar()"><!-- <img src="https://api.iconify.design/ci:hamburger-md.svg" width="32" height="32"> --></button>
+        <button id="sidebarBtn" onclick="toggleSidebar()"></button>
         <div id="topDiv">
             <h1 class="rainbow">ImgToShader</h1>
         </div>
         <div id="actions">
             <a href="https://github.com/Non0reo/ImgToShader/wiki">→ Project Wiki</a>
             <a href="https://github.com/Non0reo/ImgToShader/issues">→ Any Issue/Feedback?</a>
-            <!-- <a href="#">Doc</a> -->
         </div>
         <div id="bottomDiv">
             <p class="infoText" id="credits">Thanks to Titruc, Maxboxx, fayer3 and the OneiricForge Team!</p>
